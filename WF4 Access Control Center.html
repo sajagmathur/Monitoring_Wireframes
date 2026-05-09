@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WF4 v2.0 — Access Control Center (Admin)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#eef1f5;color:#1e293b;line-height:1.5}
+.nav-bar{background:#1f2937;color:#fff;padding:9px 14px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;position:sticky;top:0;z-index:1000;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.nav-bar h1{font-size:11px;font-weight:700;margin-right:6px;white-space:nowrap}
+.nb{background:#374151;color:#fff;border:1px solid #4b5563;padding:3px 8px;cursor:pointer;font-size:10px;border-radius:3px;white-space:nowrap}
+.nb:hover{background:#4b5563}.nb.on{background:#2563eb;border-color:#2563eb}
+.screen{display:none;min-height:calc(100vh - 44px);padding:12px}
+.screen.on{display:block}
+.slabel{background:#fbbf24;color:#78350f;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.shell{display:flex;flex-direction:column;min-height:calc(100vh - 80px);background:#fff;border:2px dashed #94a3b8;border-radius:8px;overflow:hidden;max-width:1500px;margin:0 auto}
+.aph{background:#1e3a8a;color:#fff;padding:9px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:7px}
+.apb{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13px}
+.apl{width:26px;height:26px;background:#fff;color:#1e3a8a;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.aphr{display:flex;align-items:center;gap:12px;font-size:12px}
+.rp{background:#fbbf24;color:#78350f;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.nw{position:relative;cursor:pointer}
+.nb2{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:8px;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.up{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);padding:3px 9px;border-radius:20px}
+.ua{width:20px;height:20px;background:#fbbf24;color:#78350f;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.ib2{background:transparent;border:none;color:#fff;cursor:pointer;font-size:13px}
+.ab{display:flex;flex:1}
+.ln{width:215px;background:#f8fafc;border-right:1px solid #e2e8f0;padding:14px 9px;flex-shrink:0}
+.lnt{font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;letter-spacing:.5px;margin-bottom:9px;padding:0 5px}
+.tni{display:flex;align-items:center;gap:9px;padding:9px;border:1px dashed #cbd5e1;border-radius:5px;margin-bottom:5px;cursor:pointer;background:#fff}
+.tni:hover{border-color:#2563eb;border-style:solid;background:#eff6ff}
+.tni.on{background:#dbeafe;border-color:#2563eb;border-style:solid}
+.tio{width:26px;height:26px;background:#dbeafe;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.tit{flex:1;min-width:0}.tit-t{font-size:11px;font-weight:600;color:#1e293b}.tit-s{font-size:9px;color:#64748b}
+.tib{background:#ef4444;color:#fff;font-size:8px;font-weight:700;padding:2px 5px;border-radius:9px;flex-shrink:0}
+.mc{flex:1;padding:18px;background:#f1f5f9;overflow-y:auto}
+.bc{font-size:10px;color:#64748b;margin-bottom:7px}.bc a{color:#2563eb;cursor:pointer;text-decoration:none}
+.pgt{font-size:19px;color:#1e293b;margin-bottom:3px}.pgs{font-size:11px;color:#64748b;margin-bottom:14px}
+/* KPI */
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-bottom:14px}
+.kc{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;padding:12px}
+.kl{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kv{font-size:24px;font-weight:700;color:#1e293b}.ks{font-size:10px;color:#64748b;margin-top:2px}
+.kc.w .kv{color:#d97706}.kc.d .kv{color:#dc2626}.kc.p .kv{color:#2563eb}.kc.s .kv{color:#16a34a}
+/* Sub-section tiles */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:14px}
+.sc{background:#fff;border:1px dashed #cbd5e1;border-radius:8px;overflow:hidden;cursor:pointer}
+.sc:hover{border-color:#2563eb;border-style:solid;box-shadow:0 3px 10px rgba(37,99,235,.12)}
+.sch{padding:14px 15px 10px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px dashed #e2e8f0}
+.sct{font-size:14px;font-weight:700;color:#1e293b}.scs{font-size:11px;color:#64748b;margin-top:2px}
+.scb2{border-radius:10px;padding:3px 9px;font-size:11px;font-weight:700;background:#fef3c7;color:#92400e;flex-shrink:0;margin-left:8px}
+.scb2.z{background:#dcfce7;color:#166534}
+.scbody{padding:10px 15px;font-size:11px;color:#475569;line-height:1.5}
+.sca{display:block;padding:8px 15px;background:#eff6ff;color:#2563eb;font-size:11px;font-weight:600;text-align:center;border-top:1px dashed #e2e8f0}
+/* Toolbar */
+.tb{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;padding:9px 11px;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.tbl{display:flex;gap:7px;flex-wrap:wrap;align-items:center;flex:1}
+.tbr{display:flex;gap:7px}
+.sb3{position:relative;flex:1;min-width:160px;max-width:260px}
+.sb3 input{width:100%;padding:5px 9px 5px 24px;border:1px dashed #94a3b8;border-radius:4px;font-size:11px}
+.sb3::before{content:'🔍';position:absolute;left:6px;top:4px;font-size:10px;opacity:.6}
+.fc{background:#fff;border:1px dashed #94a3b8;padding:4px 8px;border-radius:4px;font-size:10px;cursor:pointer}
+.fc.on{background:#dbeafe;border-color:#2563eb;color:#1e3a8a;font-weight:600}
+.tg{display:flex;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;overflow:hidden}
+.tgb{padding:4px 10px;background:transparent;border:none;cursor:pointer;font-size:10px;color:#64748b;white-space:nowrap}
+.tgb.on{background:#1e3a8a;color:#fff;font-weight:600}
+/* Buttons */
+.btn{background:#fff;border:1px solid #cbd5e1;padding:5px 11px;border-radius:4px;cursor:pointer;font-size:11px;color:#1e293b;display:inline-flex;align-items:center;gap:4px}
+.btn:hover{background:#f1f5f9}
+.btn-p{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:600}.btn-p:hover{background:#1e3a8a}
+.btn-s{background:#16a34a;color:#fff;border-color:#16a34a;font-weight:600}
+.btn-d{color:#dc2626;border-color:#fca5a5}.btn-d:hover{background:#fef2f2}
+.btn-w{background:#f59e0b;color:#fff;border-color:#f59e0b;font-weight:600}
+/* Table */
+.dtw{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;overflow:auto;margin-bottom:10px}
+.dt{width:100%;border-collapse:collapse;font-size:11px;min-width:600px}
+.dt th{background:#f8fafc;padding:8px 7px;text-align:left;font-weight:600;color:#475569;border-bottom:1px solid #e2e8f0;font-size:9px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.dt td{padding:8px 7px;border-bottom:1px dashed #e2e8f0;vertical-align:middle}
+.dt tbody tr:hover{background:#f8fafc;cursor:pointer}
+.ra{display:flex;gap:4px}
+.ia{background:transparent;border:1px dashed #cbd5e1;width:24px;height:24px;border-radius:3px;cursor:pointer;font-size:10px;display:inline-flex;align-items:center;justify-content:center}
+.ia:hover{background:#eff6ff;border-color:#2563eb}
+.ia.d:hover{background:#fef2f2;border-color:#dc2626;color:#dc2626}
+/* Pills */
+.pill{display:inline-block;padding:2px 7px;border-radius:9px;font-size:9px;font-weight:600}
+.p-pend{background:#fef3c7;color:#78350f}.p-appr{background:#dcfce7;color:#166534}
+.p-rej{background:#fee2e2;color:#991b1b}.p-act{background:#dbeafe;color:#1e3a8a}
+.p-deact{background:#f1f5f9;color:#64748b}.p-ext{background:#e0e7ff;color:#3730a3}
+.p-usr{background:#d1fae5;color:#065f46}.p-adm{background:#fef3c7;color:#92400e}
+.p-exp{background:#fee2e2;color:#991b1b}.p-lock{background:#fde68a;color:#78350f}
+/* Panel */
+.panel{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;margin-bottom:10px}
+.ph{padding:10px 14px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+.pt{font-size:12px;font-weight:700;color:#1e293b}.pb3{padding:12px 14px}
+/* Form */
+.fs{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;padding:14px;margin-bottom:10px}
+.fst{font-size:10px;font-weight:700;color:#1e3a8a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:10px}
+.fgrp{display:flex;flex-direction:column}
+.fgrp label{font-size:10px;font-weight:600;color:#475569;margin-bottom:3px}
+.req{color:#dc2626}
+.fgrp input,.fgrp select,.fgrp textarea{padding:6px 9px;border:1px dashed #94a3b8;border-radius:4px;font-size:11px;font-family:inherit;background:#fff}
+.fgrp textarea{resize:vertical;min-height:60px}
+.help{font-size:9px;color:#94a3b8;margin-top:2px}
+.fa{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}
+/* Detail */
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.dl{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.dv{font-size:12px;color:#1e293b}
+/* Banners */
+.ib3{background:#dbeafe;border-left:3px solid #2563eb;padding:8px 11px;border-radius:4px;font-size:11px;color:#1e3a8a;margin-bottom:10px}
+.wb{background:#fef3c7;border-left:3px solid #f59e0b;padding:8px 11px;border-radius:4px;font-size:11px;color:#78350f;margin-bottom:10px}
+.sb4{background:#dcfce7;border-left:3px solid #16a34a;padding:8px 11px;border-radius:4px;font-size:11px;color:#166534;margin-bottom:10px}
+.db2{background:#fee2e2;border-left:3px solid #dc2626;padding:8px 11px;border-radius:4px;font-size:11px;color:#991b1b;margin-bottom:10px}
+/* Pagination */
+.pag{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#fff;border:1px dashed #cbd5e1;border-radius:7px;font-size:11px;color:#64748b}
+.pc{display:flex;gap:3px}
+.pb4{background:transparent;border:1px solid #e2e8f0;padding:2px 7px;border-radius:3px;cursor:pointer;font-size:10px}
+.pb4.on{background:#2563eb;color:#fff;border-color:#2563eb}
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(15,23,42,.6);display:flex;align-items:center;justify-content:center;z-index:999;padding:18px}
+.mb{background:#fff;border:2px dashed #94a3b8;border-radius:8px;padding:20px;max-width:520px;width:100%}
+.mir{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.mico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.mico.w{background:#fef3c7;color:#b45309}.mico.d{background:#fee2e2;color:#dc2626}
+.mb h3{font-size:14px;color:#1e293b;margin:0}
+.mb p{font-size:11px;color:#475569;margin-bottom:9px}
+.mi{background:#f8fafc;border:1px dashed #cbd5e1;padding:9px 11px;border-radius:4px;font-size:11px;margin-bottom:10px;line-height:1.7}
+.ma{display:flex;gap:7px;justify-content:flex-end;margin-top:12px}
+/* Scope box */
+.scbx{border:1px dashed #cbd5e1;border-radius:5px;overflow:hidden;margin-top:7px}
+.scbxh{background:#f8fafc;padding:6px 10px;font-size:10px;font-weight:600;color:#475569;border-bottom:1px dashed #e2e8f0;display:flex;justify-content:space-between}
+.scbi{display:flex;align-items:center;gap:9px;padding:7px 10px;border-bottom:1px dashed #e2e8f0;font-size:11px}
+.scbi:last-child{border-bottom:none}.scbi.sel{background:#eff6ff}
+.scbn{flex:1}.scbm{font-size:9px;color:#64748b}
+/* Lock indicator */
+.lock-bar{background:#fde68a;border:1px dashed #f59e0b;border-radius:4px;padding:7px 11px;font-size:11px;color:#78350f;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+/* Step bar */
+.stepbar{display:flex;background:#fff;border:1px dashed #cbd5e1;border-radius:5px;padding:9px;margin-bottom:12px}
+.st{flex:1;text-align:center;font-size:10px;color:#94a3b8;padding:3px}
+.st.on{color:#2563eb;font-weight:600}.st.dn{color:#16a34a}
+.stn{width:20px;height:20px;border-radius:50%;background:#e2e8f0;color:#94a3b8;display:inline-flex;align-items:center;justify-content:center;font-weight:700;margin-bottom:2px;font-size:10px}
+.st.on .stn{background:#2563eb;color:#fff}.st.dn .stn{background:#16a34a;color:#fff}
+/* Notif panel */
+.notif-panel{position:fixed;top:44px;right:0;width:360px;height:calc(100vh - 44px);background:#fff;border-left:2px dashed #94a3b8;z-index:998;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,.15)}
+.np-header{background:#1e3a8a;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.np-header h3{font-size:13px;font-weight:700}
+.np-item{padding:11px 14px;border-bottom:1px dashed #e2e8f0;cursor:pointer}
+.np-item:hover{background:#f8fafc}
+.np-item.unread{border-left:3px solid #2563eb;background:#f0f7ff}
+.np-item.unread:hover{background:#dbeafe}
+.np-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.np-row{display:flex;gap:9px;align-items:flex-start}
+.np-text{flex:1}.np-title{font-size:11px;font-weight:600;color:#1e293b}.np-meta{font-size:10px;color:#64748b;margin-top:2px}
+.np-time{font-size:9px;color:#94a3b8;white-space:nowrap}
+/* Ann */
+.ann{background:#fef9c3;border-left:3px solid #ca8a04;padding:9px 12px;margin:10px auto;font-size:10px;color:#713f12;border-radius:3px;max-width:1500px}
+.ann strong{color:#422006}
+@media(max-width:768px){.ab{flex-direction:column}.ln{width:100%;border-right:none;border-bottom:1px solid #e2e8f0}}
+</style>
+</head>
+<body>
+<div class="nav-bar">
+  <h1>📐 WF4 v2.0</h1>
+  <button class="nb on" onclick="S('s1',this)">1. ACC Home</button>
+  <button class="nb" onclick="S('s2',this)">2. Configure Roles</button>
+  <button class="nb" onclick="S('s3',this)">3. Ext. Request Detail</button>
+  <button class="nb" onclick="S('s4',this)">4. Provision User</button>
+  <button class="nb" onclick="S('s5',this)">5. Provision Admin</button>
+  <button class="nb" onclick="S('s6',this)">6. Provision External</button>
+  <button class="nb" onclick="S('s7',this)">7. Model Access Requests</button>
+  <button class="nb" onclick="S('s8',this)">8. Data Deletion Requests</button>
+  <button class="nb" onclick="S('s9',this)">9. Manage Model Access</button>
+  <button class="nb" onclick="S('s10',this)">10. User Directory</button>
+  <button class="nb" onclick="S('s11',this)">11. User Profile</button>
+  <button class="nb" onclick="S('s12',this)">12. Deactivation</button>
+  <button class="nb" onclick="S('s13',this)">13. Notifications</button>
+  <button class="nb" onclick="S('s14',this)">14. Expiry Renewals</button>
+</div>
+
+<!-- ══ S1: ACC HOMEPAGE ══ -->
+<div id="s1" class="screen on">
+  <span class="slabel">Screen 1 — ACC Homepage (4 Sub-Sections)</span>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div>
+      <div class="aphr">
+        <div class="rp">👤 ADMIN</div>
+        <div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div>
+        <div class="up"><div class="ua">JD</div><span>John Doe</span></div>
+        <button class="ib2">⏻</button>
+      </div>
+    </div>
+    <div class="ab">
+      <div class="ln" id="ln1"></div>
+      <div class="mc">
+        <div class="bc">Admin › Access Control Center</div>
+        <h2 class="pgt">Access Control Center</h2>
+        <p class="pgs">Govern platform access, process requests, and manage model assignments</p>
+        <div class="kg">
+          <div class="kc p"><div class="kl">Active Users</div><div class="kv">34</div><div class="ks">User role</div></div>
+          <div class="kc s"><div class="kl">Active Externals</div><div class="kv">18</div><div class="ks">Read-only accounts</div></div>
+          <div class="kc"><div class="kl">Admins</div><div class="kv">4</div></div>
+          <div class="kc d"><div class="kl">Pending Requests</div><div class="kv">9</div><div class="ks">Across all queues</div></div>
+          <div class="kc w"><div class="kl">Expiring ≤ 30d</div><div class="kv">5</div><div class="ks">Access renewals</div></div>
+        </div>
+        <!-- 4 sub-section tiles -->
+        <div class="sg">
+          <div class="sc" onclick="S('s2',null)">
+            <div class="sch">
+              <div><div class="sct">⚙️ Configure Roles</div><div class="scs">Provision Admins, Users &amp; Externals</div></div>
+              <span class="scb2">4 Pending</span>
+            </div>
+            <div class="scbody">Review External access requests; provision new User, Admin, and External accounts. Admin provisioning requires dual-Admin authorisation.</div>
+            <span class="sca">Open →</span>
+          </div>
+          <div class="sc" onclick="S('s7',null)">
+            <div class="sch">
+              <div><div class="sct">📥 Requests</div><div class="scs">Model access &amp; data deletion requests</div></div>
+              <span class="scb2">5 Pending</span>
+            </div>
+            <div class="scbody">Model access requests from Users/Externals (approval updates Assigned Users on model record). Data deletion requests raised by Users for Admin-actioned archival.</div>
+            <span class="sca">Open →</span>
+          </div>
+          <div class="sc" onclick="S('s9',null)">
+            <div class="sch">
+              <div><div class="sct">🔗 Manage Model Access</div><div class="scs">Per-model assignments &amp; locking</div></div>
+              <span class="scb2 z">No Action</span>
+            </div>
+            <div class="scbody">Assign/remove Users and Externals to specific models. View active section locks. Force-release locks. Supports multiple users per model with section-level concurrency control.</div>
+            <span class="sca">Open →</span>
+          </div>
+          <div class="sc" onclick="S('s11',null)">
+            <div class="sch">
+              <div><div class="sct">🚫 User Deactivation &amp; Roles</div><div class="scs">Account lifecycle &amp; expiry</div></div>
+              <span class="scb2">5 Expiring</span>
+            </div>
+            <div class="scbody">Deactivate accounts, revoke roles, reassign model ownership, and manage access expiry renewals. Full session invalidation on deactivation.</div>
+            <span class="sca">Open →</span>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="pt">Quick Actions</span></div>
+          <div class="pb3" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-p" onclick="S('s4',null)">＋ Provision User</button>
+            <button class="btn btn-w" onclick="S('s5',null)">＋ Provision Admin</button>
+            <button class="btn" onclick="S('s6',null)">＋ Provision External</button>
+            <button class="btn" onclick="S('s10',null)">👥 User Directory</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-HOME-001 to 007):</strong> Four sub-section tiles replace the previous queue-card layout. Each tile badge shows live pending counts (WebSocket/polling ≤5s). Notification bell (top right) shows total unread count (12) — clicking opens Notifications Centre (Screen 13). Quick Actions allow direct provisioning without navigating into a sub-section (WF4-HOME-007).</div>
+</div>
+
+<!-- ══ S2: CONFIGURE ROLES ══ -->
+<div id="s2" class="screen">
+  <span class="slabel">Screen 2 — Configure Roles Sub-Section</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln2"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">Access Control Center</a> › Configure Roles</div>
+        <h2 class="pgt">Configure Roles</h2>
+        <p class="pgs">Approve External access requests; provision new Users, Admins, and Externals</p>
+        <div class="sg">
+          <div class="sc" onclick="S('s3',null)" style="cursor:pointer;">
+            <div class="sch"><div class="sct">🙋 External Access Requests</div><span class="scb2">3 Pending</span></div>
+            <div class="scbody">Self-service requests from External stakeholders (submitted via pre-login form). Review justification, stakeholder type, set model scope and optional expiry.</div>
+            <span class="sca">Review Queue →</span>
+          </div>
+          <div class="sc" style="cursor:pointer;" onclick="S('s5',null)">
+            <div class="sch"><div class="sct">🔐 Admin Provisioning</div><span class="scb2">1 Awaiting 2nd Admin</span></div>
+            <div class="scbody">Create new Admin accounts. Dual-Admin authorisation required — the submitting Admin cannot approve their own request.</div>
+            <span class="sca">Review →</span>
+          </div>
+        </div>
+        <div class="tb">
+          <div class="tbl">
+            <button class="btn btn-p" onclick="S('s4',null)">＋ Provision New User</button>
+            <button class="btn btn-w" onclick="S('s5',null)">＋ Provision New Admin</button>
+            <button class="btn" onclick="S('s6',null)">＋ Provision New External</button>
+          </div>
+        </div>
+        <!-- External request queue -->
+        <div class="dtw">
+          <table class="dt">
+            <thead><tr><th>Name</th><th>Email / ID</th><th>Department</th><th>Stakeholder Type</th><th>Submitted</th><th>Days Pending</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr onclick="S('s3',null)"><td><strong>Sarah Mitchell</strong></td><td>s.mitchell@co.com</td><td>Internal Audit</td><td><span class="pill p-pend">Auditor</span></td><td>2026-05-07</td><td style="color:#d97706;font-weight:600;">2</td><td><span class="pill p-pend">Pending</span></td><td onclick="ev()"><div class="ra"><button class="ia" onclick="S('s3',null)">👁</button></div></td></tr>
+              <tr onclick="S('s3',null)"><td><strong>Raj Kumar</strong></td><td>r.kumar@co.com</td><td>Risk Management</td><td><span class="pill p-pend">Risk Reviewer</span></td><td>2026-05-06</td><td style="color:#d97706;font-weight:600;">3</td><td><span class="pill p-pend">Pending</span></td><td onclick="ev()"><div class="ra"><button class="ia">👁</button></div></td></tr>
+              <tr onclick="S('s3',null)"><td><strong>Emma Chen</strong></td><td>e.chen@co.com</td><td>Compliance</td><td><span class="pill p-pend">Gov. Reviewer</span></td><td>2026-05-05</td><td style="color:#dc2626;font-weight:600;">4</td><td><span class="pill p-pend">Pending</span></td><td onclick="ev()"><div class="ra"><button class="ia">👁</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pag"><div>Showing <strong>1–3</strong> of <strong>3</strong> pending External requests</div><div class="pc"><button class="pb4 on">1</button></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-EXT-001 to 013, WF4-HOME-005):</strong> Configure Roles sub-section shows External request queue + Admin provisioning pending card. Days Pending colour-escalates (orange ≥2, red ≥4). Duplicate corporate IDs flagged. 'Viewer' label is replaced by 'External' in all UI text throughout the platform per v2.0 rename.</div>
+</div>
+
+<!-- ══ S3: EXT REQUEST DETAIL ══ -->
+<div id="s3" class="screen">
+  <span class="slabel">Screen 3 — External Request Detail &amp; Approval</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln3"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › <a onclick="S('s2',null)">Configure Roles</a> › External Request Detail</div>
+        <h2 class="pgt">External Access Request — Detail</h2>
+        <p class="pgs">Review all submitted details before approving or rejecting</p>
+        <div class="fs">
+          <div class="fst">Submitted Request Details</div>
+          <div class="dg">
+            <div><div class="dl">Full Name</div><div class="dv"><strong>Sarah Mitchell</strong></div></div>
+            <div><div class="dl">Corporate Email / ID</div><div class="dv">s.mitchell@company.com</div></div>
+            <div><div class="dl">Department / BU</div><div class="dv">Internal Audit</div></div>
+            <div><div class="dl">Stakeholder Type</div><div class="dv"><span class="pill p-pend">Auditor</span></div></div>
+            <div><div class="dl">Submitted</div><div class="dv">2026-05-07 09:14 UTC</div></div>
+            <div><div class="dl">Source IP</div><div class="dv">192.168.1.44</div></div>
+            <div><div class="dl">Browser / OS</div><div class="dv">Chrome 124 / Windows 11</div></div>
+            <div><div class="dl">Days Pending</div><div class="dv" style="color:#d97706;font-weight:600;">2 days</div></div>
+          </div>
+          <div style="margin-top:12px;"><div class="dl">Business Justification</div>
+          <div style="background:#f8fafc;border:1px dashed #cbd5e1;padding:9px;border-radius:4px;font-size:11px;margin-top:3px;line-height:1.6;">Annual model risk review FY2026. Need read-only dashboard and trigger hit report access for credit model portfolio audit substantiation. Required May–September 2026.</div></div>
+        </div>
+        <div class="fs">
+          <div class="fst">Access Scope &amp; Expiry (configure before approving)</div>
+          <div class="ib3">ℹ️ External role = read-only. Set model scope and optional expiry date before approving. Default scope: All Active Models.</div>
+          <div class="fg">
+            <div class="fgrp"><label>Access Scope <span class="req">*</span></label>
+              <select><option>All Active Models (default)</option><option>Restrict by Category / Domain / Product</option><option>Specific Model IDs only</option></select></div>
+            <div class="fgrp"><label>Access Expiry (optional)</label><input type="date" value="2026-09-30"><div class="help">Warning sent 7 days before expiry and on expiry day.</div></div>
+          </div>
+          <div class="fgrp" style="margin-top:10px;"><label>Internal Admin Comment (not sent to requester)</label><textarea placeholder="Optional — visible to other Admins only…"></textarea></div>
+        </div>
+        <div class="fs">
+          <div class="fst">Rejection Reason (if rejecting)</div>
+          <div class="fgrp"><label>Rejection Reason <span class="req">*</span> (min 10 chars)</label><textarea placeholder="Explain reason for rejection…"></textarea></div>
+        </div>
+        <div class="fa" style="justify-content:space-between;">
+          <button class="btn" onclick="S('s2',null)">← Back</button>
+          <div style="display:flex;gap:7px;">
+            <button class="btn btn-d">✕ Reject</button>
+            <button class="btn btn-s">✓ Approve &amp; Activate External Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-EXT-004 to 010):</strong> On Approve: External account created, model scope assigned, welcome email + in-platform notification sent, audit log written. On Reject: rejection email + in-platform notification with reason sent. Internal comments Admin-only. Role label is 'External' throughout — not 'Viewer'.</div>
+</div>
+
+<!-- ══ S4: PROVISION USER ══ -->
+<div id="s4" class="screen">
+  <span class="slabel">Screen 4 — Provision New User</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln4"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › <a onclick="S('s2',null)">Configure Roles</a> › Provision New User</div>
+        <h2 class="pgt">Provision New User</h2>
+        <p class="pgs">User accounts are Admin-provisioned only — not self-service</p>
+        <div class="fs">
+          <div class="fst">1. Identity &amp; Role</div>
+          <div class="fg">
+            <div class="fgrp"><label>Full Name <span class="req">*</span></label><input type="text" placeholder="e.g., James Okafor"></div>
+            <div class="fgrp"><label>Corporate Email / ID <span class="req">*</span></label><input type="text" placeholder="j.okafor@company.com"><div class="help">Validated against corporate domain; must be unique across all accounts.</div></div>
+            <div class="fgrp"><label>Department / BU <span class="req">*</span></label><input type="text" placeholder="e.g., Credit Risk Analytics"></div>
+            <div class="fgrp"><label>Job Title</label><input type="text" placeholder="e.g., Senior Model Risk Analyst"></div>
+            <div class="fgrp"><label>Manager / Sponsor</label><input type="text" placeholder="Authorising manager name"></div>
+            <div class="fgrp"><label>Role <span class="req">*</span></label><select><option>User</option></select><div class="help">User role only. Use Provision New Admin for Admin accounts.</div></div>
+            <div class="fgrp"><label>Access Expiry (optional)</label><input type="date"><div class="help">Warning sent 7 days before expiry.</div></div>
+          </div>
+        </div>
+        <div class="fs">
+          <div class="fst">2. Model Access Scope <span class="req">*</span></div>
+          <div class="ib3">ℹ️ Users access only selected models. Assigned Users field on each model record updates on save. Users can raise Model Access Requests to expand scope later.</div>
+          <div class="sb3" style="margin-bottom:9px;max-width:270px;"><input type="text" placeholder="Search Model ID, Name, Domain…"></div>
+          <div class="scbx">
+            <div class="scbxh"><span>Active Inventory (142 models)</span><span style="color:#2563eb;cursor:pointer;font-size:10px;">Select All | Clear All</span></div>
+            <div class="scbi sel"><input type="checkbox" checked><span class="scbn"><strong>MDL-001</strong> — Credit Risk PD v2.3</span><span class="scbm">NA / Credit / Cards · Monthly · <span class="pill p-act" style="font-size:8px;">Active</span></span></div>
+            <div class="scbi sel"><input type="checkbox" checked><span class="scbn"><strong>MDL-002</strong> — Mortgage LGD Model</span><span class="scbm">EMEA / Credit / Mortgage · Quarterly · <span class="pill p-act" style="font-size:8px;">Active</span></span></div>
+            <div class="scbi"><input type="checkbox"><span class="scbn"><strong>MDL-003</strong> — Auto Loan Default Pred</span><span class="scbm">APAC / Credit / Auto · Monthly</span></div>
+            <div class="scbi"><input type="checkbox"><span class="scbn"><strong>MDL-004</strong> — Cards Fraud Score</span><span class="scbm">NA / Credit / Cards · Daily</span></div>
+            <div style="padding:7px 10px;font-size:10px;color:#64748b;border-top:1px dashed #e2e8f0;">… 138 more. Use search to filter. <strong>2 selected.</strong></div>
+          </div>
+        </div>
+        <div class="fs">
+          <div class="fst">3. Submission Summary</div>
+          <div class="dg">
+            <div><div class="dl">User</div><div class="dv">James Okafor — j.okafor@company.com</div></div>
+            <div><div class="dl">Role</div><div class="dv"><span class="pill p-usr">User</span></div></div>
+            <div><div class="dl">Models Assigned</div><div class="dv" style="color:#2563eb;font-weight:600;">2 models — Assigned Users field will be updated on each</div></div>
+            <div><div class="dl">Access Expiry</div><div class="dv">None</div></div>
+          </div>
+        </div>
+        <div class="fa">
+          <button class="btn">💾 Save Draft</button>
+          <button class="btn" onclick="S('s1',null)">Cancel</button>
+          <button class="btn btn-p">＋ Provision &amp; Send Welcome Notification</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-USR-001 to 009):</strong> Summary explicitly states "Assigned Users field will be updated" on each selected model record (WF4-USR-005 write-back). On submit: account created, WF2 write-back executed transactionally, welcome email + in-platform notification sent. Draft saved session-cached (WF4-USR-009).</div>
+</div>
+
+<!-- ══ S5: PROVISION ADMIN ══ -->
+<div id="s5" class="screen">
+  <span class="slabel">Screen 5 — Provision New Admin (Dual-Admin Auth)</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln5"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › <a onclick="S('s2',null)">Configure Roles</a> › Provision New Admin</div>
+        <h2 class="pgt">Provision New Admin</h2>
+        <p class="pgs">Requires dual-Admin authorisation — a second independent Admin must approve before activation</p>
+        <div class="stepbar">
+          <div class="st on"><div class="stn">1</div><br>Submit Request</div>
+          <div class="st"><div class="stn">2</div><br>Awaiting 2nd Admin</div>
+          <div class="st"><div class="stn">3</div><br>Account Activated</div>
+        </div>
+        <div class="wb">⚠️ <strong>Dual-Admin Authorisation Required.</strong> The submitting Admin cannot approve their own request (server-side enforced). All other active Admins are notified. Request times out in 5 business days.</div>
+        <div class="fs">
+          <div class="fst">New Admin Identity</div>
+          <div class="fg">
+            <div class="fgrp"><label>Full Name <span class="req">*</span></label><input type="text" placeholder="e.g., Priya Nair"></div>
+            <div class="fgrp"><label>Corporate Email / ID <span class="req">*</span></label><input type="text" placeholder="p.nair@company.com"></div>
+            <div class="fgrp"><label>Department / BU <span class="req">*</span></label><input type="text" placeholder="e.g., ML Platform Team"></div>
+            <div class="fgrp"><label>Job Title</label><input type="text" placeholder="e.g., ML Platform Lead"></div>
+            <div class="fgrp"><label>Role</label><input value="Admin (Full Platform Access)" readonly style="background:#f1f5f9;padding:6px 9px;border:1px dashed #94a3b8;border-radius:4px;font-size:11px;"></div>
+            <div class="fgrp"><label>Business Justification <span class="req">*</span></label><textarea placeholder="Why does this person require Admin-level access?"></textarea></div>
+          </div>
+        </div>
+        <!-- Pending state example -->
+        <div class="fs" style="border-color:#f59e0b;">
+          <div class="fst" style="color:#b45309;">⏳ Example: Pending 2nd Admin Approval State</div>
+          <div class="wb">Request for <strong>Priya Nair</strong> submitted. Awaiting second Admin approval. Notified: Jane Smith, Carlos Mendez, Li Wei. Times out: 2026-05-15 10:22 UTC.</div>
+          <div class="dg">
+            <div><div class="dl">Submitted By</div><div class="dv">John Doe (Admin)</div></div>
+            <div><div class="dl">Status</div><div class="dv"><span class="pill p-pend">Awaiting 2nd Admin</span></div></div>
+            <div><div class="dl">Timeout</div><div class="dv">2026-05-15 (5 business days)</div></div>
+          </div>
+        </div>
+        <div class="fa"><button class="btn" onclick="S('s1',null)">Cancel</button><button class="btn btn-w">Submit Admin Provisioning Request →</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-ADM-001 to 008):</strong> 3-step flow. Submitting Admin cannot self-approve (server-side, WF4-ADM-004). "Pending 2nd Admin" example shows post-submit state. Timeout 5 business days (WF4-ADM-008, configurable). Auth model configurable per WF4-ADM-005.</div>
+</div>
+
+<!-- ══ S6: PROVISION EXTERNAL ══ -->
+<div id="s6" class="screen">
+  <span class="slabel">Screen 6 — Provision New External</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln6"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › <a onclick="S('s2',null)">Configure Roles</a> › Provision New External</div>
+        <h2 class="pgt">Provision New External</h2>
+        <p class="pgs">Directly provision an External (read-only) account. External accounts can also be created via self-service request (Configure Roles &gt; External Access Requests).</p>
+        <div class="fs">
+          <div class="fst">Identity &amp; Role</div>
+          <div class="fg">
+            <div class="fgrp"><label>Full Name <span class="req">*</span></label><input type="text" placeholder="e.g., Ana Torres"></div>
+            <div class="fgrp"><label>Corporate or External Email / ID <span class="req">*</span></label><input type="text" placeholder="a.torres@external.org"><div class="help">External (non-corporate) email domains accepted. Domain validation advisory only. ⚠️ Non-corporate domains may have higher email delivery failure rate.</div></div>
+            <div class="fgrp"><label>Organisation / Department <span class="req">*</span></label><input type="text" placeholder="e.g., External Audit Firm Ltd"></div>
+            <div class="fgrp"><label>Stakeholder Type <span class="req">*</span></label><select><option>-- Select --</option><option>Auditor</option><option>Governance / Risk Reviewer</option><option>Business Stakeholder</option><option>External Reviewer</option><option>Other</option></select></div>
+            <div class="fgrp"><label>Role</label><input value="External (Read-Only)" readonly style="background:#f1f5f9;padding:6px 9px;border:1px dashed #94a3b8;border-radius:4px;font-size:11px;"></div>
+            <div class="fgrp"><label>Access Expiry <span class="req">*</span></label><input type="date"><div class="help">Recommended for External accounts. Expiry warning sent 7 days before and on expiry day.</div></div>
+          </div>
+        </div>
+        <div class="fs">
+          <div class="fst">Model Access Scope <span class="req">*</span></div>
+          <div class="ib3">ℹ️ External accounts have read-only access to assigned models. Assigned Users field on each model record is updated on save.</div>
+          <div class="scbx">
+            <div class="scbxh"><span>Active Inventory (142 models)</span><span style="color:#2563eb;cursor:pointer;font-size:10px;">Select All | Clear All</span></div>
+            <div class="scbi sel"><input type="checkbox" checked><span class="scbn"><strong>MDL-001</strong> — Credit Risk PD v2.3</span><span class="scbm">NA / Credit · <span class="pill p-ext" style="font-size:8px;">External: Read-Only</span></span></div>
+            <div class="scbi sel"><input type="checkbox" checked><span class="scbn"><strong>MDL-002</strong> — Mortgage LGD Model</span><span class="scbm">EMEA / Credit · <span class="pill p-ext" style="font-size:8px;">External: Read-Only</span></span></div>
+            <div style="padding:7px 10px;font-size:10px;color:#64748b;border-top:1px dashed #e2e8f0;">2 selected. External accounts access selected models in read-only mode.</div>
+          </div>
+        </div>
+        <div class="fa">
+          <button class="btn" onclick="S('s1',null)">Cancel</button>
+          <button class="btn btn-p">＋ Provision External &amp; Send Welcome Notification</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-EXP-001 to 006):</strong> Separate provisioning form for External accounts. Non-corporate email domain warning shown inline (OPN-W4-012). Role is fixed to External (read-only). Expiry date strongly recommended. On submit: WF2 Assigned Users write-back, welcome email + in-platform notification sent.</div>
+</div>
+
+<!-- ══ S7: MODEL ACCESS REQUESTS ══ -->
+<div id="s7" class="screen">
+  <span class="slabel">Screen 7 — Requests: Model Access Request Queue</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln7"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › Requests › Model Access Requests</div>
+        <h2 class="pgt">Model Access Requests</h2>
+        <p class="pgs">Requests from Users and Externals to expand their model scope. On approval, Assigned Users field on model record is updated.</p>
+        <div class="tb">
+          <div class="tbl">
+            <div class="tg"><button class="tgb on">Pending (4)</button><button class="tgb">Approved (31)</button><button class="tgb">Rejected (8)</button></div>
+            <div class="sb3"><input type="text" placeholder="Search user, email, or Model ID…"></div>
+            <div class="fc on">👤 Role: All ▾</div>
+            <div class="fc">📅 Date ▾</div>
+          </div>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead><tr><th>Requesting User</th><th>ID</th><th>Role</th><th>Requested Model(s)</th><th>Risk Tier</th><th>Justification</th><th>Days Pending</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>James Okafor</strong></td><td>j.okafor@co.com</td><td><span class="pill p-usr">User</span></td>
+                <td>MDL-005 Cards Behavior<br><span style="font-size:9px;color:#64748b;">MDL-007 Cards Approval</span></td>
+                <td><span class="pill p-pend">Tier 1</span></td>
+                <td style="font-size:10px;color:#475569;max-width:160px;">Cards portfolio for Q3 regulatory submission…</td>
+                <td style="color:#d97706;font-weight:600;">2</td><td><span class="pill p-pend">Pending</span></td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia" style="background:#dcfce7;color:#166534;border-color:#86efac;">✓</button><button class="ia d">✕</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Mei Lin</strong></td><td>m.lin@co.com</td><td><span class="pill p-usr">User</span></td>
+                <td>MDL-011 SME Default v2</td>
+                <td><span class="pill p-act">Tier 2</span></td>
+                <td style="font-size:10px;color:#475569;max-width:160px;">Expanding to SME after team restructure…</td>
+                <td style="color:#d97706;font-weight:600;">3</td><td><span class="pill p-pend">Pending</span></td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia" style="background:#dcfce7;color:#166534;border-color:#86efac;">✓</button><button class="ia d">✕</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Ana Torres</strong></td><td>a.torres@external.org</td><td><span class="pill p-ext">External</span></td>
+                <td>MDL-001 Credit Risk PD</td>
+                <td><span class="pill p-pend">Tier 1</span></td>
+                <td style="font-size:10px;color:#475569;max-width:160px;">Annual audit scope expansion to credit portfolio…</td>
+                <td style="color:#dc2626;font-weight:600;">4</td><td><span class="pill p-pend">Pending</span></td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia" style="background:#dcfce7;color:#166534;border-color:#86efac;">✓</button><button class="ia d">✕</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Tom Byrne</strong></td><td>t.byrne@co.com</td><td><span class="pill p-usr">User</span></td>
+                <td>MDL-033 Market VaR<br><span style="font-size:9px;color:#64748b;">MDL-034 Credit VaR</span></td>
+                <td><span class="pill p-pend">Tier 1</span></td>
+                <td style="font-size:10px;color:#475569;max-width:160px;">Cross-BU VaR working group membership…</td>
+                <td style="color:#dc2626;font-weight:600;">5</td><td><span class="pill p-pend">Pending</span></td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia" style="background:#dcfce7;color:#166534;border-color:#86efac;">✓</button><button class="ia d">✕</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ib3">ℹ️ <strong>On Approval:</strong> Requester's model scope is updated AND the model record's Assigned Users field is appended with the requester's ID (WF2 write-back). Requester receives in-platform + email notification listing approved/rejected models.</div>
+        <div class="pag"><div>1–4 of 4 pending</div><div class="pc"><button class="pb4 on">1</button></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-MAR-001 to 009):</strong> Queue shows both User and External requestors. Partial approval available in detail view. On approval: WF2 write-back is transactional with access grant (WF4-MAR-005). Duplicate same-model requests from same user blocked (WF4-MAR-009). Requester notified in-platform + email with model-level detail (WF4-NTF-016).</div>
+</div>
+
+<!-- ══ S8: DATA DELETION REQUESTS ══ -->
+<div id="s8" class="screen">
+  <span class="slabel">Screen 8 — Requests: Data Deletion Request Queue</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln8"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › Requests › Data Deletion Requests</div>
+        <h2 class="pgt">Data Deletion Requests</h2>
+        <p class="pgs">Raised by Users requesting Admin-actioned soft-deletion of specific data within a model. Users have zero delete permissions — Admin executes all deletions.</p>
+        <div class="wb">⚠️ <strong>Important:</strong> Approving a deletion archives the specified data in the Repository. This is not reversible through the UI. All other Users assigned to the same model are notified. Externals cannot raise deletion requests.</div>
+        <div class="dtw">
+          <table class="dt">
+            <thead><tr><th>Requesting User</th><th>Model</th><th>Data Reference / Scope</th><th>Deletion Reason</th><th>Submitted</th><th>Days Pending</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>James Okafor</strong></td>
+                <td>MDL-001<br><span style="font-size:9px;color:#64748b;">Credit Risk PD v2.3</span></td>
+                <td style="font-size:10px;">Records: 2024-Q1 batch (IDs: 10001–10450). ~450 records.</td>
+                <td style="font-size:10px;color:#475569;max-width:150px;">Duplicate records from failed ingestion run. Distorting model performance metrics.</td>
+                <td>2026-05-07</td><td style="color:#d97706;font-weight:600;">2</td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia d">🗑</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Mei Lin</strong></td>
+                <td>MDL-011<br><span style="font-size:9px;color:#64748b;">SME Default v2</span></td>
+                <td style="font-size:10px;">Segment: APAC-SME 2023-H2. ~1,200 records.</td>
+                <td style="font-size:10px;color:#475569;max-width:150px;">Data no longer relevant post-regulatory scope change. Creates noise in monitoring outputs.</td>
+                <td>2026-05-06</td><td style="color:#d97706;font-weight:600;">3</td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia d">🗑</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Detail panel for first request -->
+        <div class="panel">
+          <div class="ph"><span class="pt">Deletion Request Detail — MDL-001 · James Okafor</span></div>
+          <div class="pb3">
+            <div class="db2">⚠️ <strong>Impact Summary:</strong> ~450 records will be soft-deleted and archived in Repository. Model MDL-001 has 2 other assigned Users (Mei Lin, Tom Byrne) who will be notified. Monitoring results using this data will show a gap for 2024-Q1 batch.</div>
+            <div class="dg" style="margin-bottom:12px;">
+              <div><div class="dl">Model</div><div class="dv">MDL-001 — Credit Risk PD v2.3</div></div>
+              <div><div class="dl">Model Owner</div><div class="dv">James Okafor</div></div>
+              <div><div class="dl">Data Reference</div><div class="dv">2024-Q1 batch IDs 10001–10450</div></div>
+              <div><div class="dl">Records Affected</div><div class="dv" style="color:#dc2626;font-weight:600;">~450 records</div></div>
+              <div><div class="dl">Other Assigned Users</div><div class="dv">Mei Lin, Tom Byrne (will be notified)</div></div>
+              <div><div class="dl">Requesting User Reason</div><div class="dv">Duplicate records from failed ingestion run</div></div>
+            </div>
+            <div class="fgrp" style="margin-bottom:10px;">
+              <label>Approval / Deletion Reason <span class="req">*</span> (min 20 chars — persisted in Repository archive record)</label>
+              <textarea placeholder="e.g., Confirmed duplicates from ingestion failure 2024-Q1. Approved for archival. Monitoring runs to be re-executed post-deletion."></textarea>
+            </div>
+            <div class="fa" style="justify-content:space-between;">
+              <button class="btn btn-d">✕ Reject Request</button>
+              <button class="btn" style="background:#dc2626;color:#fff;border-color:#dc2626;">🗑️ Approve — Archive Data (irreversible)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-DDR-001 to 010):</strong> Users raise the request; Admin executes. Externals cannot raise deletion requests (WF4-DDR-009). Impact summary mandatory before action (WF4-DDR-005). On Approve: data archived in Repository, requesting User notified, all other Users on model notified (WF4-DDR-006, WF4-NTF-015). Approval Reason persisted in archive record (WF4-DDR-008).</div>
+</div>
+
+<!-- ══ S9: MANAGE MODEL ACCESS ══ -->
+<div id="s9" class="screen">
+  <span class="slabel">Screen 9 — Manage Model Access</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln9"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › Manage Model Access</div>
+        <h2 class="pgt">Manage Model Access</h2>
+        <p class="pgs">Model-centric view of all user assignments. Assign/remove Users and Externals per model. View and manage section-level locks.</p>
+        <div class="tb">
+          <div class="tbl">
+            <div class="sb3"><input type="text" placeholder="Search Model ID or Name…"></div>
+            <div class="fc">📂 Category ▾</div><div class="fc">🌍 Domain ▾</div><div class="fc">⚠️ Risk Tier ▾</div>
+          </div>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead><tr><th>Model ID</th><th>Model Name</th><th>Category</th><th>Risk Tier</th><th>Status</th><th>Assigned Users</th><th>Assigned Externals</th><th>Active Locks</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>MDL-001</strong></td><td>Credit Risk PD v2.3</td><td>Credit</td><td><span class="pill p-pend">Tier 1</span></td><td><span class="pill p-act">Active</span></td>
+                <td style="text-align:center;"><strong style="color:#2563eb;">3</strong></td>
+                <td style="text-align:center;">2</td>
+                <td><span class="pill p-lock">1 Lock</span></td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia">✏️</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>MDL-002</strong></td><td>Mortgage LGD Model</td><td>Credit</td><td><span class="pill p-act">Tier 2</span></td><td><span class="pill p-act">Active</span></td>
+                <td style="text-align:center;"><strong style="color:#2563eb;">2</strong></td>
+                <td style="text-align:center;">1</td>
+                <td>—</td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia">✏️</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>MDL-011</strong></td><td>SME Default v2</td><td>Credit</td><td><span class="pill p-act">Tier 2</span></td><td><span class="pill p-act">Active</span></td>
+                <td style="text-align:center;"><strong style="color:#2563eb;">1</strong></td>
+                <td style="text-align:center;">0</td>
+                <td>—</td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia">✏️</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Model Assignment Detail for MDL-001 -->
+        <div class="panel">
+          <div class="ph"><span class="pt">Model Assignment Detail — MDL-001 (Credit Risk PD v2.3)</span><button class="btn btn-p" style="font-size:10px;">＋ Add User</button></div>
+          <div class="pb3">
+            <!-- Active lock indicator -->
+            <div class="lock-bar">
+              🔒 <strong>Active Section Lock:</strong> Model Monitoring section locked by <strong>James Okafor</strong> since 10:14 UTC (16 min ago) · <span style="font-size:10px;">Default timeout: 30 min</span>
+              <button class="btn" style="font-size:10px;margin-left:auto;">⚡ Force Release Lock</button>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:#475569;margin-bottom:7px;">Assigned Users (3)</div>
+            <div class="dtw" style="margin-bottom:10px;">
+              <table class="dt">
+                <thead><tr><th>User Name</th><th>Corporate ID</th><th>Assigned</th><th>Expiry</th><th>Last Active</th><th>Section Lock</th><th>Actions</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><strong>James Okafor</strong></td><td>j.okafor@co.com</td><td>2026-03-15</td><td>—</td><td>Today 10:14</td>
+                    <td><span class="pill p-lock">🔒 Model Monitoring</span></td>
+                    <td><div class="ra"><button class="ia">✏️</button><button class="ia d">−</button></div></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mei Lin</strong></td><td>m.lin@co.com</td><td>2026-03-20</td><td>2026-06-01</td><td>Yesterday 16:22</td>
+                    <td>—</td>
+                    <td><div class="ra"><button class="ia">✏️</button><button class="ia d">−</button></div></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tom Byrne</strong></td><td>t.byrne@co.com</td><td>2026-04-01</td><td>—</td><td>Today 08:55</td>
+                    <td>—</td>
+                    <td><div class="ra"><button class="ia">✏️</button><button class="ia d">−</button></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:#475569;margin-bottom:7px;">Assigned Externals (2)</div>
+            <div class="dtw">
+              <table class="dt">
+                <thead><tr><th>External Name</th><th>ID</th><th>Assigned</th><th>Expiry</th><th>Last Active</th><th>Actions</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Sarah Mitchell</strong></td><td>s.mitchell@co.com</td><td>2026-05-08</td><td>2026-09-30</td><td>Today 09:15</td>
+                    <td><div class="ra"><button class="ia">✏️</button><button class="ia d">−</button></div></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ana Torres</strong></td><td>a.torres@external.org</td><td>2026-04-15</td><td>2026-07-15</td><td>2026-05-06</td>
+                    <td><div class="ra"><button class="ia">✏️</button><button class="ia d">−</button></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-MMA-001 to 012, WF4-LCK-001 to 010):</strong> Model-centric view shows assigned Users, Externals, and active locks per model. Lock indicator shows locking User + section + elapsed time. Force Release triggers Admin-release flow (WF4-MMA-012, WF4-LCK-006). Remove action triggers user notification + WF2 write-back removal. Externals are always read-only and never acquire locks (WF4-LCK-010).</div>
+</div>
+
+<!-- ══ S10: USER DIRECTORY ══ -->
+<div id="s10" class="screen">
+  <span class="slabel">Screen 10 — User Directory</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln10"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › User Directory</div>
+        <h2 class="pgt">User Directory</h2>
+        <p class="pgs">All platform accounts — Admin, User, External (Active, Pending, Deactivated)</p>
+        <div class="kg">
+          <div class="kc p"><div class="kl">Active Users</div><div class="kv">34</div></div>
+          <div class="kc s"><div class="kl">Active Externals</div><div class="kv">18</div></div>
+          <div class="kc"><div class="kl">Admins</div><div class="kv">4</div></div>
+          <div class="kc d"><div class="kl">Pending</div><div class="kv">9</div></div>
+          <div class="kc w"><div class="kl">Expiring ≤30d</div><div class="kv">5</div></div>
+        </div>
+        <div class="tb">
+          <div class="tbl">
+            <div class="tg"><button class="tgb on">All (56)</button><button class="tgb">Active (52)</button><button class="tgb">Deactivated (4)</button></div>
+            <div class="sb3"><input type="text" placeholder="Search name, email, org…"></div>
+            <div class="fc on">👤 Role: All ▾</div>
+            <div class="fc">⏱️ Expiry ▾</div>
+          </div>
+          <div class="tbr"><button class="btn">📤 Export</button><button class="btn btn-p" onclick="S('s4',null)">＋ Provision User</button></div>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead><tr><th>Full Name</th><th>Email / ID</th><th>Role</th><th>Dept / Org</th><th>Model Count</th><th>Access Expiry</th><th>Last Login</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr onclick="S('s11',null)">
+                <td><strong>James Okafor</strong></td><td>j.okafor@co.com</td><td><span class="pill p-usr">User</span></td><td>Credit Risk Analytics</td><td style="text-align:center;">2</td><td>—</td><td>Today 10:14</td><td><span class="pill p-act">Active</span></td>
+                <td onclick="ev()"><div class="ra"><button class="ia" onclick="S('s11',null)">👁</button><button class="ia">✏️</button><button class="ia d" onclick="S('s12',null)">🚫</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Mei Lin</strong></td><td>m.lin@co.com</td><td><span class="pill p-usr">User</span></td><td>Market Risk</td><td style="text-align:center;">7</td><td style="color:#d97706;font-weight:600;">2026-06-01</td><td>Yesterday</td><td><span class="pill p-exp">Expiring</span></td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia">✏️</button><button class="ia d">🚫</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Sarah Mitchell</strong></td><td>s.mitchell@co.com</td><td><span class="pill p-ext">External</span></td><td>Internal Audit</td><td style="text-align:center;">—</td><td>2026-09-30</td><td>Today 09:15</td><td><span class="pill p-act">Active</span></td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia">✏️</button><button class="ia d">🚫</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Ana Torres</strong></td><td>a.torres@external.org</td><td><span class="pill p-ext">External</span></td><td>External Audit Firm</td><td style="text-align:center;">—</td><td>2026-07-15</td><td>2026-05-06</td><td><span class="pill p-act">Active</span></td>
+                <td><div class="ra"><button class="ia">👁</button><button class="ia">✏️</button><button class="ia d">🚫</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>John Doe</strong></td><td>j.doe@co.com</td><td><span class="pill p-adm">Admin</span></td><td>ML Platform</td><td style="text-align:center;">—</td><td>—</td><td>Today 10:05</td><td><span class="pill p-act">Active</span></td>
+                <td><div class="ra"><button class="ia">👁</button><span style="font-size:9px;color:#94a3b8;padding:2px 5px;">Self — no deactivate</span></div></td>
+              </tr>
+              <tr style="opacity:.5;">
+                <td><strong>Old Account</strong></td><td>old.user@co.com</td><td><span class="pill p-deact">User</span></td><td>Retired BU</td><td style="text-align:center;">0</td><td>—</td><td>2025-11-01</td><td><span class="pill p-deact">Deactivated</span></td>
+                <td><div class="ra"><button class="ia">👁</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pag"><div>1–25 of 56 · Page: <select style="font-size:10px;padding:1px 3px;"><option>25</option><option>50</option></select></div><div class="pc"><button class="pb4 on">1</button><button class="pb4">2</button><button class="pb4">3</button></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-DIR-001 to 009):</strong> 'Viewer' label replaced by 'External' throughout. External accounts may have non-corporate email domains (Ana Torres). Deactivated rows greyed out. Admin cannot deactivate own account (WF4-DEA-006). Default sort: Active first, then A–Z. Loads ≤2s for 5,000 accounts (WF4-DIR-009).</div>
+</div>
+
+<!-- ══ S11: USER PROFILE ══ -->
+<div id="s11" class="screen">
+  <span class="slabel">Screen 11 — User Profile</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln11"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › <a onclick="S('s10',null)">Directory</a> › User Profile</div>
+        <h2 class="pgt">User Profile — James Okafor</h2>
+        <p class="pgs">Full account details, model scope, active locks, and activity history</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+          <div class="fs" style="flex:1;min-width:260px;">
+            <div class="fst">Account Details</div>
+            <div class="dg">
+              <div><div class="dl">Full Name</div><div class="dv"><strong>James Okafor</strong></div></div>
+              <div><div class="dl">Corporate Email / ID</div><div class="dv">j.okafor@company.com</div></div>
+              <div><div class="dl">Department</div><div class="dv">Credit Risk Analytics</div></div>
+              <div><div class="dl">Role</div><div class="dv"><span class="pill p-usr">User</span></div></div>
+              <div><div class="dl">Account Status</div><div class="dv"><span class="pill p-act">Active</span></div></div>
+              <div><div class="dl">Provisioned By</div><div class="dv">John Doe (Admin) · 2026-03-15</div></div>
+              <div><div class="dl">Access Expiry</div><div class="dv">— (no expiry)</div></div>
+              <div><div class="dl">Last Login</div><div class="dv">Today 10:14 UTC</div></div>
+            </div>
+          </div>
+          <div class="fs" style="width:200px;flex-shrink:0;">
+            <div class="fst">Quick Actions</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <button class="btn" style="justify-content:flex-start;font-size:11px;">✏️ Edit Model Scope</button>
+              <button class="btn" style="justify-content:flex-start;font-size:11px;">⏱️ Set / Extend Expiry</button>
+              <button class="btn" style="justify-content:flex-start;font-size:11px;">📋 View Audit History</button>
+              <button class="btn btn-d" style="justify-content:flex-start;font-size:11px;" onclick="S('s12',null)">🚫 Deactivate Account</button>
+            </div>
+          </div>
+        </div>
+        <!-- Active lock on this user -->
+        <div class="lock-bar" style="margin-bottom:10px;">🔒 <strong>Active Section Lock:</strong> James Okafor currently holds a lock on MDL-001 · Model Monitoring section (acquired 10:14 UTC, 16 min ago). <button class="btn" style="font-size:10px;margin-left:auto;">Force Release</button></div>
+        <div class="fs">
+          <div class="fst">Model Access Scope (2 models)</div>
+          <div class="scbx">
+            <div class="scbxh"><span>Assigned Models</span><span style="color:#2563eb;cursor:pointer;font-size:10px;">＋ Add | − Remove</span></div>
+            <div class="scbi"><span class="scbn"><strong>MDL-001</strong> — Credit Risk PD v2.3</span><span class="scbm">NA / Credit · <span class="pill p-act" style="font-size:8px;">Active</span> · Expiry: None · <span class="pill p-lock" style="font-size:8px;">🔒 Lock Active</span></span></div>
+            <div class="scbi"><span class="scbn"><strong>MDL-002</strong> — Mortgage LGD Model</span><span class="scbm">EMEA / Credit · <span class="pill p-act" style="font-size:8px;">Active</span> · Expiry: None</span></div>
+          </div>
+        </div>
+        <div class="fs">
+          <div class="fst">Recent Activity</div>
+          <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:11px;"><div style="width:10px;height:10px;border-radius:50%;background:#16a34a;flex-shrink:0;margin-top:3px;"></div><div><div style="font-weight:600;">Model Monitoring run initiated on MDL-001</div><div style="font-size:10px;color:#64748b;">Today 10:14 UTC · Section lock acquired</div></div></div>
+          <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:11px;"><div style="width:10px;height:10px;border-radius:50%;background:#16a34a;flex-shrink:0;margin-top:3px;"></div><div><div style="font-weight:600;">Data Deletion Request raised for MDL-001 (2024-Q1 batch)</div><div style="font-size:10px;color:#64748b;">2026-05-07 11:14 UTC · Status: Pending Admin review</div></div></div>
+          <div style="display:flex;gap:10px;padding:8px 0;font-size:11px;"><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;flex-shrink:0;margin-top:3px;"></div><div><div style="font-weight:600;">Account provisioned</div><div style="font-size:10px;color:#64748b;">2026-03-15 14:22 UTC · By John Doe (Admin)</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-DIR-005, 006, WF4-LCK-001):</strong> User Profile now shows active section locks with force-release option. Activity feed shows lock acquisition and data deletion request events. Model scope shows per-model lock state inline. Quick Actions include Deactivate (links to Screen 12).</div>
+</div>
+
+<!-- ══ S12: DEACTIVATION ══ -->
+<div id="s12" class="screen">
+  <span class="slabel">Screen 12 — Deactivation Confirmation Modal</span>
+  <div class="shell" style="filter:blur(2px);pointer-events:none;opacity:.35;">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div></div>
+    <div class="ab"><div class="ln"></div><div class="mc"><h2 class="pgt">User Profile — James Okafor</h2><div style="height:160px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:7px;margin-top:10px;"></div></div></div>
+  </div>
+  <div class="mo">
+    <div class="mb">
+      <div class="mir"><div class="mico d">🚫</div><h3>Deactivate Account — Confirm</h3></div>
+      <p>This permanently terminates James Okafor's access. All sessions invalidated server-side, all section locks released. Irreversible through the UI.</p>
+      <div class="mi">
+        <strong>Name:</strong> James Okafor · <strong>Role:</strong> User<br>
+        <strong>Models:</strong> MDL-001, MDL-002<br>
+        <strong>Active Sessions:</strong> 1 · <strong>Active Section Locks:</strong> 1 (MDL-001 — Model Monitoring)<br>
+        <strong>Model Ownership:</strong> <span style="color:#dc2626;">⚠️ Sole Owner of MDL-001 — must reassign</span>
+      </div>
+      <div class="db2">⚠️ <strong>James Okafor is sole Owner of MDL-001.</strong> Assign a new owner before deactivation can proceed.</div>
+      <div class="fgrp" style="margin-bottom:10px;">
+        <label>Reassign MDL-001 Ownership <span class="req">*</span></label>
+        <select style="padding:6px 9px;border:1px dashed #94a3b8;border-radius:4px;font-size:11px;">
+          <option>— Select new owner —</option>
+          <option>Mei Lin (m.lin@company.com)</option>
+          <option>Tom Byrne (t.byrne@company.com)</option>
+        </select>
+      </div>
+      <div class="fgrp" style="margin-bottom:10px;">
+        <label>Deactivation Reason <span class="req">*</span></label>
+        <textarea rows="2" placeholder="e.g., Employee has left the organisation per HR-2026-0418."></textarea>
+      </div>
+      <div class="wb" style="margin-bottom:0;">⚠️ On confirm: (1) sessions invalidated, (2) all section locks released, (3) roles revoked, (4) model scope removed, (5) Assigned Users field on all models updated, (6) deactivation email sent, (7) audit log written.</div>
+      <div class="ma">
+        <button class="btn" onclick="S('s11',null)">Cancel</button>
+        <button class="btn" style="background:#dc2626;color:#fff;border-color:#dc2626;opacity:.45;" disabled>🚫 Deactivate (enabled when ownership &amp; reason complete)</button>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-DEA-001 to 009):</strong> v2.0 addition: deactivation confirmation now explicitly lists "all section locks released" and "Assigned Users field updated on all models" as part of the on-confirm action sequence (WF4-DEA-003). Sole-owner blocking guard still enforced (WF4-DEA-009). Button disabled until both ownership and reason are complete.</div>
+</div>
+
+<!-- ══ S13: NOTIFICATIONS CENTRE ══ -->
+<div id="s13" class="screen">
+  <span class="slabel">Screen 13 — Notifications Centre (In-Platform Bell Panel)</span>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div>
+      <div class="aphr"><div class="rp">👤 ADMIN</div>
+        <div class="nw" style="background:#2563eb;border-radius:4px;padding:2px 7px;cursor:pointer;"><span style="color:#fff;font-size:14px;">🔔</span><span class="nb2" style="top:-2px;right:-2px;">12</span></div>
+        <div class="up"><div class="ua">JD</div><span>John Doe</span></div>
+      </div>
+    </div>
+    <div class="ab">
+      <div class="ln" id="ln13"></div>
+      <div class="mc" style="position:relative;">
+        <div class="bc">Admin › Notifications Centre</div>
+        <h2 class="pgt">Notifications Centre</h2>
+        <p class="pgs">In-platform notifications — all channels, all types. Persisted server-side across sessions.</p>
+        <!-- Filter bar -->
+        <div class="tb">
+          <div class="tbl">
+            <div class="tg">
+              <button class="tgb on">All (12 unread)</button>
+              <button class="tgb">Access Requests</button>
+              <button class="tgb">Model Assignments</button>
+              <button class="tgb">Deletions</button>
+              <button class="tgb">Locks</button>
+            </div>
+          </div>
+          <div class="tbr"><button class="btn">✓ Mark All Read</button></div>
+        </div>
+        <!-- Notification items -->
+        <div class="panel">
+          <div class="np-item unread">
+            <div class="np-row">
+              <div class="np-icon" style="background:#fee2e2;">🗑️</div>
+              <div class="np-text"><div class="np-title">Data Deletion Request received — MDL-001</div><div class="np-meta">James Okafor requests deletion of 2024-Q1 batch (~450 records). Reason: Duplicate records from failed ingestion.</div></div>
+              <div class="np-time">2 min ago</div>
+            </div>
+          </div>
+          <div class="np-item unread">
+            <div class="np-row">
+              <div class="np-icon" style="background:#dbeafe;">🔑</div>
+              <div class="np-text"><div class="np-title">New Model Access Request — MDL-033, MDL-034</div><div class="np-meta">Tom Byrne (User) requests access to Market Risk VaR and Credit VaR models. 5 days pending.</div></div>
+              <div class="np-time">5 days ago</div>
+            </div>
+          </div>
+          <div class="np-item unread">
+            <div class="np-row">
+              <div class="np-icon" style="background:#fde68a;">🔒</div>
+              <div class="np-text"><div class="np-title">Lock Release Requested — MDL-001 · Model Monitoring</div><div class="np-meta">Mei Lin is waiting for the Model Monitoring section on MDL-001. James Okafor currently holds the lock.</div></div>
+              <div class="np-time">8 min ago</div>
+            </div>
+          </div>
+          <div class="np-item unread">
+            <div class="np-row">
+              <div class="np-icon" style="background:#fef3c7;">🙋</div>
+              <div class="np-text"><div class="np-title">New External Access Request — Emma Chen</div><div class="np-meta">Emma Chen (Compliance · Governance Reviewer) submitted a Viewer access request. 4 days pending.</div></div>
+              <div class="np-time">4 days ago</div>
+            </div>
+          </div>
+          <div class="np-item unread">
+            <div class="np-row">
+              <div class="np-icon" style="background:#fef3c7;">🔐</div>
+              <div class="np-text"><div class="np-title">Admin Provisioning awaiting your approval — Priya Nair</div><div class="np-meta">John Doe submitted a request to provision Priya Nair as Admin. Requires second-Admin approval. Times out 2026-05-15.</div></div>
+              <div class="np-time">Today 10:22</div>
+            </div>
+          </div>
+          <div class="np-item">
+            <div class="np-row">
+              <div class="np-icon" style="background:#dcfce7;">✅</div>
+              <div class="np-text"><div class="np-title">Model Access Request Approved — MDL-005, MDL-007 (partial)</div><div class="np-meta">You approved James Okafor's request. Approved: MDL-005. Not Approved: MDL-007 (Tier 1 access restriction). Assigned Users field updated.</div></div>
+              <div class="np-time">Yesterday</div>
+            </div>
+          </div>
+          <div class="np-item">
+            <div class="np-row">
+              <div class="np-icon" style="background:#f1f5f9;">⏱️</div>
+              <div class="np-text"><div class="np-title">Access Expiry Warning — Mei Lin (User)</div><div class="np-meta">Mei Lin's access to 7 models expires on 2026-06-01 (in 23 days). Review expiry in Access Expiry Renewals.</div></div>
+              <div class="np-time">3 days ago</div>
+            </div>
+          </div>
+          <div class="np-item">
+            <div class="np-row">
+              <div class="np-icon" style="background:#dcfce7;">👤</div>
+              <div class="np-text"><div class="np-title">User Provisioned — James Okafor</div><div class="np-meta">James Okafor's User account was created by you. 2 models assigned: MDL-001, MDL-002. Welcome email + notification sent.</div></div>
+              <div class="np-time">2 months ago</div>
+            </div>
+          </div>
+        </div>
+        <div class="ib3" style="font-size:10px;">ℹ️ <strong>Deduplication active:</strong> Duplicate notifications of the same type for the same entity within 5 minutes are suppressed. Lock release request notifications (🔒) are in-platform only — no email. All other notifications deliver via in-platform + email.</div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-NTF-001 to 018):</strong> Notifications Centre shows: unread count badge (12), filter by type, Mark All Read, reverse-chronological order. Unread items have blue left border. Lock notifications in-platform only — no email (Option A confirmed). Partial approval notification lists Approved vs Not Approved models (WF4-NTF-016). 5-minute dedup window active. Admin self-notification suppression active (WF4-NTF-012). Notifications persist across sessions server-side (WF4-NTF-006).</div>
+</div>
+
+<!-- ══ S14: EXPIRY RENEWALS ══ -->
+<div id="s14" class="screen">
+  <span class="slabel">Screen 14 — Access Expiry Renewal Queue</span>
+  <div class="shell">
+    <div class="aph"><div class="apb"><div class="apl">📊</div>Model Monitoring Platform</div><div class="aphr"><div class="rp">👤 ADMIN</div><div class="nw" onclick="S('s13',null)"><span style="color:#fff;font-size:15px;">🔔</span><span class="nb2">12</span></div><div class="up"><div class="ua">JD</div><span>John Doe</span></div></div></div>
+    <div class="ab">
+      <div class="ln" id="ln14"></div>
+      <div class="mc">
+        <div class="bc"><a onclick="S('s1',null)">ACC</a> › Access Expiry Renewals</div>
+        <h2 class="pgt">Access Expiry Renewals</h2>
+        <p class="pgs">Accounts with expiry dates within 30 days. Extend or let expire automatically. Expired accounts are auto-deactivated.</p>
+        <div class="ib3">ℹ️ Users and Externals receive in-platform + email warning 7 days before expiry and on expiry day. On the expiry date, access is auto-revoked if no extension is granted. Each auto-expiry is audit-logged and Assigned Users field updated.</div>
+        <div class="dtw">
+          <table class="dt">
+            <thead><tr><th>Full Name</th><th>ID</th><th>Role</th><th>Expiry Date</th><th>Days Until Expiry</th><th>Status</th><th>7-Day Warning</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Mei Lin</strong></td><td>m.lin@co.com</td><td><span class="pill p-usr">User</span></td>
+                <td style="color:#dc2626;font-weight:600;">2026-05-10</td><td style="color:#dc2626;font-weight:600;">2 days</td>
+                <td><span class="pill p-exp">Expiring Soon</span></td><td><span class="pill p-appr">✓ Sent 2026-05-03</span></td>
+                <td><div class="ra"><button class="ia" style="background:#dcfce7;color:#166534;border-color:#86efac;width:auto;padding:0 8px;font-size:10px;">⏱ Extend</button><button class="ia d" style="width:auto;padding:0 8px;font-size:10px;">Expire</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Raj Kumar</strong></td><td>r.kumar@co.com</td><td><span class="pill p-ext">External</span></td>
+                <td style="color:#dc2626;font-weight:600;">2026-05-14</td><td style="color:#d97706;font-weight:600;">6 days</td>
+                <td><span class="pill p-exp">Expiring Soon</span></td><td><span class="pill p-pend">Sends Tomorrow</span></td>
+                <td><div class="ra"><button class="ia" style="background:#dcfce7;color:#166534;border-color:#86efac;width:auto;padding:0 8px;font-size:10px;">⏱ Extend</button><button class="ia d" style="width:auto;padding:0 8px;font-size:10px;">Expire</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Ana Torres</strong></td><td>a.torres@external.org</td><td><span class="pill p-ext">External</span></td>
+                <td>2026-07-15</td><td>27 days</td><td><span class="pill p-act">Active</span></td><td><span class="pill p-pend">Not yet due</span></td>
+                <td><div class="ra"><button class="ia" style="background:#dcfce7;color:#166534;border-color:#86efac;width:auto;padding:0 8px;font-size:10px;">⏱ Extend</button><button class="ia d" style="width:auto;padding:0 8px;font-size:10px;">Expire</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>Emma Chen</strong></td><td>e.chen@co.com</td><td><span class="pill p-ext">External</span></td>
+                <td>2026-05-31</td><td>23 days</td><td><span class="pill p-act">Active</span></td><td><span class="pill p-pend">Not yet due</span></td>
+                <td><div class="ra"><button class="ia" style="background:#dcfce7;color:#166634;border-color:#86efac;width:auto;padding:0 8px;font-size:10px;">⏱ Extend</button><button class="ia d" style="width:auto;padding:0 8px;font-size:10px;">Expire</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>David Park</strong></td><td>d.park@co.com</td><td><span class="pill p-usr">User</span></td>
+                <td>2026-06-05</td><td>28 days</td><td><span class="pill p-act">Active</span></td><td><span class="pill p-pend">Not yet due</span></td>
+                <td><div class="ra"><button class="ia" style="background:#dcfce7;color:#166634;border-color:#86efac;width:auto;padding:0 8px;font-size:10px;">⏱ Extend</button><button class="ia d" style="width:auto;padding:0 8px;font-size:10px;">Expire</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="pt">Extend Access — Mei Lin</span></div>
+          <div class="pb3">
+            <div class="dg" style="margin-bottom:10px;">
+              <div><div class="dl">Current Expiry</div><div class="dv" style="color:#dc2626;font-weight:600;">2026-05-10 (2 days)</div></div>
+              <div><div class="dl">Role</div><div class="dv"><span class="pill p-usr">User</span></div></div>
+            </div>
+            <div class="fgrp" style="max-width:230px;"><label>New Expiry Date <span class="req">*</span></label><input type="date" value="2026-11-10"></div>
+            <div class="fa" style="justify-content:flex-start;margin-top:9px;"><button class="btn">Cancel</button><button class="btn btn-p">⏱ Confirm Extension</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ann"><strong>📝 Note (WF4-EXT-009, WF4-USR-006, WF4-EXP-002):</strong> Expiry queue now includes External accounts (previously 'Viewer'). On auto-expiry: Assigned Users field on all associated model records is updated to remove the user's ID. Extension is audit-logged with old/new expiry dates. Non-corporate email accounts (Ana Torres) may have delivery failures per OPN-W4-012.</div>
+</div>
+
+<template id="lntpl">
+  <div class="lnt">Admin Console</div>
+  <div class="tni"><div class="tio">📋</div><div class="tit"><div class="tit-t">Manage Model Inventory</div><div class="tit-s">Register, archive</div></div></div>
+  <div class="tni"><div class="tio">⚙️</div><div class="tit"><div class="tit-t">Configure Metrics</div><div class="tit-s">Thresholds &amp; rules</div></div></div>
+  <div class="tni"><div class="tio">📥</div><div class="tit"><div class="tit-t">Model Data Ingestion</div><div class="tit-s">Pipelines</div></div></div>
+  <div class="tni on"><div class="tio">🔐</div><div class="tit"><div class="tit-t">Access Control Center</div><div class="tit-s">Users &amp; access</div></div><span class="tib">9</span></div>
+  <div class="tni"><div class="tio">⏰</div><div class="tit"><div class="tit-t">Set-up Scheduler</div><div class="tit-s">Jobs &amp; batch</div></div></div>
+  <div class="tni"><div class="tio">🛡️</div><div class="tit"><div class="tit-t">Governance</div><div class="tit-s">Audit &amp; compliance</div></div></div>
+</template>
+
+<script>
+const smap={s1:0,s2:1,s3:2,s4:3,s5:4,s6:5,s7:6,s8:7,s9:8,s10:9,s11:10,s12:11,s13:12,s14:13};
+const tpl=document.getElementById('lntpl').innerHTML;
+function S(id,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  const t=document.getElementById(id);
+  if(t)t.classList.add('on');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  if(btn){btn.classList.add('on');}
+  else{const nb=document.querySelectorAll('.nb');if(smap[id]!==undefined&&nb[smap[id]])nb[smap[id]].classList.add('on');}
+  const ln=document.getElementById('ln'+id.replace('s',''));
+  if(ln&&!ln.innerHTML.trim())ln.innerHTML=tpl;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function ev(){event.stopPropagation();}
+document.querySelectorAll('[id^="ln"]').forEach(el=>{if(!el.innerHTML.trim())el.innerHTML=tpl;});
+</script>
+</body>
+</html>

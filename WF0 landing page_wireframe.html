@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Monitoring Platform - Landing Page Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: #eef1f5;
+    color: #2c3e50;
+    line-height: 1.5;
+  }
+
+  /* ===== Wireframe Navigator ===== */
+  .nav-bar {
+    background: #1f2937;
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  .nav-bar h1 { font-size: 14px; font-weight: 600; margin-right: 15px; }
+  .nav-btn {
+    background: #374151;
+    color: #fff;
+    border: 1px solid #4b5563;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .nav-btn:hover { background: #4b5563; }
+  .nav-btn.active { background: #2563eb; border-color: #2563eb; }
+
+  /* ===== Screen Container ===== */
+  .screen {
+    display: none;
+    min-height: calc(100vh - 50px);
+    padding: 20px;
+  }
+  .screen.active { display: block; }
+  .screen-label {
+    background: #fbbf24;
+    color: #78350f;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== Pre-Login & Login Common ===== */
+  .pre-login-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #fff;
+    border: 2px dashed #94a3b8;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .pre-login-header {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .corp-logo {
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .corp-logo-box {
+    width: 35px;
+    height: 35px;
+    background: #fff;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e3a8a;
+    font-size: 18px;
+  }
+  .header-links a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 13px;
+  }
+  .hero-section {
+    padding: 50px 30px;
+    text-align: center;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: #fff;
+  }
+  .hero-section h2 { font-size: 28px; margin-bottom: 10px; }
+  .hero-section p { font-size: 15px; opacity: 0.9; max-width: 700px; margin: 0 auto 25px; }
+  .hero-buttons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+  .btn-primary {
+    background: #fbbf24;
+    color: #1e3a8a;
+    border: none;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .btn-secondary {
+    background: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+    padding: 10px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .features-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    padding: 30px;
+  }
+  .feature-card {
+    border: 1px dashed #94a3b8;
+    padding: 20px;
+    text-align: center;
+    border-radius: 6px;
+  }
+  .feature-icon {
+    width: 50px; height: 50px;
+    background: #dbeafe;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .feature-card h4 { font-size: 14px; margin-bottom: 5px; color: #1e3a8a; }
+  .feature-card p { font-size: 12px; color: #64748b; }
+  .pre-login-footer {
+    background: #f8fafc;
+    padding: 15px 25px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #64748b;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .pre-login-footer a { color: #2563eb; text-decoration: none; margin-left: 12px; }
+
+  /* ===== Login Screen ===== */
+  .login-wrap {
+    max-width: 450px;
+    margin: 60px auto;
+    background: #fff;
+    border: 2px dashed #94a3b8;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .login-header {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 25px;
+    text-align: center;
+  }
+  .login-header h2 { font-size: 22px; margin-bottom: 5px; }
+  .login-header p { font-size: 13px; opacity: 0.85; }
+  .login-body { padding: 30px; }
+  .sso-button {
+    width: 100%;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 15px;
+  }
+  .login-divider {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 12px;
+    margin: 20px 0;
+    position: relative;
+  }
+  .login-divider::before, .login-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: #e2e8f0;
+  }
+  .login-divider::before { left: 0; }
+  .login-divider::after { right: 0; }
+  .form-group { margin-bottom: 15px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
+  .form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px dashed #94a3b8;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  .login-footer-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .login-footer-links a { color: #2563eb; text-decoration: none; }
+  .mfa-note {
+    background: #fef3c7;
+    border-left: 3px solid #f59e0b;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: #78350f;
+    margin-top: 15px;
+    border-radius: 3px;
+  }
+
+  /* ===== Access Request Screen ===== */
+  .request-wrap {
+    max-width: 600px;
+    margin: 40px auto;
+    background: #fff;
+    border: 2px dashed #94a3b8;
+    border-radius: 8px;
+    padding: 30px;
+  }
+  .request-wrap h2 { color: #1e3a8a; margin-bottom: 5px; }
+  .request-wrap > p { color: #64748b; font-size: 13px; margin-bottom: 20px; }
+  .info-box {
+    background: #dbeafe;
+    border-left: 3px solid #2563eb;
+    padding: 12px;
+    font-size: 12px;
+    color: #1e3a8a;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px dashed #94a3b8;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px dashed #94a3b8;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #fff;
+  }
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  .btn-cancel {
+    background: #fff;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .btn-submit {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ===== Post-Login Layout ===== */
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 50px);
+    background: #fff;
+    border: 2px dashed #94a3b8;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .app-header {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .app-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+  }
+  .app-brand-logo {
+    width: 32px; height: 32px;
+    background: #fff;
+    color: #1e3a8a;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .app-header-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 13px;
+  }
+  .role-switcher {
+    background: #fbbf24;
+    color: #78350f;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .icon-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    position: relative;
+  }
+  .badge-dot {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 9px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+  .user-avatar {
+    width: 26px; height: 26px;
+    background: #fbbf24;
+    color: #78350f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .app-body {
+    display: flex;
+    flex: 1;
+  }
+  .left-nav {
+    width: 240px;
+    background: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    padding: 20px 12px;
+  }
+  .nav-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    padding: 0 8px;
+  }
+  .tile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .tile-nav-item:hover {
+    border-color: #2563eb;
+    border-style: solid;
+    background: #eff6ff;
+  }
+  .tile-nav-item.active {
+    background: #dbeafe;
+    border-color: #2563eb;
+    border-style: solid;
+  }
+  .tile-icon {
+    width: 32px; height: 32px;
+    background: #dbeafe;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .tile-text { flex: 1; }
+  .tile-title { font-size: 13px; font-weight: 600; color: #1e293b; }
+  .tile-subtitle { font-size: 10px; color: #64748b; margin-top: 2px; }
+  .tile-badge {
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 25px;
+    background: #f1f5f9;
+    overflow-y: auto;
+  }
+  .page-title {
+    font-size: 20px;
+    color: #1e293b;
+    margin-bottom: 5px;
+  }
+  .page-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 20px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  .summary-card {
+    background: #fff;
+    padding: 18px;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
+  }
+  .summary-card-label {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .summary-card-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .summary-card-trend {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+  .trend-up { color: #16a34a; }
+  .trend-down { color: #dc2626; }
+
+  .panel {
+    background: #fff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  .panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel-title { font-size: 14px; font-weight: 600; color: #1e293b; }
+  .panel-link { font-size: 12px; color: #2563eb; text-decoration: none; }
+  .panel-body { padding: 15px 18px; }
+  .placeholder-block {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    height: 180px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 12px;
+  }
+  .activity-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    font-size: 13px;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-meta { color: #94a3b8; font-size: 11px; }
+  .status-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .status-pending { background: #fef3c7; color: #78350f; }
+  .status-success { background: #dcfce7; color: #166534; }
+  .status-fail { background: #fee2e2; color: #991b1b; }
+  .status-readonly { background: #e0e7ff; color: #3730a3; }
+
+  /* ===== Unauthorized & 403 ===== */
+  .error-wrap {
+    max-width: 550px;
+    margin: 80px auto;
+    background: #fff;
+    border: 2px dashed #94a3b8;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+  }
+  .error-icon {
+    width: 80px; height: 80px;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+  }
+  .error-wrap h2 { color: #1e293b; margin-bottom: 10px; }
+  .error-wrap p { color: #64748b; font-size: 14px; margin-bottom: 25px; }
+
+  /* ===== Session Timeout Modal ===== */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  .modal-box {
+    background: #fff;
+    border: 2px dashed #94a3b8;
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+  }
+  .modal-icon {
+    width: 60px; height: 60px;
+    background: #fef3c7;
+    color: #d97706;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .modal-box h3 { color: #1e293b; margin-bottom: 10px; }
+  .modal-box p { color: #64748b; font-size: 13px; margin-bottom: 20px; }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  /* ===== Role Switcher Dropdown ===== */
+  .role-dropdown {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: absolute;
+    top: 50px;
+    right: 200px;
+    z-index: 100;
+  }
+  .role-option {
+    padding: 10px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #1e293b;
+  }
+  .role-option:hover { background: #f1f5f9; }
+  .role-option.active { background: #dbeafe; font-weight: 600; }
+  .role-option .check { color: #16a34a; }
+
+  /* ===== Wireframe Annotation Notes ===== */
+  .annotation {
+    background: #fef9c3;
+    border-left: 3px solid #ca8a04;
+    padding: 10px 14px;
+    margin: 15px 0;
+    font-size: 12px;
+    color: #713f12;
+    border-radius: 3px;
+  }
+  .annotation strong { color: #422006; }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 768px) {
+    .app-body { flex-direction: column; }
+    .left-nav { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; }
+    .features-row { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .header-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== WIREFRAME NAVIGATOR ===== -->
+<div class="nav-bar">
+  <h1>📐 Wireframe Navigator</h1>
+  <button class="nav-btn active" onclick="showScreen('pre-login', this)">1. Pre-Login</button>
+  <button class="nav-btn" onclick="showScreen('login', this)">2. Login</button>
+  <button class="nav-btn" onclick="showScreen('access-request', this)">3. Access Request</button>
+  <button class="nav-btn" onclick="showScreen('admin-home', this)">4. Admin Home</button>
+  <button class="nav-btn" onclick="showScreen('user-home', this)">5. User Home</button>
+  <button class="nav-btn" onclick="showScreen('viewer-home', this)">6. Viewer Home</button>
+  <button class="nav-btn" onclick="showScreen('no-access', this)">7. No Access</button>
+  <button class="nav-btn" onclick="showScreen('forbidden', this)">8. 403 Forbidden</button>
+  <button class="nav-btn" onclick="showScreen('session-timeout', this)">9. Session Timeout</button>
+</div>
+
+<!-- ===== SCREEN 1: PRE-LOGIN LANDING PAGE ===== -->
+<div id="pre-login" class="screen active">
+  <span class="screen-label">Screen 1 — Pre-Login Landing Page (Public)</span>
+  <div class="pre-login-container">
+    <div class="pre-login-header">
+      <div class="corp-logo">
+        <div class="corp-logo-box">🏢</div>
+        <div>
+          <div>Corporate Logo</div>
+          <div style="font-size: 11px; opacity: 0.8;">Model Monitoring Platform</div>
+        </div>
+      </div>
+      <div class="header-links">
+        <a href="#">Documentation</a>
+        <a href="#">Support</a>
+        <a href="#">Compliance</a>
+      </div>
+    </div>
+
+    <div class="hero-section">
+      <h2>Enterprise-Grade Agentic Model Monitoring</h2>
+      <p>End-to-end workflows for model monitoring, validation, and root-cause analysis — built for governance, scale, and trust.</p>
+      <div class="hero-buttons">
+        <button class="btn-primary" onclick="showScreen('login', null)">🔐 Login</button>
+        <button class="btn-secondary" onclick="showScreen('access-request', null)">Request Access</button>
+      </div>
+    </div>
+
+    <div class="features-row">
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h4>Model Monitoring</h4>
+        <p>Real-time drift, performance & data quality tracking</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h4>Validation</h4>
+        <p>Automated validation workflows with thresholds</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h4>Root-Cause Analysis</h4>
+        <p>Agentic RCA to pinpoint issues quickly</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h4>Governance</h4>
+        <p>Audit trails, policies & compliance reports</p>
+      </div>
+    </div>
+
+    <div class="pre-login-footer">
+      <div>© 2026 Corporate Name. Internal Use Only.</div>
+      <div>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact IT</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width: 1100px; margin: 15px auto;">
+    <div class="annotation">
+      <strong>📝 Note:</strong> Branding (logo, colors, typography) must conform to the corporate design system. The "Login" CTA initiates SSO redirect. "Request Access" routes new users to the Viewer-only access request form.
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 2: LOGIN ===== -->
+<div id="login" class="screen">
+  <span class="screen-label">Screen 2 — Login (Corporate SSO + MFA)</span>
+  <div class="login-wrap">
+    <div class="login-header">
+      <h2>Sign In</h2>
+      <p>Model Monitoring Platform</p>
+    </div>
+    <div class="login-body">
+      <button class="sso-button">🔑 Sign in with Corporate SSO</button>
+
+      <div class="login-divider">or (break-glass admin only)</div>
+
+      <div class="form-group">
+        <label>Corporate ID / Email</label>
+        <input type="text" placeholder="user@company.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••">
+      </div>
+      <button class="btn-submit" style="width:100%; padding: 12px;">Continue</button>
+
+      <div class="mfa-note">
+        🔒 Multi-Factor Authentication will be required after credential validation.
+      </div>
+
+      <div class="login-footer-links">
+        <a href="#">Forgot Password?</a>
+        <a href="#" onclick="showScreen('access-request', null); return false;">Request Access</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width: 450px; margin: 15px auto;">
+    <div class="annotation">
+      <strong>📝 Note:</strong> SSO is the primary path. Local credentials shown only for break-glass scenarios per security policy. All login events (success/failure/MFA outcome) are written to the audit log.
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 3: ACCESS REQUEST ===== -->
+<div id="access-request" class="screen">
+  <span class="screen-label">Screen 3 — New User Access Request (Viewer Only)</span>
+  <div class="request-wrap">
+    <h2>Request Access</h2>
+    <p>Submit a request to gain access to the Model Monitoring Platform.</p>
+
+    <div class="info-box">
+      ℹ️ Self-service access requests are limited to <strong>Viewer (read-only)</strong> role. User and Admin roles must be provisioned by an Administrator.
+    </div>
+
+    <div class="form-group">
+      <label>Full Name *</label>
+      <input type="text" placeholder="Enter your full name">
+    </div>
+    <div class="form-group">
+      <label>Corporate Email / ID *</label>
+      <input type="text" placeholder="user@company.com">
+    </div>
+    <div class="form-group">
+      <label>Department / Business Unit *</label>
+      <input type="text" placeholder="e.g., Risk, Audit, Compliance">
+    </div>
+    <div class="form-group">
+      <label>Requested Access Type</label>
+      <select>
+        <option>Viewer (Read-only)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Business Justification *</label>
+      <textarea rows="4" placeholder="Briefly describe why you need access..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Stakeholder Type</label>
+      <select>
+        <option>-- Select --</option>
+        <option>Auditor</option>
+        <option>Governance / Risk Reviewer</option>
+        <option>Business Stakeholder</option>
+        <option>External Reviewer</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="showScreen('pre-login', null)">Cancel</button>
+      <button class="btn-submit">Submit Request</button>
+    </div>
+  </div>
+
+  <div style="max-width: 600px; margin: 15px auto;">
+    <div class="annotation">
+      <strong>📝 Note:</strong> Submitted requests route to the Admin's Access Control Center for review. Requester is notified via email upon approval/rejection.
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 4: ADMIN HOMEPAGE ===== -->
+<div id="admin-home" class="screen">
+  <span class="screen-label">Screen 4 — Admin Homepage</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand">
+        <div class="app-brand-logo">📊</div>
+        <div>Model Monitoring Platform</div>
+      </div>
+      <div class="app-header-right">
+        <button class="role-switcher" onclick="toggleRoleDropdown('admin')">
+          👤 Active Role: ADMIN ▾
+        </button>
+        <button class="icon-btn">
+          🔔 <span class="badge-dot">5</span>
+        </button>
+        <div class="user-pill">
+          <div class="user-avatar">JD</div>
+          <span>John Doe</span>
+        </div>
+        <button class="icon-btn" title="Logout">⏻</button>
+      </div>
+    </div>
+
+    <div id="admin-role-dd" style="display:none;">
+      <div class="role-dropdown">
+        <div class="role-option active">Admin <span class="check">✓</span></div>
+        <div class="role-option" onclick="showScreen('user-home', null)">User</div>
+        <div class="role-option" onclick="showScreen('viewer-home', null)">Viewer</div>
+      </div>
+    </div>
+
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Admin Console</div>
+        <div class="tile-nav-item active">
+          <div class="tile-icon">📋</div>
+          <div class="tile-text">
+            <div class="tile-title">Manage Model Inventory</div>
+            <div class="tile-subtitle">Register, edit, archive</div>
+          </div>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">⚙️</div>
+          <div class="tile-text">
+            <div class="tile-title">Configure Metrics</div>
+            <div class="tile-subtitle">Thresholds & rules</div>
+          </div>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">📥</div>
+          <div class="tile-text">
+            <div class="tile-title">Model Data Ingestion</div>
+            <div class="tile-subtitle">Pipelines & sources</div>
+          </div>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">🔐</div>
+          <div class="tile-text">
+            <div class="tile-title">Access Control Center</div>
+            <div class="tile-subtitle">Users & approvals</div>
+          </div>
+          <span class="tile-badge">3</span>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">⏰</div>
+          <div class="tile-text">
+            <div class="tile-title">Set-up Scheduler</div>
+            <div class="tile-subtitle">Jobs & batch runs</div>
+          </div>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">🛡️</div>
+          <div class="tile-text">
+            <div class="tile-title">Governance</div>
+            <div class="tile-subtitle">Audit & compliance</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <h2 class="page-title">Welcome back, John 👋</h2>
+        <p class="page-subtitle">Admin Console — operational overview</p>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-card-label">Total Models</div>
+            <div class="summary-card-value">142</div>
+            <div class="summary-card-trend trend-up">▲ 4 this week</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Pending Access Requests</div>
+            <div class="summary-card-value">3</div>
+            <div class="summary-card-trend">Action required</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Active Schedulers</div>
+            <div class="summary-card-value">28</div>
+            <div class="summary-card-trend trend-up">All healthy</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Triggers Hit (24h)</div>
+            <div class="summary-card-value">17</div>
+            <div class="summary-card-trend trend-down">▼ 2 vs yesterday</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Pending Access Requests</div>
+            <a href="#" class="panel-link">View all →</a>
+          </div>
+          <div class="panel-body">
+            <div class="activity-item">
+              <div>
+                <strong>Sarah Mitchell</strong> — Viewer access request
+                <div class="activity-meta">Auditor • 2 hours ago</div>
+              </div>
+              <span class="status-tag status-pending">Pending</span>
+            </div>
+            <div class="activity-item">
+              <div>
+                <strong>Raj Kumar</strong> — Viewer access request
+                <div class="activity-meta">Risk Reviewer • 5 hours ago</div>
+              </div>
+              <span class="status-tag status-pending">Pending</span>
+            </div>
+            <div class="activity-item">
+              <div>
+                <strong>Emma Chen</strong> — Viewer access request
+                <div class="activity-meta">Compliance • 1 day ago</div>
+              </div>
+              <span class="status-tag status-pending">Pending</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">System Health & Recent Activity</div>
+            <a href="#" class="panel-link">View audit log →</a>
+          </div>
+          <div class="panel-body">
+            <div class="placeholder-block">[ Activity Feed / System Health Chart Placeholder ]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width: 1400px; margin: 15px auto;">
+    <div class="annotation">
+      <strong>📝 Note:</strong> Six tiles per spec — Manage Model Inventory, Configure Metrics, Model Data Ingestion, Access Control Center, Set-up Scheduler, Governance. Click the role pill in the header to test multi-role switching.
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 5: USER HOMEPAGE ===== -->
+<div id="user-home" class="screen">
+  <span class="screen-label">Screen 5 — User Homepage</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand">
+        <div class="app-brand-logo">📊</div>
+        <div>Model Monitoring Platform</div>
+      </div>
+      <div class="app-header-right">
+        <button class="role-switcher" onclick="toggleRoleDropdown('user')">
+          👤 Active Role: USER ▾
+        </button>
+        <button class="icon-btn">
+          🔔 <span class="badge-dot">2</span>
+        </button>
+        <div class="user-pill">
+          <div class="user-avatar">JD</div>
+          <span>John Doe</span>
+        </div>
+        <button class="icon-btn" title="Logout">⏻</button>
+      </div>
+    </div>
+
+    <div id="user-role-dd" style="display:none;">
+      <div class="role-dropdown">
+        <div class="role-option" onclick="showScreen('admin-home', null)">Admin</div>
+        <div class="role-option active">User <span class="check">✓</span></div>
+        <div class="role-option" onclick="showScreen('viewer-home', null)">Viewer</div>
+      </div>
+    </div>
+
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">User Workspace</div>
+        <div class="tile-nav-item active">
+          <div class="tile-icon">📈</div>
+          <div class="tile-text">
+            <div class="tile-title">Dashboard</div>
+            <div class="tile-subtitle">KPIs & widgets</div>
+          </div>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">📋</div>
+          <div class="tile-text">
+            <div class="tile-title">Model Inventory</div>
+            <div class="tile-subtitle">Your models</div>
+          </div>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">🔬</div>
+          <div class="tile-text">
+            <div class="tile-title">Model Monitoring</div>
+            <div class="tile-subtitle">Drift, performance, RCA</div>
+          </div>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">🚨</div>
+          <div class="tile-text">
+            <div class="tile-title">Trigger Hit Report</div>
+            <div class="tile-subtitle">Alerts & breaches</div>
+          </div>
+          <span class="tile-badge">2</span>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">📦</div>
+          <div class="tile-text">
+            <div class="tile-title">Repository</div>
+            <div class="tile-subtitle">Artifacts & access</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <h2 class="page-title">Welcome back, John 👋</h2>
+        <p class="page-subtitle">Your model monitoring workspace</p>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-card-label">My Models</div>
+            <div class="summary-card-value">12</div>
+            <div class="summary-card-trend">8 healthy, 4 warnings</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Active Alerts</div>
+            <div class="summary-card-value">2</div>
+            <div class="summary-card-trend trend-down">Needs review</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Last Run</div>
+            <div class="summary-card-value">2h</div>
+            <div class="summary-card-trend">ago</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Pending Repo Requests</div>
+            <div class="summary-card-value">1</div>
+            <div class="summary-card-trend">Awaiting approval</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Recent Trigger Hits</div>
+            <a href="#" class="panel-link">View Trigger Hit Report →</a>
+          </div>
+          <div class="panel-body">
+            <div class="activity-item">
+              <div>
+                <strong>Credit Risk Model v2.3</strong> — PSI threshold breach
+                <div class="activity-meta">Today, 9:42 AM</div>
+              </div>
+              <span class="status-tag status-fail">Critical</span>
+            </div>
+            <div class="activity-item">
+              <div>
+                <strong>Customer Churn Predictor</strong> — Performance drop
+                <div class="activity-meta">Yesterday, 4:15 PM</div>
+              </div>
+              <span class="status-tag status-pending">Warning</span>
+            </div>
+            <div class="activity-item">
+              <div>
+                <strong>Fraud Detection Model</strong> — Validation passed
+                <div class="activity-meta">Yesterday, 11:00 AM</div>
+              </div>
+              <span class="status-tag status-success">Healthy</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Model Health Overview</div>
+            <a href="#" class="panel-link">Open Dashboard →</a>
+          </div>
+          <div class="panel-body">
+            <div class="placeholder-block">[ Performance / Drift Chart Placeholder ]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width: 1400px; margin: 15px auto;">
+    <div class="annotation">
+      <strong>📝 Note:</strong> Five tiles per spec — Dashboard, Model Inventory, Model Monitoring, Trigger Hit Report, Repository. Users can request additional model/repo access from within respective modules.
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 6: VIEWER HOMEPAGE ===== -->
+<div id="viewer-home" class="screen">
+  <span class="screen-label">Screen 6 — Viewer Homepage (Read-Only)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand">
+        <div class="app-brand-logo">📊</div>
+        <div>Model Monitoring Platform</div>
+      </div>
+      <div class="app-header-right">
+        <span class="status-tag status-readonly" style="font-size:11px; padding: 4px 10px;">🔒 READ-ONLY MODE</span>
+        <button class="role-switcher" onclick="toggleRoleDropdown('viewer')">
+          👤 Active Role: VIEWER ▾
+        </button>
+        <button class="icon-btn">🔔</button>
+        <div class="user-pill">
+          <div class="user-avatar">SM</div>
+          <span>Sarah Mitchell</span>
+        </div>
+        <button class="icon-btn" title="Logout">⏻</button>
+      </div>
+    </div>
+
+    <div id="viewer-role-dd" style="display:none;">
+      <div class="role-dropdown">
+        <div class="role-option" onclick="showScreen('user-home', null)">User</div>
+        <div class="role-option active">Viewer <span class="check">✓</span></div>
+      </div>
+    </div>
+
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Viewer Access</div>
+        <div class="tile-nav-item active">
+          <div class="tile-icon">📈</div>
+          <div class="tile-text">
+            <div class="tile-title">Dashboard</div>
+            <div class="tile-subtitle">Read-only KPIs</div>
+          </div>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">📋</div>
+          <div class="tile-text">
+            <div class="tile-title">Model Inventory</div>
+            <div class="tile-subtitle">Browse only</div>
+          </div>
+        </div>
+        <div class="tile-nav-item">
+          <div class="tile-icon">🚨</div>
+          <div class="tile-text">
+            <div class="tile-title">Trigger Hit Report</div>
+            <div class="tile-subtitle">View only</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <h2 class="page-title">Welcome, Sarah 👋</h2>
+        <p class="page-subtitle">Viewer dashboard — read-only access for stakeholders & auditors</p>
+
+        <div class="info-box" style="margin-bottom: 20px;">
+          ℹ️ You have <strong>read-only access</strong>. Configuration, request, and edit actions are disabled. Contact your Administrator for elevated access.
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-card-label">Models in Scope</div>
+            <div class="summary-card-value">87</div>
+            <div class="summary-card-trend">Across 4 BUs</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Healthy</div>
+            <div class="summary-card-value">71</div>
+            <div class="summary-card-trend trend-up">82%</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Warnings</div>
+            <div class="summary-card-value">12</div>
+            <div class="summary-card-trend">14%</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Critical</div>
+            <div class="summary-card-value">4</div>
+            <div class="summary-card-trend trend-down">4%</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Aggregated Trigger Hit Summary</div>
+            <a href="#" class="panel-link">View Report →</a>
+          </div>
+          <div class="panel-body">
+            <div class="placeholder-block">[ Aggregated Trigger Trend Chart — Read-only ]</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Compliance Snapshot</div>
+          </div>
+          <div class="panel-body">
+            <div class="activity-item">
+              <div>Models within SLA</div>
+              <span class="status-tag status-success">96%</span>
+            </div>
+            <div class="activity-item">
+              <div>Validations completed (last 30d)</div>
+              <span class="status-tag status-success">218</span>
+            </div>
+            <div class="activity-item">
+              <div>Open governance findings</div>
+              <span class="status-tag status-pending">3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width: 1400px; margin: 15px auto;">
+    <div class="annotation">
+      <strong>📝 Note:</strong> Three tiles per spec — Dashboard, Model Inventory, Trigger Hit Report. All edit/configure/request controls are hidden or disabled. The "READ-ONLY" indicator is persistently shown in the header.
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 7: NO ACCESS ===== -->
+<div id="no-access" class="screen">
+  <span class="screen-label">Screen 7 — No Role Assigned</span>
+  <div class="error-wrap">
+    <div class="error-icon">🔒</div>
+    <h2>No Access Assigned</h2>
+    <p>You have authenticated successfully, but no role has been assigned to your account yet. Submit an access request to get started.</p>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button class="btn-cancel" onclick="showScreen('pre-login', null)">Sign Out</button>
+      <button class="btn-submit" onclick="showScreen('access-request', null)">Request Viewer Access</button>
+    </div>
+  </div>
+
+  <div style="max-width: 550px; margin: 15px auto;">
+    <div class="annotation">
+      <strong>📝 Note:</strong> Triggered when authentication succeeds but the user has no role in the access control DB. Logged in audit trail.
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 8: 403 FORBIDDEN ===== -->
+<div id="forbidden" class="screen">
+  <span class="screen-label">Screen 8 — 403 Access Denied</span>
+  <div class="error-wrap">
+    <div class="error-icon">⛔</div>
+    <h2>403 — Access Denied</h2>
+    <p>You don't have permission to access this resource. Your current role does not include this module. If you believe this is an error, please contact your Administrator.</p>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button class="btn-cancel" onclick="showScreen('pre-login', null)">Sign Out</button>
+      <button class="btn-submit" onclick="showScreen('viewer-home', null)">Return to My Homepage</button>
+    </div>
+  </div>
+
+  <div style="max-width: 550px; margin: 15px auto;">
+    <div class="annotation">
+      <strong>📝 Note:</strong> Triggered when a user attempts to access a URL/module outside their role's permissions. Logged + flagged to security if a configurable threshold of attempts is exceeded.
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 9: SESSION TIMEOUT WARNING ===== -->
+<div id="session-timeout" class="screen">
+  <span class="screen-label">Screen 9 — Session Timeout Warning Modal</span>
+
+  <!-- Background mock of an in-app screen -->
+  <div class="app-shell" style="filter: blur(2px); pointer-events: none;">
+    <div class="app-header">
+      <div class="app-brand">
+        <div class="app-brand-logo">📊</div>
+        <div>Model Monitoring Platform</div>
+      </div>
+      <div class="app-header-right">
+        <button class="role-switcher">👤 USER ▾</button>
+        <div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="tile-nav-item"><div class="tile-icon">📈</div><div class="tile-text"><div class="tile-title">Dashboard</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Model Inventory</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="placeholder-block" style="height: 300px;">[ Background Screen ]</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal overlay -->
+  <div class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-icon">⏱️</div>
+      <h3>Your session is about to expire</h3>
+      <p>For your security, you will be signed out in <strong>2 minutes</strong> due to inactivity. Any unsaved drafts will be cached locally.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="showScreen('pre-login', null)">Sign Out Now</button>
+        <button class="btn-submit">Stay Signed In</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showScreen(id, btn) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      // Sync nav button state when navigating via in-screen links
+      const map = {
+        'pre-login': 0, 'login': 1, 'access-request': 2,
+        'admin-home': 3, 'user-home': 4, 'viewer-home': 5,
+        'no-access': 6, 'forbidden': 7, 'session-timeout': 8
+      };
+      const navBtns = document.querySelectorAll('.nav-btn');
+      if (map[id] !== undefined) navBtns[map[id]].classList.add('active');
+    }
+
+    // Hide any open role dropdowns
+    ['admin-role-dd','user-role-dd','viewer-role-dd'].forEach(d => {
+      const el = document.getElementById(d);
+      if (el) el.style.display = 'none';
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleRoleDropdown(role) {
+    const id = role + '-role-dd';
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.role-switcher') && !e.target.closest('.role-dropdown')) {
+      ['admin-role-dd','user-role-dd','viewer-role-dd'].forEach(d => {
+        const el = document.getElementById(d);
+        if (el) el.style.display = 'none';
+      });
+    }
+  });
+</script>
+
+</body>
+</html>

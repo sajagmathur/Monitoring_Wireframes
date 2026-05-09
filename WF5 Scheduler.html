@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WF6 — Admin: Set-up Scheduler Wireframe</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #eef1f5; color: #1e293b; line-height: 1.5; }
+
+/* ── Navigator ── */
+.nav-bar {
+  background: #1f2937; color: #fff; padding: 10px 16px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,.2);
+}
+.nav-bar h1 { font-size: 13px; font-weight: 700; margin-right: 10px; white-space: nowrap; }
+.nav-btn {
+  background: #374151; color: #fff; border: 1px solid #4b5563;
+  padding: 5px 10px; cursor: pointer; font-size: 11px; border-radius: 4px;
+  transition: background .15s; white-space: nowrap;
+}
+.nav-btn:hover { background: #4b5563; }
+.nav-btn.active { background: #2563eb; border-color: #2563eb; }
+
+/* ── Screens ── */
+.screen { display: none; min-height: calc(100vh - 46px); padding: 18px; }
+.screen.active { display: block; }
+.screen-label {
+  background: #fbbf24; color: #78350f; padding: 5px 10px; border-radius: 4px;
+  font-size: 11px; font-weight: 700; display: inline-block; margin-bottom: 14px;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.annotation {
+  background: #fef9c3; border-left: 3px solid #ca8a04;
+  padding: 9px 13px; margin: 12px 0; font-size: 11px; color: #713f12; border-radius: 3px;
+}
+.annotation strong { color: #422006; }
+
+/* ── App Shell ── */
+.app-shell {
+  background: #fff; border: 2px dashed #94a3b8; border-radius: 8px;
+  overflow: hidden; max-width: 1400px; margin: 0 auto;
+}
+.app-header {
+  background: #1e3a8a; color: #fff; padding: 11px 18px;
+  display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.app-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; }
+.app-brand-logo {
+  width: 30px; height: 30px; background: #fff; color: #1e3a8a;
+  border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.app-header-right { display: flex; align-items: center; gap: 14px; font-size: 12px; }
+.role-pill {
+  background: #fbbf24; color: #78350f; padding: 4px 10px;
+  border-radius: 20px; font-size: 11px; font-weight: 700;
+}
+.user-pill {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.1); padding: 4px 10px; border-radius: 20px;
+}
+.avatar {
+  width: 24px; height: 24px; background: #fbbf24; color: #78350f;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+}
+.app-body { display: flex; min-height: 600px; }
+
+/* ── Left Nav ── */
+.left-nav {
+  width: 220px; background: #f8fafc; border-right: 1px solid #e2e8f0;
+  padding: 16px 10px; flex-shrink: 0;
+}
+.nav-section-title {
+  font-size: 10px; text-transform: uppercase; color: #64748b;
+  font-weight: 700; letter-spacing: .5px; margin-bottom: 8px; padding: 0 6px;
+}
+.tile {
+  display: flex; align-items: center; gap: 9px; padding: 10px;
+  border: 1px dashed #cbd5e1; border-radius: 6px; margin-bottom: 6px;
+  cursor: pointer; background: #fff; transition: all .15s;
+}
+.tile:hover { border-color: #2563eb; border-style: solid; background: #eff6ff; }
+.tile.active { background: #dbeafe; border-color: #2563eb; border-style: solid; }
+.tile-icon {
+  width: 30px; height: 30px; background: #dbeafe; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+}
+.tile-title { font-size: 12px; font-weight: 600; color: #1e293b; }
+.tile-sub { font-size: 10px; color: #64748b; margin-top: 1px; }
+
+/* ── Main ── */
+.main { flex: 1; padding: 22px; background: #f1f5f9; overflow-y: auto; }
+.page-title { font-size: 19px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+.page-sub { font-size: 12px; color: #64748b; margin-bottom: 18px; }
+
+/* ── KPI Cards ── */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 13px; margin-bottom: 20px; }
+.kpi-card {
+  background: #fff; padding: 16px; border-radius: 8px;
+  border: 1px dashed #cbd5e1; cursor: pointer; transition: border-color .15s;
+}
+.kpi-card:hover { border-color: #2563eb; border-style: solid; }
+.kpi-label { font-size: 10px; text-transform: uppercase; color: #64748b; letter-spacing: .4px; margin-bottom: 6px; }
+.kpi-value { font-size: 28px; font-weight: 700; color: #1e293b; }
+.kpi-trend { font-size: 11px; margin-top: 3px; }
+.kpi-trend.warn { color: #d97706; }
+.kpi-trend.ok { color: #16a34a; }
+.kpi-trend.err { color: #dc2626; }
+
+/* ── Panel ── */
+.panel { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; margin-bottom: 18px; }
+.panel-hdr {
+  padding: 13px 16px; border-bottom: 1px solid #e2e8f0;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.panel-title { font-size: 13px; font-weight: 700; color: #1e293b; }
+.panel-body { padding: 14px 16px; }
+
+/* ── Toolbar Row ── */
+.toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.search-box {
+  flex: 1; min-width: 200px; padding: 7px 10px;
+  border: 1px dashed #94a3b8; border-radius: 5px; font-size: 12px;
+}
+.filter-sel {
+  padding: 7px 10px; border: 1px dashed #94a3b8; border-radius: 5px;
+  font-size: 12px; background: #fff; min-width: 140px;
+}
+.btn-primary {
+  background: #2563eb; color: #fff; border: none; padding: 8px 16px;
+  border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.btn-secondary {
+  background: #fff; color: #475569; border: 1px solid #cbd5e1;
+  padding: 7px 14px; border-radius: 6px; font-size: 12px; cursor: pointer;
+}
+.btn-danger {
+  background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;
+  padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;
+}
+.btn-sm {
+  padding: 4px 9px; font-size: 11px; border-radius: 4px; cursor: pointer;
+  border: 1px solid #cbd5e1; background: #fff; color: #1e293b;
+}
+.btn-sm.blue { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+.btn-sm.orange { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.btn-sm.red { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.btn-sm.green { background: #dcfce7; color: #166534; border-color: #86efac; }
+
+/* ── Table ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th {
+  background: #1e3a8a; color: #fff; padding: 9px 10px; text-align: left;
+  font-weight: 600; font-size: 11px; white-space: nowrap;
+}
+.data-table td { padding: 9px 10px; border-bottom: 1px dashed #e2e8f0; vertical-align: middle; }
+.data-table tr:hover td { background: #f8fafc; }
+.data-table tr.failed-row td { background: #fff5f5; }
+.data-table tr.failed-row:hover td { background: #fee2e2; }
+
+/* ── Status Tags ── */
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap;
+}
+.tag-yes { background: #dcfce7; color: #166534; }
+.tag-no { background: #f1f5f9; color: #64748b; }
+.tag-paused { background: #fef3c7; color: #92400e; }
+.tag-success { background: #dcfce7; color: #166534; }
+.tag-failed { background: #fee2e2; color: #991b1b; }
+.tag-inprog { background: #dbeafe; color: #1e40af; }
+.tag-never { background: #f1f5f9; color: #64748b; }
+.tag-warn { background: #fef3c7; color: #92400e; }
+.tz-label { font-size: 10px; color: #94a3b8; display: block; margin-top: 1px; }
+.warn-icon { color: #d97706; }
+
+/* ── Pagination ── */
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; font-size: 12px; color: #64748b; margin-top: 8px;
+}
+.page-btns { display: flex; gap: 5px; }
+.page-btn {
+  padding: 4px 9px; border: 1px solid #cbd5e1; border-radius: 4px;
+  font-size: 11px; cursor: pointer; background: #fff;
+}
+.page-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+/* ── Filter Flow Panel ── */
+.filter-flow {
+  background: #fff; border: 2px dashed #94a3b8; border-radius: 8px;
+  max-width: 900px; margin: 0 auto; overflow: hidden;
+}
+.filter-flow-hdr {
+  background: #1e3a8a; color: #fff; padding: 14px 20px;
+}
+.filter-flow-hdr h3 { font-size: 15px; margin-bottom: 3px; }
+.filter-flow-hdr p { font-size: 11px; opacity: .8; }
+.filter-flow-body { padding: 20px; }
+.cascade-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+  gap: 12px; margin-bottom: 20px;
+}
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block; font-size: 11px; font-weight: 700; color: #475569;
+  margin-bottom: 5px; text-transform: uppercase; letter-spacing: .3px;
+}
+.form-group select, .form-group input[type="date"], .form-group input[type="time"] {
+  width: 100%; padding: 8px 10px; border: 1px dashed #94a3b8;
+  border-radius: 5px; font-size: 13px; background: #fff;
+}
+.form-group select:disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }
+.step-divider {
+  display: flex; align-items: center; gap: 10px; margin: 16px 0;
+}
+.step-divider::before, .step-divider::after {
+  content: ''; flex: 1; height: 1px; background: #e2e8f0;
+}
+.step-label {
+  font-size: 11px; font-weight: 700; color: #2563eb; white-space: nowrap; text-transform: uppercase;
+}
+
+/* ── Model Selection List ── */
+.model-list { border: 1px dashed #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+.model-list-hdr {
+  background: #f8fafc; padding: 8px 12px; border-bottom: 1px solid #e2e8f0;
+  display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600;
+}
+.model-list-row {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  border-bottom: 1px dashed #e2e8f0; font-size: 12px;
+}
+.model-list-row:last-child { border-bottom: none; }
+.model-list-row:hover { background: #f8fafc; }
+.model-list-row.selected { background: #eff6ff; }
+.model-count-tag {
+  background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 700;
+}
+
+/* ── Schedule Config Panel ── */
+.config-panel {
+  background: #fff; border: 2px dashed #94a3b8; border-radius: 8px;
+  max-width: 700px; margin: 0 auto; overflow: hidden;
+}
+.run-preview {
+  background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 12px; margin-top: 10px;
+}
+.run-preview-title { font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 8px; text-transform: uppercase; }
+.run-preview-row { display: flex; gap: 10px; font-size: 12px; padding: 4px 0; border-bottom: 1px dashed #e2e8f0; }
+.run-preview-row:last-child { border-bottom: none; }
+.run-num { color: #94a3b8; width: 30px; }
+.tz-info { background: #eff6ff; border: 1px solid #bfdbfe; padding: 8px 12px; border-radius: 5px; font-size: 11px; color: #1e40af; margin-top: 8px; }
+
+/* ── Conflict Modal ── */
+.modal-overlay-sim {
+  background: rgba(15,23,42,.5); padding: 40px 20px;
+  border-radius: 8px; border: 2px dashed #94a3b8;
+}
+.modal-box {
+  background: #fff; border-radius: 8px; max-width: 640px; margin: 0 auto;
+  overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.15);
+}
+.modal-hdr { background: #dc2626; color: #fff; padding: 14px 18px; }
+.modal-hdr h3 { font-size: 14px; margin-bottom: 2px; }
+.modal-hdr p { font-size: 11px; opacity: .85; }
+.modal-body { padding: 16px 18px; }
+.conflict-row {
+  border: 1px solid #fee2e2; border-radius: 6px; padding: 12px; margin-bottom: 10px; background: #fff5f5;
+}
+.conflict-model-name { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+.conflict-existing { font-size: 11px; color: #64748b; margin-bottom: 8px; }
+.conflict-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.modal-footer {
+  padding: 12px 18px; background: #f8fafc; border-top: 1px solid #e2e8f0;
+  display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap;
+}
+
+/* ── Confirmation Screen ── */
+.confirm-wrap {
+  max-width: 700px; margin: 0 auto; background: #fff;
+  border: 2px dashed #94a3b8; border-radius: 8px; padding: 30px; text-align: center;
+}
+.confirm-icon {
+  width: 70px; height: 70px; background: #dcfce7; color: #16a34a; border-radius: 50%;
+  margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 30px;
+}
+.confirm-config { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 14px; margin: 16px 0; text-align: left; }
+.confirm-config-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; font-size: 12px; }
+.confirm-config-row:last-child { border-bottom: none; }
+.skipped-list { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 6px; padding: 12px; margin-top: 12px; text-align: left; font-size: 12px; }
+.skipped-title { font-weight: 700; color: #78350f; margin-bottom: 6px; }
+
+/* ── Edit Scheduler Full Page ── */
+.edit-page { max-width: 1100px; margin: 0 auto; }
+.edit-two-col { display: grid; grid-template-columns: 420px 1fr; gap: 18px; }
+.edit-form-panel, .edit-history-panel {
+  background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; overflow: hidden;
+}
+.edit-panel-hdr {
+  background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid #e2e8f0;
+  font-size: 13px; font-weight: 700; color: #1e293b;
+}
+.edit-panel-body { padding: 16px; }
+.edit-meta-row { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; }
+.edit-meta-row:last-child { border-bottom: none; }
+.edit-meta-label { color: #64748b; }
+.edit-meta-value { font-weight: 600; color: #1e293b; }
+.failure-context { background: #fee2e2; border: 1px solid #fca5a5; border-radius: 5px; padding: 10px 12px; margin-bottom: 12px; font-size: 12px; color: #991b1b; }
+.field-highlight { border: 2px solid #ef4444 !important; background: #fff5f5 !important; }
+.run-hist-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.run-hist-table th { background: #f8fafc; color: #475569; padding: 7px 9px; text-align: left; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+.run-hist-table td { padding: 7px 9px; border-bottom: 1px dashed #e2e8f0; }
+
+/* ── Pause Modal ── */
+.pause-modal-wrap { max-width: 460px; margin: 60px auto; }
+.pause-modal {
+  background: #fff; border: 2px dashed #94a3b8; border-radius: 8px; overflow: hidden;
+}
+.pause-icon {
+  width: 60px; height: 60px; background: #fef3c7; color: #d97706; border-radius: 50%;
+  margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 26px;
+}
+
+/* ── Info / Warning Boxes ── */
+.info-box {
+  background: #dbeafe; border-left: 3px solid #2563eb; padding: 10px 13px;
+  font-size: 12px; color: #1e40af; border-radius: 3px; margin-bottom: 14px;
+}
+.warn-box {
+  background: #fef3c7; border-left: 3px solid #f59e0b; padding: 10px 13px;
+  font-size: 12px; color: #78350f; border-radius: 3px; margin-bottom: 14px;
+}
+.err-box {
+  background: #fee2e2; border-left: 3px solid #ef4444; padding: 10px 13px;
+  font-size: 12px; color: #991b1b; border-radius: 3px; margin-bottom: 14px;
+}
+
+@media (max-width: 900px) {
+  .edit-two-col { grid-template-columns: 1fr; }
+  .cascade-row { grid-template-columns: 1fr 1fr; }
+  .app-body { flex-direction: column; }
+  .left-nav { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<div class="nav-bar">
+  <h1>📐 WF6 — Set-up Scheduler</h1>
+  <button class="nav-btn active"  onclick="show('s1',this)">1. Scheduler Homepage</button>
+  <button class="nav-btn" onclick="show('s2',this)">2. Filter &amp; Select Models</button>
+  <button class="nav-btn" onclick="show('s3',this)">3. Bulk Schedule Config</button>
+  <button class="nav-btn" onclick="show('s4',this)">4. Conflict Modal</button>
+  <button class="nav-btn" onclick="show('s5',this)">5. Confirmation</button>
+  <button class="nav-btn" onclick="show('s6',this)">6. Edit Scheduler</button>
+  <button class="nav-btn" onclick="show('s7',this)">7. Pause Modal</button>
+  <button class="nav-btn" onclick="show('s8',this)">8. Failed State</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 1 — SCHEDULER HOMEPAGE
+══════════════════════════════════════════════════════════ -->
+<div id="s1" class="screen active">
+  <span class="screen-label">Screen 1 — Scheduler Homepage (WF6-HOM-001 to WF6-HOM-011)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right">
+        <span class="role-pill">👤 ADMIN</span>
+        <button style="background:none;border:none;color:#fff;font-size:15px;cursor:pointer;">🔔</button>
+        <div class="user-pill"><div class="avatar">JD</div>John Doe</div>
+        <button style="background:none;border:none;color:#fff;font-size:14px;cursor:pointer;">⏻</button>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Admin Console</div>
+        <div class="tile"><div class="tile-icon">📋</div><div><div class="tile-title">Manage Model Inventory</div><div class="tile-sub">Register, edit, archive</div></div></div>
+        <div class="tile"><div class="tile-icon">⚙️</div><div><div class="tile-title">KPI Configuration</div><div class="tile-sub">Thresholds &amp; rules</div></div></div>
+        <div class="tile"><div class="tile-icon">📥</div><div><div class="tile-title">Model Data Ingestion</div><div class="tile-sub">Pipelines &amp; sources</div></div></div>
+        <div class="tile"><div class="tile-icon">🔐</div><div><div class="tile-title">Access Control Center</div><div class="tile-sub">Users &amp; approvals</div></div></div>
+        <div class="tile active"><div class="tile-icon">⏰</div><div><div class="tile-title">Scheduler</div><div class="tile-sub">Jobs &amp; batch runs</div></div></div>
+        <div class="tile"><div class="tile-icon">🛡️</div><div><div class="tile-title">Governance</div><div class="tile-sub">Audit &amp; compliance</div></div></div>
+        <div class="tile"><div class="tile-icon">🗄️</div><div><div class="tile-title">Data Center</div><div class="tile-sub">Data repository</div></div></div>
+      </div>
+      <div class="main">
+        <div class="page-title">Scheduler</div>
+        <div class="page-sub">Configure and manage monitoring schedules for all registered models</div>
+
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-label">Total Models</div><div class="kpi-value">142</div><div class="kpi-trend ok">In inventory</div></div>
+          <div class="kpi-card"><div class="kpi-label">Scheduled</div><div class="kpi-value">98</div><div class="kpi-trend ok">▲ 69%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Unscheduled</div><div class="kpi-value">44</div><div class="kpi-trend warn">Click to filter</div></div>
+          <div class="kpi-card"><div class="kpi-label">No Reference Data</div><div class="kpi-value">11</div><div class="kpi-trend err">⚠ Needs attention</div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hdr">
+            <div class="panel-title">All Models — Scheduler Status</div>
+            <button class="btn-primary" onclick="show('s2',null)">＋ Set-up Scheduler</button>
+          </div>
+          <div class="panel-body">
+            <div class="toolbar">
+              <input class="search-box" placeholder="🔍  Search by Model ID, Name, or Family…">
+              <select class="filter-sel"><option>All Statuses</option><option>Scheduled</option><option>Unscheduled</option><option>Paused</option><option>Failed</option><option>No Reference Data</option></select>
+              <select class="filter-sel"><option>All Domains</option><option>Credit Risk</option><option>Marketing</option><option>Fraud</option></select>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Model Family ↕</th>
+                    <th>Model ID ↕</th>
+                    <th>Model Name ↕</th>
+                    <th>Ref. Data Ingested</th>
+                    <th>Scheduler</th>
+                    <th>Next Run ↕</th>
+                    <th>Last Run ↕</th>
+                    <th>Last Status</th>
+                    <th>Scheduled By</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-size:11px;">CreditRisk_Classification<br>_AccountLevel_CrossSectional</td>
+                    <td><strong>CR-001</strong></td>
+                    <td>Credit Scorecard v2.3</td>
+                    <td><span class="tag tag-yes">✓ Yes</span></td>
+                    <td><span class="tag tag-yes">Yes</span></td>
+                    <td>01 Jun 2026, 02:00<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td>01 May 2026, 02:00<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td><span class="tag tag-success">Success</span></td>
+                    <td>John Doe</td>
+                    <td style="white-space:nowrap;"><button class="btn-sm blue" onclick="show('s6',null)">Edit</button> <button class="btn-sm orange" onclick="show('s7',null)">Pause</button></td>
+                  </tr>
+                  <tr>
+                    <td style="font-size:11px;">Fraud_Classification<br>_AccountLevel_Panel</td>
+                    <td><strong>FR-007</strong></td>
+                    <td>Fraud Detection Model v1.1</td>
+                    <td><span class="tag tag-yes">✓ Yes</span></td>
+                    <td><span class="tag tag-paused">⏸ Paused</span></td>
+                    <td>— Paused</td>
+                    <td>15 Apr 2026, 02:00<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td><span class="tag tag-success">Success</span></td>
+                    <td>Jane Smith</td>
+                    <td style="white-space:nowrap;"><button class="btn-sm blue" onclick="show('s6',null)">Edit</button> <button class="btn-sm green">Resume</button></td>
+                  </tr>
+                  <tr class="failed-row">
+                    <td style="font-size:11px;">Marketing_Continuous<br>_SummarisedLevel_TimeSeries</td>
+                    <td><strong>MK-014</strong></td>
+                    <td>Customer LTV Model</td>
+                    <td><span class="tag tag-yes">✓ Yes</span></td>
+                    <td><span class="tag tag-yes">Yes</span></td>
+                    <td>— Awaiting Reset<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td>01 May 2026, 02:00<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td><span class="tag tag-failed">❌ Failed</span></td>
+                    <td>John Doe</td>
+                    <td style="white-space:nowrap;"><button class="btn-sm red" onclick="show('s8',null)">Reset Date</button> <button class="btn-sm blue" onclick="show('s6',null)">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td style="font-size:11px;">CreditRisk_Classification<br>_AccountLevel_Panel</td>
+                    <td><strong>CR-019</strong></td>
+                    <td>PD Model — Retail</td>
+                    <td><span class="tag tag-warn">⚠ No</span></td>
+                    <td><span class="tag tag-no">No</span></td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td><span class="tag tag-never">Never Run</span></td>
+                    <td>—</td>
+                    <td style="white-space:nowrap;"><button class="btn-sm blue" onclick="show('s2',null)">Schedule</button></td>
+                  </tr>
+                  <tr>
+                    <td style="font-size:11px;">Fraud_Classification<br>_AccountLevel_CrossSectional</td>
+                    <td><strong>FR-003</strong></td>
+                    <td>Transaction Anomaly Detector</td>
+                    <td><span class="tag tag-yes">✓ Yes</span></td>
+                    <td><span class="tag tag-yes">Yes</span></td>
+                    <td>15 Jun 2026, 02:00<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td>15 May 2026, 02:00<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td><span class="tag tag-inprog">⟳ In Progress</span></td>
+                    <td>Jane Smith</td>
+                    <td style="white-space:nowrap;"><button class="btn-sm blue" onclick="show('s6',null)">Edit</button> <button class="btn-sm orange" onclick="show('s7',null)">Pause</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <span>Showing 5 of 142 models</span>
+              <div class="page-btns">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <span style="padding:4px 6px;font-size:11px;">…</span>
+                <button class="page-btn">6</button>
+              </div>
+              <span>Page size: <select style="font-size:11px;border:1px solid #e2e8f0;border-radius:3px;"><option>25</option><option>50</option><option>100</option></select></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:1400px;margin:10px auto;">
+    <div class="annotation"><strong>📝 WF6-HOM-001 to 011:</strong> Four KPI cards at top — clicking any card filters the table. Table shows all 10 required columns including Model Family (Domain_ModelType_DataType_DataStructure), Reference Data Ingested with ⚠ warning badge for No, Scheduler status (Yes/Paused/No), timezone-labelled run dates, Last Run Status with colour coding. Failed rows (MK-014) show red background and "Reset Date" quick action. "Set-up Scheduler" CTA in panel header opens the Filter flow (Screen 2).</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 2 — FILTER & MODEL SELECTION
+══════════════════════════════════════════════════════════ -->
+<div id="s2" class="screen">
+  <span class="screen-label">Screen 2 — Filter &amp; Model Selection (WF6-FIL-001 to WF6-FIL-011)</span>
+  <div class="filter-flow">
+    <div class="filter-flow-hdr">
+      <h3>⚙️ Set-up Scheduler — Step 1 of 2: Filter &amp; Select Models</h3>
+      <p>Use the cascading filters to narrow the model cohort, then select models to schedule</p>
+    </div>
+    <div class="filter-flow-body">
+
+      <div class="step-divider"><span class="step-label">Step 1 — Apply Cascade Filters</span></div>
+      <div class="cascade-row">
+        <div class="form-group">
+          <label>1. Domain *</label>
+          <select><option>-- Select Domain --</option><option selected>Credit Risk</option><option>Marketing</option><option>Fraud</option></select>
+        </div>
+        <div class="form-group">
+          <label>2. Model Type *</label>
+          <select><option>-- Select --</option><option selected>Classification</option><option>Continuous</option></select>
+        </div>
+        <div class="form-group">
+          <label>3. Data Type *</label>
+          <select><option>-- Select --</option><option selected>Account Level</option><option>Summarised Level</option></select>
+        </div>
+        <div class="form-group">
+          <label>4. Data Structure *</label>
+          <select><option>-- Select --</option><option selected>Cross Sectional</option><option>Panel</option><option>Time Series</option></select>
+        </div>
+      </div>
+      <div style="text-align:right;margin-bottom:16px;">
+        <button class="btn-secondary">✕ Clear Filters</button>
+      </div>
+
+      <div class="step-divider"><span class="step-label">Step 2 — Select Models (22 matching models found)</span></div>
+      <div class="info-box">ℹ️ Filtered by: <strong>Credit Risk</strong> → <strong>Classification</strong> → <strong>Account Level</strong> → <strong>Cross Sectional</strong> &nbsp;|&nbsp; <span class="model-count-tag">14 of 22 selected</span></div>
+
+      <div class="model-list">
+        <div class="model-list-hdr">
+          <input type="checkbox" checked style="width:14px;height:14px;" title="Select All / Deselect All">
+          <span style="flex:1;">Model ID — Model Name</span>
+          <span style="width:220px;">Model Family</span>
+          <span style="width:120px;">Ref. Data</span>
+          <span style="width:100px;">Scheduler</span>
+        </div>
+        <div class="model-list-row selected">
+          <input type="checkbox" checked style="width:14px;height:14px;flex-shrink:0;">
+          <span style="flex:1;font-weight:600;">CR-001 — Credit Scorecard v2.3</span>
+          <span style="width:220px;font-size:11px;color:#64748b;">CreditRisk_Class_Acct_Cross</span>
+          <span style="width:120px;"><span class="tag tag-yes">✓ Yes</span></span>
+          <span style="width:100px;"><span class="tag tag-yes">Yes</span></span>
+        </div>
+        <div class="model-list-row selected">
+          <input type="checkbox" checked style="width:14px;height:14px;flex-shrink:0;">
+          <span style="flex:1;font-weight:600;">CR-005 — Credit Scorecard v3.0</span>
+          <span style="width:220px;font-size:11px;color:#64748b;">CreditRisk_Class_Acct_Cross</span>
+          <span style="width:120px;"><span class="tag tag-yes">✓ Yes</span></span>
+          <span style="width:100px;"><span class="tag tag-no">No</span></span>
+        </div>
+        <div class="model-list-row selected" style="background:#fff9f0;">
+          <input type="checkbox" checked style="width:14px;height:14px;flex-shrink:0;">
+          <span style="flex:1;font-weight:600;">CR-019 — PD Model Retail <span class="warn-icon">⚠</span></span>
+          <span style="width:220px;font-size:11px;color:#64748b;">CreditRisk_Class_Acct_Cross</span>
+          <span style="width:120px;"><span class="tag tag-warn">⚠ No</span></span>
+          <span style="width:100px;"><span class="tag tag-no">No</span></span>
+        </div>
+        <div class="model-list-row">
+          <input type="checkbox" style="width:14px;height:14px;flex-shrink:0;">
+          <span style="flex:1;font-weight:600;">CR-022 — Behavioural Score Model</span>
+          <span style="width:220px;font-size:11px;color:#64748b;">CreditRisk_Class_Acct_Cross</span>
+          <span style="width:120px;"><span class="tag tag-yes">✓ Yes</span></span>
+          <span style="width:100px;"><span class="tag tag-no">No</span></span>
+        </div>
+        <div class="model-list-row" style="background:#f8fafc;font-size:11px;color:#94a3b8;text-align:center;">
+          <span style="flex:1;">… and 18 more models matching the filter …</span>
+        </div>
+      </div>
+
+      <div class="warn-box">⚠️ <strong>1 model with no Reference Data selected (CR-019).</strong> Scheduling is allowed but monitoring may run on incomplete data. Ensure reference data is ingested before the scheduled run date.</div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <button class="btn-secondary" onclick="show('s1',null)">← Back to Homepage</button>
+        <button class="btn-primary" onclick="show('s3',null)">Proceed to Configure Schedule (14 models) →</button>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:900px;margin:10px auto;">
+    <div class="annotation"><strong>📝 WF6-FIL-001 to 011:</strong> Cascading dropdowns activate sequentially — each selection narrows the next. Filtered model list shows ID - Name concatenated with " - " separator. Select All / Deselect All checkbox in header. Individual checkboxes per row. ⚠ warning shown for models where Reference Data Ingested = No — admin can still select but gets a non-blocking warning. Selected count updates dynamically. "Proceed" button only active when ≥1 model is selected.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 3 — BULK SCHEDULE CONFIGURATION
+══════════════════════════════════════════════════════════ -->
+<div id="s3" class="screen">
+  <span class="screen-label">Screen 3 — Bulk Schedule Configuration (WF6-SCH-001 to WF6-SCH-008)</span>
+  <div class="config-panel">
+    <div class="filter-flow-hdr">
+      <h3>⏰ Set-up Scheduler — Step 2 of 2: Configure Schedule</h3>
+      <p>Applying to 14 selected models from Credit Risk → Classification → Account Level → Cross Sectional</p>
+    </div>
+    <div style="padding:20px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group">
+          <label>Monitoring Frequency *</label>
+          <select>
+            <option>-- Select Frequency --</option>
+            <option>Daily</option>
+            <option>Weekly</option>
+            <option selected>Monthly</option>
+            <option>Quarterly</option>
+            <option>Semi-Annually</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>First Run Date * <span style="font-size:10px;color:#94a3b8;">(Future dates only)</span></label>
+          <input type="date" value="2026-06-01" min="2026-05-09">
+        </div>
+        <div class="form-group">
+          <label>Run Time (HH:MM) *</label>
+          <input type="time" value="02:00">
+        </div>
+        <div class="form-group">
+          <label>Timezone <span style="font-size:10px;color:#94a3b8;">(Auto-detected)</span></label>
+          <input type="text" value="IST (UTC+5:30)" style="width:100%;padding:8px 10px;border:1px dashed #94a3b8;border-radius:5px;font-size:13px;background:#f8fafc;" readonly>
+        </div>
+      </div>
+
+      <div class="tz-info">🌐 All scheduled run times are stored in UTC. Displayed times are converted to your local timezone: <strong>IST (UTC+5:30)</strong>. Other Admins viewing this schedule will see times in their own local timezone.</div>
+
+      <div class="run-preview">
+        <div class="run-preview-title">📅 Next 5 Scheduled Run Dates (Monthly, starting 01 Jun 2026 at 02:00 IST)</div>
+        <div class="run-preview-row"><span class="run-num">1.</span><span>01 Jun 2026, 02:00 <span style="color:#94a3b8;">IST (UTC+5:30)</span></span></div>
+        <div class="run-preview-row"><span class="run-num">2.</span><span>01 Jul 2026, 02:00 <span style="color:#94a3b8;">IST (UTC+5:30)</span></span></div>
+        <div class="run-preview-row"><span class="run-num">3.</span><span>01 Aug 2026, 02:00 <span style="color:#94a3b8;">IST (UTC+5:30)</span></span></div>
+        <div class="run-preview-row"><span class="run-num">4.</span><span>01 Sep 2026, 02:00 <span style="color:#94a3b8;">IST (UTC+5:30)</span></span></div>
+        <div class="run-preview-row"><span class="run-num">5.</span><span>01 Oct 2026, 02:00 <span style="color:#94a3b8;">IST (UTC+5:30)</span></span></div>
+      </div>
+
+      <div class="warn-box" style="margin-top:12px;">⚠️ <strong>CR-001</strong> already has an active schedule (Monthly, next run 01 Jun 2026). A conflict resolution step will follow.</div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:18px;flex-wrap:wrap;gap:10px;">
+        <button class="btn-secondary" onclick="show('s2',null)">← Back to Model Selection</button>
+        <button class="btn-primary" onclick="show('s4',null)">Confirm &amp; Review Conflicts →</button>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:700px;margin:10px auto;">
+    <div class="annotation"><strong>📝 WF6-SCH-001 to 008:</strong> Frequency dropdown includes all 5 options (Daily, Weekly, Monthly, Quarterly, Semi-Annually). Date picker restricts to today or future. Timezone auto-populated from browser — read-only. "Next 5 runs" preview auto-calculates on frequency + date selection. Warning banner shown because CR-001 already has a schedule — clicking Confirm proceeds to Conflict Modal (Screen 4). All times stored UTC, displayed IST with label.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 4 — CONFLICT DETECTION MODAL
+══════════════════════════════════════════════════════════ -->
+<div id="s4" class="screen">
+  <span class="screen-label">Screen 4 — Conflict Detection Modal (WF6-CON-001 to WF6-CON-005)</span>
+  <div class="modal-overlay-sim">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        <h3>⚠️ Schedule Conflicts Detected</h3>
+        <p>1 of your 14 selected models already has an active schedule. Resolve each conflict before saving.</p>
+      </div>
+      <div class="modal-body">
+        <div class="conflict-row">
+          <div class="conflict-model-name">CR-001 — Credit Scorecard v2.3</div>
+          <div class="conflict-existing">
+            <strong>Existing Schedule:</strong> Monthly &nbsp;|&nbsp; Next Run: 01 Jun 2026, 02:00 IST &nbsp;|&nbsp; Scheduled by: John Doe
+            <br><strong>Proposed New Schedule:</strong> Monthly &nbsp;|&nbsp; First Run: 01 Jun 2026, 02:00 IST
+          </div>
+          <div class="conflict-actions">
+            <button class="btn-sm red">Overwrite — Replace with new config</button>
+            <button class="btn-sm">Skip — Keep existing schedule</button>
+            <button class="btn-sm blue" onclick="show('s6',null)">Edit Individually</button>
+          </div>
+        </div>
+        <div class="info-box" style="margin-top:4px;">Remaining 13 models have no existing schedules and will be scheduled without conflict.</div>
+      </div>
+      <div class="modal-footer">
+        <div style="display:flex;gap:8px;">
+          <button class="btn-sm red">Overwrite All Conflicts</button>
+          <button class="btn-sm">Skip All Conflicts</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-secondary" onclick="show('s3',null)">← Back</button>
+          <button class="btn-primary" onclick="show('s5',null)">Save Schedule (Resolve conflicts first)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:640px;margin:10px auto;">
+    <div class="annotation"><strong>📝 WF6-CON-001 to 005:</strong> Conflict modal lists each conflicted model with existing config pre-displayed for comparison. Per-model options: Overwrite, Skip, Edit Individually. Bulk actions: Overwrite All / Skip All. Save button only enabled after all conflicts are resolved. "Edit Individually" opens the full Edit Scheduler screen for that model (Screen 6).</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 5 — CONFIRMATION
+══════════════════════════════════════════════════════════ -->
+<div id="s5" class="screen">
+  <span class="screen-label">Screen 5 — Schedule Confirmation (WF6-SCH-006)</span>
+  <div class="confirm-wrap">
+    <div class="confirm-icon">✓</div>
+    <h2 style="color:#1e293b;font-size:20px;margin-bottom:8px;">Schedule Successfully Applied</h2>
+    <p style="color:#64748b;font-size:13px;">13 models have been scheduled. 1 model was skipped (existing schedule retained).</p>
+
+    <div class="confirm-config">
+      <div style="font-size:12px;font-weight:700;color:#475569;margin-bottom:8px;text-transform:uppercase;">Applied Configuration</div>
+      <div class="confirm-config-row"><span style="color:#64748b;">Monitoring Frequency</span><span style="font-weight:600;">Monthly</span></div>
+      <div class="confirm-config-row"><span style="color:#64748b;">First Run Date</span><span style="font-weight:600;">01 Jun 2026, 02:00 IST (UTC+5:30)</span></div>
+      <div class="confirm-config-row"><span style="color:#64748b;">Models Scheduled</span><span style="font-weight:600;">13 models</span></div>
+      <div class="confirm-config-row"><span style="color:#64748b;">Filter Applied</span><span style="font-weight:600;font-size:11px;">CreditRisk → Classification → Account Level → Cross Sectional</span></div>
+    </div>
+
+    <div class="skipped-list">
+      <div class="skipped-title">⚠️ 1 Model Skipped (Existing Schedule Retained)</div>
+      <div style="margin-top:4px;">CR-001 — Credit Scorecard v2.3 &nbsp;|&nbsp; Kept: Monthly, next run 01 Jun 2026, 02:00 IST</div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
+      <button class="btn-secondary" onclick="show('s2',null)">Schedule More Models</button>
+      <button class="btn-primary" onclick="show('s1',null)">Return to Scheduler Homepage</button>
+    </div>
+  </div>
+  <div style="max-width:700px;margin:10px auto;">
+    <div class="annotation"><strong>📝 WF6-SCH-006:</strong> Confirmation screen shows total successfully scheduled, applied config summary, and a list of skipped models with their retained config. Two CTAs: schedule more models (back to Filter flow) or return to homepage.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 6 — EDIT SCHEDULER
+══════════════════════════════════════════════════════════ -->
+<div id="s6" class="screen">
+  <span class="screen-label">Screen 6 — Edit Scheduler (Full-Page) (WF6-EDT-001 to WF6-EDT-008)</span>
+  <div class="edit-page">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div class="page-title">Edit Scheduler — CR-001 &nbsp; <span style="font-size:14px;color:#64748b;">Credit Scorecard v2.3</span></div>
+        <div class="page-sub">CreditRisk_Classification_AccountLevel_CrossSectional &nbsp;|&nbsp; Scheduled by: John Doe on 15 Jan 2026</div>
+      </div>
+      <button class="btn-secondary" onclick="show('s1',null)">← Back to Scheduler Homepage</button>
+    </div>
+
+    <div class="edit-two-col">
+      <!-- Form Panel -->
+      <div class="edit-form-panel">
+        <div class="edit-panel-hdr">⚙️ Scheduler Configuration</div>
+        <div class="edit-panel-body">
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;margin-bottom:8px;">Model Details</div>
+            <div class="edit-meta-row"><span class="edit-meta-label">Model ID</span><span class="edit-meta-value">CR-001</span></div>
+            <div class="edit-meta-row"><span class="edit-meta-label">Model Name</span><span class="edit-meta-value">Credit Scorecard v2.3</span></div>
+            <div class="edit-meta-row"><span class="edit-meta-label">Model Family</span><span class="edit-meta-value" style="font-size:11px;">CreditRisk_Classification_AccountLevel_CrossSectional</span></div>
+            <div class="edit-meta-row"><span class="edit-meta-label">Ref. Data Ingested</span><span class="edit-meta-value"><span class="tag tag-yes">✓ Yes</span></span></div>
+          </div>
+          <div class="form-group">
+            <label>Monitoring Frequency</label>
+            <select>
+              <option>Daily</option><option>Weekly</option><option selected>Monthly</option>
+              <option>Quarterly</option><option>Semi-Annually</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Next Run Date * <span style="font-size:10px;color:#94a3b8;">(Future only)</span></label>
+            <input type="date" value="2026-06-01" min="2026-05-09">
+          </div>
+          <div class="form-group">
+            <label>Run Time (HH:MM)</label>
+            <input type="time" value="02:00">
+          </div>
+          <div class="form-group">
+            <label>Timezone</label>
+            <input type="text" value="IST (UTC+5:30)" style="width:100%;padding:8px 10px;border:1px dashed #94a3b8;border-radius:5px;font-size:13px;background:#f8fafc;" readonly>
+          </div>
+
+          <div class="run-preview" style="margin-bottom:14px;">
+            <div class="run-preview-title">📅 Next 3 Runs (after saving)</div>
+            <div class="run-preview-row"><span class="run-num">1.</span><span>01 Jun 2026, 02:00 IST</span></div>
+            <div class="run-preview-row"><span class="run-num">2.</span><span>01 Jul 2026, 02:00 IST</span></div>
+            <div class="run-preview-row"><span class="run-num">3.</span><span>01 Aug 2026, 02:00 IST</span></div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button class="btn-primary">💾 Save Changes</button>
+            <button class="btn-sm orange" style="padding:8px;" onclick="show('s7',null)">⏸ Pause Schedule</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Run History Panel -->
+      <div class="edit-history-panel">
+        <div class="edit-panel-hdr">📋 Run History</div>
+        <div class="edit-panel-body" style="padding:0;">
+          <table class="run-hist-table">
+            <thead>
+              <tr>
+                <th>Run Date/Time</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th>Report</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>01 May 2026, 02:00<br><span class="tz-label" style="display:block;">IST (UTC+5:30)</span></td>
+                <td><span class="tag tag-success">Success</span></td>
+                <td>4m 32s</td>
+                <td><a href="#" style="color:#2563eb;font-size:11px;">View Report →</a></td>
+              </tr>
+              <tr>
+                <td>01 Apr 2026, 02:00<br><span class="tz-label" style="display:block;">IST (UTC+5:30)</span></td>
+                <td><span class="tag tag-success">Success</span></td>
+                <td>4m 11s</td>
+                <td><a href="#" style="color:#2563eb;font-size:11px;">View Report →</a></td>
+              </tr>
+              <tr>
+                <td>01 Mar 2026, 02:00<br><span class="tz-label" style="display:block;">IST (UTC+5:30)</span></td>
+                <td><span class="tag tag-failed">Failed</span></td>
+                <td>—</td>
+                <td><span style="color:#94a3b8;font-size:11px;">N/A</span></td>
+              </tr>
+              <tr>
+                <td>01 Feb 2026, 02:00<br><span class="tz-label" style="display:block;">IST (UTC+5:30)</span></td>
+                <td><span class="tag tag-success">Success</span></td>
+                <td>3m 58s</td>
+                <td><a href="#" style="color:#2563eb;font-size:11px;">View Report →</a></td>
+              </tr>
+              <tr>
+                <td>01 Jan 2026, 02:00<br><span class="tz-label" style="display:block;">IST (UTC+5:30)</span></td>
+                <td><span class="tag tag-success">Success</span></td>
+                <td>4m 20s</td>
+                <td><a href="#" style="color:#2563eb;font-size:11px;">View Report →</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:1100px;margin:10px auto;">
+    <div class="annotation"><strong>📝 WF6-EDT-001 to 008:</strong> Full-page edit screen (not modal). Left panel: model metadata (read-only), editable Frequency / Next Run Date / Run Time, timezone label, next-3-runs preview, Save + Pause buttons. Right panel: run history table with Status, Duration, and Report link. All date pickers restricted to future dates. Saving triggers backend recalculation of full run sequence. All changes audit-logged.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 7 — PAUSE CONFIRMATION MODAL
+══════════════════════════════════════════════════════════ -->
+<div id="s7" class="screen">
+  <span class="screen-label">Screen 7 — Pause Confirmation Modal (WF6-PAU-001 to WF6-PAU-006)</span>
+  <div class="pause-modal-wrap">
+    <div class="pause-modal">
+      <div style="padding:28px;text-align:center;">
+        <div class="pause-icon">⏸</div>
+        <h3 style="color:#1e293b;font-size:17px;margin-bottom:10px;">Pause Scheduler</h3>
+        <p style="color:#64748b;font-size:13px;margin-bottom:6px;">You are about to pause the schedule for:</p>
+        <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;padding:12px;margin:12px 0;text-align:left;font-size:12px;">
+          <div style="font-weight:700;margin-bottom:4px;">CR-001 — Credit Scorecard v2.3</div>
+          <div style="color:#64748b;">Current Schedule: Monthly &nbsp;|&nbsp; Next Run: 01 Jun 2026, 02:00 IST (UTC+5:30)</div>
+        </div>
+        <div class="warn-box" style="text-align:left;">⏸ All future scheduled runs will be suspended. The schedule configuration will be retained and can be resumed at any time. To resume, you will need to confirm or update the next run date.</div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+          <button class="btn-secondary" onclick="show('s6',null)">Cancel — Keep Active</button>
+          <button class="btn-sm orange" style="padding:10px 20px;font-size:13px;" onclick="show('s1',null)">Confirm Pause</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:460px;margin:10px auto;">
+    <div class="annotation"><strong>📝 WF6-PAU-001 to 003:</strong> Pause modal shows model name, current schedule config, and warning that future runs will be suspended (config retained). Cancel returns to Edit screen or homepage. Confirm Pause updates homepage row to show "Paused" status and "— Paused" for next run date. Audit log event written on confirm. Resume flow (WF6-PAU-004/005) requires Admin to confirm or update next run date since the stored date may be in the past.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 8 — FAILED STATE
+══════════════════════════════════════════════════════════ -->
+<div id="s8" class="screen">
+  <span class="screen-label">Screen 8 — Failed State &amp; Reset Run Date (WF6-FAL-001 to WF6-FAL-006)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right">
+        <span class="role-pill">👤 ADMIN</span>
+        <div class="user-pill"><div class="avatar">JD</div>John Doe</div>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Admin Console</div>
+        <div class="tile active"><div class="tile-icon">⏰</div><div><div class="tile-title">Scheduler</div><div class="tile-sub">Jobs &amp; batch runs</div></div></div>
+        <div class="tile"><div class="tile-icon">🛡️</div><div><div class="tile-title">Governance</div><div class="tile-sub">Audit &amp; compliance</div></div></div>
+        <div class="tile"><div class="tile-icon">🗄️</div><div><div class="tile-title">Data Center</div><div class="tile-sub">Data repository</div></div></div>
+      </div>
+      <div class="main">
+        <div class="page-title">Scheduler</div>
+        <div class="page-sub">Configure and manage monitoring schedules for all registered models</div>
+
+        <div class="err-box">
+          ❌ <strong>Scheduler Run Failure Alert:</strong> &nbsp;The scheduled monitoring run for <strong>MK-014 — Customer LTV Model</strong> failed on 01 May 2026 at 02:00 IST. An email notification has been sent to the Admin and the model owner. Please investigate the failure and reset the next run date below.
+        </div>
+
+        <div class="panel">
+          <div class="panel-hdr">
+            <div class="panel-title">All Models — Scheduler Status</div>
+            <button class="btn-primary" onclick="show('s2',null)">＋ Set-up Scheduler</button>
+          </div>
+          <div class="panel-body">
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Model Family</th>
+                    <th>Model ID</th>
+                    <th>Model Name</th>
+                    <th>Ref. Data</th>
+                    <th>Scheduler</th>
+                    <th>Next Run</th>
+                    <th>Last Run</th>
+                    <th>Last Status</th>
+                    <th>Scheduled By</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-size:11px;">CreditRisk_Class_Acct_Cross</td>
+                    <td><strong>CR-001</strong></td>
+                    <td>Credit Scorecard v2.3</td>
+                    <td><span class="tag tag-yes">✓ Yes</span></td>
+                    <td><span class="tag tag-yes">Yes</span></td>
+                    <td>01 Jun 2026<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td>01 May 2026<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td><span class="tag tag-success">Success</span></td>
+                    <td>John Doe</td>
+                    <td><button class="btn-sm blue" onclick="show('s6',null)">Edit</button></td>
+                  </tr>
+                  <tr class="failed-row">
+                    <td style="font-size:11px;">Marketing_Cont_Summary_TS</td>
+                    <td><strong>MK-014</strong></td>
+                    <td>Customer LTV Model</td>
+                    <td><span class="tag tag-yes">✓ Yes</span></td>
+                    <td><span class="tag tag-yes">Yes</span></td>
+                    <td style="color:#dc2626;font-weight:600;">⚠ Awaiting Reset</td>
+                    <td>01 May 2026<span class="tz-label">IST (UTC+5:30)</span></td>
+                    <td><span class="tag tag-failed">❌ Failed</span></td>
+                    <td>John Doe</td>
+                    <td style="white-space:nowrap;">
+                      <button class="btn-sm red" onclick="show('s6',null)">Reset Date →</button>
+                      <button class="btn-sm blue" onclick="show('s6',null)">Edit</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="border-color:#fca5a5;">
+          <div class="panel-hdr" style="background:#fff5f5;">
+            <div class="panel-title" style="color:#991b1b;">🔴 Failure Details — MK-014 Customer LTV Model</div>
+          </div>
+          <div class="panel-body" style="font-size:12px;">
+            <div class="edit-meta-row"><span class="edit-meta-label">Failed Run Date/Time</span><span class="edit-meta-value">01 May 2026, 02:00 IST (UTC+5:30)</span></div>
+            <div class="edit-meta-row"><span class="edit-meta-label">Failure Reason</span><span class="edit-meta-value" style="color:#dc2626;">Data Ingestion job for Apr 2026 did not complete before scheduler run window</span></div>
+            <div class="edit-meta-row"><span class="edit-meta-label">Email Notifications Sent</span><span class="edit-meta-value">Admin (John Doe), Model Owner (priya.k@company.com) — 01 May 2026, 02:04 IST</span></div>
+            <div class="edit-meta-row"><span class="edit-meta-label">Next Run Status</span><span class="edit-meta-value" style="color:#dc2626;">⏸ Blocked — Awaiting Admin reset of next run date</span></div>
+            <div style="margin-top:12px;">
+              <button class="btn-primary" onclick="show('s6',null)">→ Go to Edit Scheduler to Reset Next Run Date</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:1400px;margin:10px auto;">
+    <div class="annotation"><strong>📝 WF6-FAL-001 to 006:</strong> Failed row highlighted in red on homepage. Top-of-page error banner shows failure details. Failure detail panel shows failed run date/time, failure reason, notification recipients/timestamp, and blocked next run status. "Reset Date →" quick action and "Go to Edit Scheduler" CTA both navigate to the Edit Scheduler screen (Screen 6) with the Next Run Date field highlighted and pre-focused. No auto-retry — admin must manually reset.</div>
+  </div>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const map = { s1:0, s2:1, s3:2, s4:3, s5:4, s6:5, s7:6, s8:7 };
+  if (btn) btn.classList.add('active');
+  else if (map[id] !== undefined) document.querySelectorAll('.nav-btn')[map[id]].classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

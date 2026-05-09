@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Monitoring Platform — Step 2: Reference Sample Ingestion</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: #eef1f5;
+    color: #2c3e50;
+    line-height: 1.5;
+  }
+
+  /* ===== Wireframe Navigator ===== */
+  .nav-bar {
+    background: #1f2937;
+    color: #fff;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  .nav-bar h1 { font-size: 12px; font-weight: 600; margin-right: 8px; white-space: nowrap; }
+  .nav-btn {
+    background: #374151;
+    color: #fff;
+    border: 1px solid #4b5563;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 10px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { background: #4b5563; }
+  .nav-btn.active { background: #2563eb; border-color: #2563eb; }
+  .nav-divider {
+    width: 1px; height: 18px; background: #4b5563; margin: 0 4px;
+  }
+
+  /* ===== Screen Container ===== */
+  .screen { display: none; min-height: calc(100vh - 46px); padding: 14px; }
+  .screen.active { display: block; }
+  .screen-label {
+    background: #fbbf24; color: #78350f;
+    padding: 5px 10px; border-radius: 4px; font-size: 11px;
+    font-weight: 700; display: inline-block; margin-bottom: 10px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ===== Common App Shell ===== */
+  .app-shell {
+    display: flex; flex-direction: column;
+    min-height: calc(100vh - 90px);
+    background: #fff; border: 2px dashed #94a3b8;
+    border-radius: 8px; overflow: hidden;
+    max-width: 1500px; margin: 0 auto;
+  }
+  .app-header {
+    background: #1e3a8a; color: #fff;
+    padding: 10px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .app-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+  .app-brand-logo {
+    width: 28px; height: 28px; background: #fff; color: #1e3a8a;
+    border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .app-header-right { display: flex; align-items: center; gap: 14px; font-size: 12px; }
+  .role-pill { background: #fbbf24; color: #78350f; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .user-pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+  .user-avatar { width: 22px; height: 22px; background: #fbbf24; color: #78350f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+
+  /* ===== App body / left nav ===== */
+  .app-body { display: flex; flex: 1; }
+  .left-nav { width: 220px; background: #f8fafc; border-right: 1px solid #e2e8f0; padding: 16px 10px; flex-shrink: 0; }
+  .nav-section-title { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 10px; padding: 0 6px; }
+  .tile-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px dashed #cbd5e1; border-radius: 6px; margin-bottom: 6px; cursor: pointer; background: #fff; transition: all 0.2s; }
+  .tile-nav-item:hover { border-color: #2563eb; border-style: solid; background: #eff6ff; }
+  .tile-nav-item.active { background: #dbeafe; border-color: #2563eb; border-style: solid; }
+  .tile-icon { width: 28px; height: 28px; background: #dbeafe; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .tile-text { flex: 1; min-width: 0; }
+  .tile-title { font-size: 12px; font-weight: 600; color: #1e293b; }
+  .tile-subtitle { font-size: 10px; color: #64748b; margin-top: 1px; }
+
+  /* ===== Main content ===== */
+  .main-content { flex: 1; padding: 20px; background: #f1f5f9; overflow-y: auto; }
+  .breadcrumb { font-size: 12px; color: #64748b; margin-bottom: 8px; }
+  .breadcrumb a { color: #2563eb; text-decoration: none; }
+  .page-title { font-size: 20px; color: #1e293b; margin-bottom: 4px; }
+  .page-subtitle { font-size: 12px; color: #64748b; margin-bottom: 18px; }
+
+  /* ===== Sub-step tracker ===== */
+  .substep-tracker {
+    background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px;
+    padding: 12px 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 0; overflow-x: auto;
+  }
+  .substep {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 14px; border-radius: 6px; font-size: 12px;
+    color: #94a3b8; cursor: default; white-space: nowrap;
+    position: relative;
+  }
+  .substep.clickable { cursor: pointer; }
+  .substep.clickable:hover { background: #f1f5f9; }
+  .substep.active { color: #2563eb; font-weight: 600; background: #eff6ff; }
+  .substep.done { color: #16a34a; font-weight: 600; }
+  .substep-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #e2e8f0; color: #94a3b8;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 10px; flex-shrink: 0;
+  }
+  .substep.active .substep-num { background: #2563eb; color: #fff; }
+  .substep.done .substep-num { background: #16a34a; color: #fff; }
+  .substep-arrow { color: #cbd5e1; font-size: 14px; padding: 0 2px; flex-shrink: 0; }
+
+  /* ===== Cards ===== */
+  .form-section {
+    background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px;
+    padding: 18px; margin-bottom: 14px;
+  }
+  .form-section-title { font-size: 13px; font-weight: 700; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-section-desc { font-size: 11px; color: #64748b; margin-bottom: 14px; }
+
+  /* ===== Dataset type selection cards ===== */
+  .dataset-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .dataset-card {
+    border: 2px dashed #cbd5e1; border-radius: 10px; padding: 18px;
+    cursor: pointer; transition: all 0.2s; background: #fff; position: relative;
+  }
+  .dataset-card:hover { border-color: #2563eb; background: #f8fafc; }
+  .dataset-card.selected { border: 2px solid #2563eb; background: #eff6ff; }
+  .dataset-card.selected-warn { border: 2px solid #f59e0b; background: #fffbeb; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .card-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+  .priority-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+  .p1 { background: #dcfce7; color: #166534; }
+  .p2 { background: #fef3c7; color: #78350f; }
+  .card-desc { font-size: 12px; color: #475569; margin-bottom: 10px; }
+  .source-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+  .source-chip { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 4px; font-size: 10px; color: #475569; }
+  .feature-pills { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+  .fpill { padding: 3px 9px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+  .fpill-green { background: #dcfce7; color: #166534; }
+  .fpill-blue { background: #dbeafe; color: #1e3a8a; }
+  .fpill-gray { background: #f1f5f9; color: #64748b; }
+  .card-radio { position: absolute; top: 16px; right: 16px; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; }
+  .card-radio.checked { border-color: #2563eb; background: #2563eb; }
+  .card-radio.checked::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+  .card-warn-note { font-size: 11px; color: #b45309; background: #fef3c7; padding: 6px 8px; border-radius: 4px; margin-top: 6px; }
+
+  /* ===== Banners ===== */
+  .info-banner { background: #dbeafe; border-left: 3px solid #2563eb; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #1e3a8a; margin-bottom: 14px; }
+  .warn-banner { background: #fef3c7; border-left: 3px solid #f59e0b; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #78350f; margin-bottom: 14px; }
+  .error-banner { background: #fee2e2; border-left: 3px solid #dc2626; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #991b1b; margin-bottom: 14px; }
+  .success-banner { background: #dcfce7; border-left: 3px solid #16a34a; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #166534; margin-bottom: 14px; }
+
+  /* ===== Form elements ===== */
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group label { font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px; }
+  .form-group label .req { color: #dc2626; margin-left: 2px; }
+  .form-group input, .form-group select, .form-group textarea { padding: 8px 10px; border: 1px dashed #94a3b8; border-radius: 4px; font-size: 12px; font-family: inherit; background: #fff; }
+  .form-group .help { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+  .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; gap: 8px; }
+  .form-actions-right { display: flex; gap: 8px; }
+
+  .btn { background: #fff; border: 1px solid #cbd5e1; padding: 7px 14px; border-radius: 5px; cursor: pointer; font-size: 12px; color: #1e293b; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
+  .btn:hover { background: #f1f5f9; }
+  .btn-primary { background: #2563eb; color: #fff; border-color: #2563eb; font-weight: 600; }
+  .btn-primary:hover { background: #1e3a8a; }
+  .btn-primary:disabled, .btn-disabled { background: #94a3b8; border-color: #94a3b8; color: #fff; cursor: not-allowed; opacity: 0.7; }
+  .btn-success { background: #16a34a; color: #fff; border-color: #16a34a; font-weight: 600; }
+  .btn-warn { background: #f59e0b; color: #fff; border-color: #f59e0b; font-weight: 600; }
+
+  /* ===== Upload zone ===== */
+  .upload-zone {
+    border: 2px dashed #94a3b8; border-radius: 8px; padding: 32px;
+    text-align: center; background: #f8fafc; margin-bottom: 14px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .upload-zone:hover { border-color: #2563eb; background: #eff6ff; }
+  .upload-zone.has-file { border-color: #16a34a; border-style: solid; background: #f0fdf4; }
+  .upload-icon { font-size: 36px; margin-bottom: 10px; }
+  .upload-zone h4 { font-size: 14px; color: #1e293b; margin-bottom: 5px; }
+  .upload-zone p { font-size: 11px; color: #64748b; margin-bottom: 12px; }
+
+  .uploaded-file-block {
+    background: #f0fdf4; border: 1px solid #16a34a; border-radius: 6px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 14px; margin-bottom: 14px;
+  }
+  .file-icon { font-size: 28px; }
+  .file-details { flex: 1; }
+  .file-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+  .file-meta { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .file-badge { font-size: 10px; color: #16a34a; font-weight: 600; }
+
+  /* ===== Parse settings inline panel ===== */
+  .parse-panel {
+    background: #f8fafc; border: 1px dashed #2563eb; border-radius: 6px; padding: 14px; margin-bottom: 14px;
+  }
+  .parse-panel-title { font-size: 12px; font-weight: 700; color: #1e3a8a; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .parse-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .parse-field label { font-size: 10px; font-weight: 600; color: #475569; display: block; margin-bottom: 3px; }
+  .parse-field select { width: 100%; padding: 5px 8px; border: 1px dashed #94a3b8; border-radius: 4px; font-size: 11px; }
+
+  /* ===== Data preview table ===== */
+  .preview-table-wrap { border: 1px dashed #cbd5e1; border-radius: 6px; overflow: auto; margin-bottom: 8px; }
+  .preview-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .preview-table thead th { background: #1e293b; color: #fff; padding: 8px 10px; text-align: left; white-space: nowrap; font-weight: 600; font-size: 10px; }
+  .preview-table thead th .type-badge { background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 400; margin-left: 4px; }
+  .preview-table thead th .miss-warn { color: #fbbf24; font-size: 9px; margin-left: 3px; }
+  .preview-table tbody td { padding: 6px 10px; border-bottom: 1px dashed #e2e8f0; white-space: nowrap; color: #475569; }
+  .preview-table tbody tr:hover { background: #f8fafc; }
+  .preview-footer { font-size: 10px; color: #64748b; padding: 6px 10px; background: #f8fafc; border-top: 1px dashed #e2e8f0; }
+
+  /* ===== Column detection table ===== */
+  .det-table-wrap { border: 1px dashed #cbd5e1; border-radius: 6px; overflow: auto; margin-bottom: 10px; }
+  .det-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .det-table th { background: #f8fafc; padding: 8px 10px; text-align: left; font-weight: 600; color: #475569; border-bottom: 1px solid #e2e8f0; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+  .det-table td { padding: 7px 10px; border-bottom: 1px dashed #e2e8f0; vertical-align: middle; }
+  .det-table tr.row-review { background: #fffbeb; }
+  .det-table tr.row-resolved { background: #f0fdf4; }
+
+  .role-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .role-identifier { background: #e0e7ff; color: #3730a3; }
+  .role-target { background: #fce7f3; color: #9d174d; }
+  .role-prob { background: #dbeafe; color: #1e3a8a; }
+  .role-outcome { background: #ede9fe; color: #5b21b6; }
+  .role-cutoff { background: #fff7ed; color: #9a3412; }
+  .role-segment { background: #fef3c7; color: #78350f; }
+  .role-feature-num { background: #dcfce7; color: #166534; }
+  .role-feature-cat { background: #d1fae5; color: #065f46; }
+  .role-metadata { background: #f1f5f9; color: #475569; }
+  .role-ambiguous { background: #fee2e2; color: #991b1b; }
+
+  .source-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; }
+  .src-ai { background: #ede9fe; color: #5b21b6; }
+  .src-mo { background: #dcfce7; color: #166534; }
+  .src-dd { background: #dbeafe; color: #1e3a8a; }
+  .src-human { background: #fef3c7; color: #78350f; }
+
+  .conf-bar { width: 50px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 4px; }
+  .conf-fill { height: 100%; border-radius: 3px; }
+  .conf-high { background: #16a34a; }
+  .conf-med { background: #f59e0b; }
+  .conf-low { background: #dc2626; }
+
+  .review-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 3px; background: #fef3c7; color: #92400e; }
+  .resolved-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 3px; background: #dcfce7; color: #166534; }
+
+  .role-select { padding: 4px 8px; border: 1px dashed #94a3b8; border-radius: 4px; font-size: 10px; min-width: 160px; }
+
+  /* ===== Hierarchy cards ===== */
+  .tier-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .tier-card { border-left: 4px solid; border-radius: 6px; padding: 12px 14px; background: #fff; border-top: 1px dashed #e2e8f0; border-right: 1px dashed #e2e8f0; border-bottom: 1px dashed #e2e8f0; }
+  .tier-card.t1 { border-left-color: #16a34a; }
+  .tier-card.t2 { border-left-color: #2563eb; }
+  .tier-card.t3 { border-left-color: #7c3aed; }
+  .tier-card.t4 { border-left-color: #f59e0b; }
+  .tier-num { font-size: 20px; font-weight: 900; color: #e2e8f0; float: right; line-height: 1; }
+  .tier-label { font-size: 11px; font-weight: 700; color: #1e293b; margin-bottom: 3px; }
+  .tier-auth { font-size: 10px; color: #64748b; margin-bottom: 8px; }
+  .tier-status { font-size: 10px; }
+
+  /* ===== Column mapping ===== */
+  .mapping-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .mapping-table th { padding: 8px 10px; background: #f8fafc; font-size: 11px; font-weight: 600; color: #475569; border-bottom: 1px solid #e2e8f0; text-align: left; }
+  .mapping-table td { padding: 8px 10px; border-bottom: 1px dashed #e2e8f0; vertical-align: middle; }
+  .mapping-label { font-size: 12px; font-weight: 600; color: #1e293b; }
+  .mapping-icon { font-size: 14px; margin-right: 4px; }
+  .mandatory-star { color: #dc2626; margin-left: 2px; font-size: 14px; }
+  .conditional-note { font-size: 10px; color: #64748b; font-style: italic; margin-top: 2px; }
+  .ai-badge { background: #ede9fe; color: #5b21b6; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-left: 4px; }
+  .mapping-select { padding: 6px 10px; border: 1px dashed #94a3b8; border-radius: 4px; font-size: 12px; min-width: 220px; }
+  .mapping-select.disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+  .disabled-note { font-size: 10px; color: #64748b; font-style: italic; }
+
+  /* ===== Feature chips ===== */
+  .feature-chip-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .fchip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 10px; border-radius: 20px; border: 1px solid; font-size: 11px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .fchip.num { background: #dcfce7; border-color: #86efac; color: #166534; }
+  .fchip.cat { background: #dbeafe; border-color: #93c5fd; color: #1e3a8a; }
+  .fchip.warn-chip { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+  .fchip .type-toggle { font-size: 9px; background: rgba(0,0,0,0.08); padding: 1px 4px; border-radius: 3px; margin-left: 2px; }
+  .fchip .edit-icon { opacity: 0; font-size: 9px; transition: opacity 0.15s; }
+  .fchip:hover .edit-icon { opacity: 1; }
+
+  /* ===== Data table (general) ===== */
+  .data-table-wrap { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th { background: #f8fafc; padding: 10px 8px; text-align: left; font-weight: 600; color: #475569; border-bottom: 1px solid #e2e8f0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+  .data-table td { padding: 10px 8px; border-bottom: 1px dashed #e2e8f0; vertical-align: middle; }
+  .data-table tbody tr:hover { background: #f8fafc; }
+
+  /* ===== Pill general ===== */
+  .pill { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+  .pill-green { background: #dcfce7; color: #166534; }
+  .pill-amber { background: #fef3c7; color: #78350f; }
+  .pill-blue { background: #dbeafe; color: #1e3a8a; }
+  .pill-red { background: #fee2e2; color: #991b1b; }
+  .pill-purple { background: #ede9fe; color: #5b21b6; }
+
+  /* ===== EDA / Data Insights ===== */
+  .eda-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .eda-card { background: #fff; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 14px; text-align: center; }
+  .eda-card.ok { border-color: #16a34a; background: #f0fdf4; }
+  .eda-card.warn { border-color: #f59e0b; background: #fffbeb; }
+  .eda-card.info { border-color: #2563eb; background: #eff6ff; }
+  .eda-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; }
+  .eda-value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .eda-card.ok .eda-value { color: #16a34a; }
+  .eda-card.warn .eda-value { color: #f59e0b; }
+  .eda-card.info .eda-value { color: #2563eb; }
+
+  .collapsible { border: 1px dashed #cbd5e1; border-radius: 6px; margin-bottom: 10px; overflow: hidden; }
+  .collapsible-header { padding: 10px 14px; background: #f8fafc; font-size: 12px; font-weight: 600; color: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .collapsible-header:hover { background: #eff6ff; }
+  .collapsible-body { padding: 14px; background: #fff; border-top: 1px dashed #e2e8f0; }
+
+  /* ===== Chart placeholder ===== */
+  .chart-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .chart-box { background: #fff; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 12px; }
+  .chart-title { font-size: 11px; font-weight: 600; color: #1e293b; margin-bottom: 8px; }
+  .chart-type-tabs { display: flex; gap: 4px; margin-bottom: 8px; }
+  .chart-tab { padding: 2px 8px; border-radius: 3px; font-size: 9px; cursor: pointer; border: 1px solid #e2e8f0; }
+  .chart-tab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .chart-placeholder { background: #f8fafc; border: 1px dashed #e2e8f0; border-radius: 4px; height: 100px; display: flex; align-items: flex-end; gap: 4px; padding: 8px; overflow: hidden; }
+  .bar { flex: 1; border-radius: 2px 2px 0 0; min-width: 6px; }
+  .bar-blue { background: linear-gradient(to top, #2563eb, #93c5fd); }
+  .bar-line-overlay { position: relative; }
+  .chart-feature-selector { font-size: 10px; padding: 3px 6px; border: 1px dashed #94a3b8; border-radius: 3px; width: 100%; margin-top: 6px; }
+
+  /* ===== Segment event rate table ===== */
+  .eda-section-title { font-size: 12px; font-weight: 700; color: #1e3a8a; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .seg-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 14px; }
+  .seg-table th { padding: 7px 10px; background: #1e293b; color: #fff; text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+  .seg-table td { padding: 7px 10px; border-bottom: 1px dashed #e2e8f0; }
+  .seg-table .overall-row { background: #f8fafc; font-weight: 600; }
+  .seg-table .seg-row { background: #fff; }
+  .seg-toggle { font-size: 9px; color: #2563eb; cursor: pointer; margin-left: 5px; }
+  .event-rate-bar { display: inline-flex; align-items: center; gap: 5px; }
+  .er-bar { width: 50px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; display: inline-block; }
+  .er-fill { height: 100%; border-radius: 3px; background: #2563eb; }
+
+  /* ===== Filter bar ===== */
+  .filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .filter-toggle { display: flex; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 5px; overflow: hidden; }
+  .ftog-btn { padding: 5px 12px; background: transparent; border: none; cursor: pointer; font-size: 11px; color: #64748b; }
+  .ftog-btn.active { background: #1e3a8a; color: #fff; font-weight: 600; }
+  .unresolved-count { background: #dc2626; color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 10px; margin-left: 4px; }
+
+  /* ===== Inline segment create panel ===== */
+  .segment-create-panel { background: #f8fafc; border: 1px dashed #2563eb; border-radius: 6px; padding: 14px; margin-top: 10px; }
+  .segment-create-title { font-size: 12px; font-weight: 700; color: #1e3a8a; margin-bottom: 10px; }
+
+  /* ===== Validation results ===== */
+  .val-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .val-card { background: #fff; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 12px; }
+  .val-card.ok { border-color: #16a34a; background: #f0fdf4; }
+  .val-card.err { border-color: #dc2626; background: #fee2e2; }
+  .val-card .vc-label { font-size: 10px; color: #64748b; text-transform: uppercase; }
+  .val-card .vc-value { font-size: 18px; font-weight: 700; margin-top: 3px; }
+  .val-card.ok .vc-value { color: #16a34a; }
+  .val-card.err .vc-value { color: #dc2626; }
+  .val-card .vc-note { font-size: 10px; color: #64748b; margin-top: 2px; }
+
+  /* ===== Transition loading screen ===== */
+  .transition-screen { text-align: center; padding: 50px 20px; }
+  .transition-icon { font-size: 50px; margin-bottom: 16px; }
+  .progress-bar-wrap { background: #e2e8f0; border-radius: 6px; height: 10px; max-width: 400px; margin: 12px auto; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(to right, #2563eb, #7c3aed); border-radius: 6px; width: 70%; animation: progAnim 2s ease-in-out infinite alternate; }
+  @keyframes progAnim { from { width: 30%; } to { width: 90%; } }
+
+  /* ===== Mismatch warning section ===== */
+  .mismatch-list { font-size: 11px; }
+  .mismatch-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px dashed #fcd34d; }
+  .mismatch-col { font-family: monospace; font-size: 11px; background: #fef3c7; padding: 2px 6px; border-radius: 3px; }
+
+  /* ===== Bias section ===== */
+  .bias-banner { background: #f5f3ff; border-left: 3px solid #7c3aed; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #4c1d95; margin-bottom: 14px; }
+  .bias-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .bias-card { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 14px; background: #fff; cursor: pointer; transition: all 0.2s; }
+  .bias-card:hover { border-color: #7c3aed; background: #faf5ff; }
+  .bias-card.selected { border: 2px solid #7c3aed; background: #f5f3ff; }
+  .bias-card-title { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 5px; }
+  .bias-card-desc { font-size: 11px; color: #64748b; }
+
+  /* ===== Tooltip ===== */
+  .tooltip { position: relative; cursor: help; }
+  .tooltip-text { display: none; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; font-size: 10px; padding: 6px 8px; border-radius: 4px; white-space: nowrap; z-index: 100; max-width: 260px; white-space: normal; text-align: left; width: 220px; }
+  .tooltip:hover .tooltip-text { display: block; }
+
+  /* ===== Annotation ===== */
+  .annotation { background: #fef9c3; border-left: 3px solid #ca8a04; padding: 10px 14px; margin: 10px auto 0; font-size: 11px; color: #713f12; border-radius: 3px; max-width: 1500px; }
+  .annotation strong { color: #422006; }
+
+  /* Inline validation warning */
+  .inline-error { color: #dc2626; font-size: 10px; font-weight: 600; margin-top: 3px; display: block; }
+  .inline-warn { color: #b45309; font-size: 10px; font-weight: 600; margin-top: 3px; display: block; }
+  .inline-ok { color: #16a34a; font-size: 10px; font-weight: 600; margin-top: 3px; display: block; }
+
+  .segment-multi { display: flex; flex-direction: column; gap: 6px; }
+  .segment-row { display: flex; align-items: center; gap: 8px; }
+  .segment-label { font-size: 10px; color: #64748b; min-width: 55px; }
+
+  @media (max-width: 768px) {
+    .app-body { flex-direction: column; }
+    .left-nav { width: 100%; }
+    .dataset-cards { grid-template-columns: 1fr; }
+    .chart-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== WIREFRAME NAVIGATOR ===== -->
+<div class="nav-bar">
+  <h1>📐 WF — Step 2: Reference Data Ingestion</h1>
+  <div class="nav-divider"></div>
+  <button class="nav-btn active" onclick="showScreen('s1-dataset-type', this)">3. Dataset Type</button>
+  <button class="nav-btn" onclick="showScreen('s2-upload', this)">4. Upload & Preview</button>
+  <button class="nav-btn" onclick="showScreen('s2-upload-done', this)">4b. Post-Upload</button>
+  <button class="nav-btn" onclick="showScreen('s3-detection', this)">5. Column Detection</button>
+  <button class="nav-btn" onclick="showScreen('s4a-mapping-acct', this)">6a. Mapping (Acct)</button>
+  <button class="nav-btn" onclick="showScreen('s4b-mapping-sum', this)">6b. Mapping (Sum)</button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="showScreen('s5-bias', this)">7. Bias Data Config</button>
+  <button class="nav-btn" onclick="showScreen('s6-validation', this)">8. Post-Map Validation</button>
+  <button class="nav-btn" onclick="showScreen('s7-eda', this)">9. Data Insights (EDA)</button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="showScreen('s-transition', this)">↻ EDA Loading</button>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 1 — DATASET TYPE SELECTION                            -->
+<!-- ============================================================= -->
+<div id="s1-dataset-type" class="screen active">
+  <span class="screen-label">Screen 3 (Nav) — Sub-step 1 of 4: Dataset Type Selection</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right">
+        <div class="role-pill">👤 ADMIN</div>
+        <div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">In progress</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔍</div><div class="tile-text"><div class="tile-title">3. Data Insights</div><div class="tile-subtitle">Locked</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">⚙️</div><div class="tile-text"><div class="tile-title">4. KPI Configuration</div><div class="tile-subtitle">Locked</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">✅</div><div class="tile-text"><div class="tile-title">5. Model Validation</div><div class="tile-subtitle">Locked</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a href="#">Model: Credit Risk PD v2.3</a> › <a href="#">MDL-001</a> › Reference Data Ingestion</div>
+        <h2 class="page-title">Reference Sample Ingestion</h2>
+        <p class="page-subtitle">Step 2 of 5 — Upload and configure the reference (baseline/training) dataset. Configuration will be reused at Model Validation.</p>
+
+        <!-- Sub-step tracker -->
+        <div class="substep-tracker">
+          <div class="substep active"><div class="substep-num">▶</div>1. Dataset Type</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep"><div class="substep-num">2</div>2. Upload & Preview</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep"><div class="substep-num">3</div>3. Column Detection</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep"><div class="substep-num">4</div>4. Column Mapping</div>
+        </div>
+
+        <div class="info-banner">
+          ℹ️ <strong>Account Level (Granular) is Priority 1</strong> and enables the full KPI suite. The same ingestion configuration will be reused at Model Validation.
+        </div>
+
+        <div class="dataset-cards">
+          <!-- Card 1: Account Level -->
+          <div class="dataset-card selected" onclick="selectDatasetType(this, 'acct')">
+            <div class="card-radio checked" id="radio-acct"></div>
+            <div class="card-header">
+              <div class="card-title">Account Level (Granular)</div>
+              <span class="priority-badge p1">⭐ Priority 1</span>
+            </div>
+            <div class="card-desc">One row per account. Required for account-level metrics calculation and feature-level drift analysis. Enables the full KPI monitoring suite.</div>
+            <div class="source-chips">
+              <span class="source-chip">📂 Core Banking Extract</span>
+              <span class="source-chip">📂 Account Level CSV</span>
+              <span class="source-chip">📂 Scoring App Output</span>
+            </div>
+            <div class="feature-pills">
+              <span class="fpill fpill-green">Full KPI Suite</span>
+              <span class="fpill fpill-blue">Feature-Level Drift</span>
+              <span class="fpill fpill-blue">SHAP / Feature Importance</span>
+              <span class="fpill fpill-green">CSI · JSD · IV · ROB</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Summarized Level -->
+          <div class="dataset-card" onclick="selectDatasetType(this, 'sum')">
+            <div class="card-radio" id="radio-sum"></div>
+            <div class="card-header">
+              <div class="card-title">Summarized Level</div>
+              <span class="priority-badge p2">Priority 2</span>
+            </div>
+            <div class="card-desc">One row per aggregated observation. Sufficient for score-level discrimination and stability metrics only.</div>
+            <div class="source-chips">
+              <span class="source-chip">📂 Score Level CSV</span>
+              <span class="source-chip">📂 Scoring Engine Output</span>
+              <span class="source-chip">📂 Scoring App DB</span>
+            </div>
+            <div class="feature-pills">
+              <span class="fpill fpill-blue">Score-Level KPIs</span>
+              <span class="fpill fpill-gray">No Feature-Level KPIs</span>
+            </div>
+            <div class="card-warn-note">⚠️ Feature-level KPIs (CSI, JSD-Feature, IV, SHAP, Feature Importance, Variable Level ROB) will show as N/A</div>
+          </div>
+        </div>
+
+        <!-- Amber warning — hidden by default, shown when Summarized selected -->
+        <div id="sum-warn" class="warn-banner" style="display:none;">
+          ⚠️ <strong>Selecting Summarized Level disables 6 feature-level KPIs</strong> from your confirmed KPI Pack. Those metrics will be computed as N/A. This cannot be changed after ingestion without re-uploading.
+        </div>
+
+        <div class="form-actions">
+          <div><button class="btn" onclick="alert('Return to KPI Review')">← Back to KPI Review</button></div>
+          <div class="form-actions-right">
+            <button class="btn-primary btn" onclick="showScreen('s2-upload', null)">Continue: Upload Data →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Screen 3 — Sub-step 1/4):</strong> Dataset type gates which column mapping fields and KPI metrics apply downstream. Account Level is pre-selected by default. Selecting Summarized Level triggers the amber warning banner. Dataset type change guard applies if user later returns: "Changing from Account Level to Summarized Level will discard your column detection and mapping work."
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 2 — FILE UPLOAD (PRE-UPLOAD STATE)                    -->
+<!-- ============================================================= -->
+<div id="s2-upload" class="screen">
+  <span class="screen-label">Screen 4 (Nav) — Sub-step 2 of 4: Upload & Preview (Pre-Upload)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">In progress</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔍</div><div class="tile-text"><div class="tile-title">3. Data Insights</div><div class="tile-subtitle">Locked</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a href="#">MDL-001</a> › Reference Data Ingestion › Upload & Preview</div>
+        <h2 class="page-title">Upload Reference Dataset</h2>
+        <p class="page-subtitle">Dataset Type: <span class="pill pill-green">Account Level (Granular) — Priority 1</span></p>
+
+        <div class="substep-tracker">
+          <div class="substep done clickable" onclick="showScreen('s1-dataset-type', null)"><div class="substep-num">✓</div>1. Dataset Type</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep active"><div class="substep-num">▶</div>2. Upload & Preview</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep"><div class="substep-num">3</div>3. Column Detection</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep"><div class="substep-num">4</div>4. Column Mapping</div>
+        </div>
+
+        <!-- Upload Zone -->
+        <div class="form-section">
+          <div class="form-section-title">Upload File</div>
+          <div class="form-section-desc">CSV format at launch. Other formats on roadmap. Max 50MB / 500,000 rows (configurable by Admin).</div>
+
+          <div class="upload-zone" onclick="showScreen('s2-upload-done', null)">
+            <div class="upload-icon">📂</div>
+            <h4>Drag & drop your CSV here, or click to browse</h4>
+            <p>Accepted: CSV only &nbsp;|&nbsp; Max 50MB &nbsp;|&nbsp; Max 500,000 rows</p>
+            <button class="btn-primary btn" style="pointer-events:none;">📁 Browse Files</button>
+          </div>
+
+          <!-- Parse Settings toggle -->
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom: 10px;">
+            <button class="btn" onclick="toggleParsePanel()">⚙️ Parse Settings</button>
+            <span style="font-size:11px; color:#64748b;">Adjust delimiter, encoding, and header row before or after upload</span>
+          </div>
+
+          <div id="parse-panel" class="parse-panel" style="display:none;">
+            <div class="parse-panel-title">
+              <span>⚙️ Parse Settings</span>
+              <button class="btn" style="font-size:10px; padding:3px 8px;" onclick="toggleParsePanel()">Close</button>
+            </div>
+            <div class="parse-grid">
+              <div class="parse-field"><label>Delimiter</label><select><option selected>Comma ( , )</option><option>Tab ( ⇥ )</option><option>Pipe ( | )</option><option>Semicolon ( ; )</option><option>Custom…</option></select></div>
+              <div class="parse-field"><label>Encoding</label><select><option selected>UTF-8</option><option>Latin-1</option><option>UTF-16</option></select></div>
+              <div class="parse-field"><label>Header Row</label><select><option selected>Row 1</option><option>Row 2</option><option>Row 3</option></select></div>
+              <div class="parse-field"><label>Decimal Separator</label><select><option selected>Period ( . )</option><option>Comma ( , )</option></select></div>
+              <div class="parse-field"><label>Null Representation</label><select><option selected>blank</option><option>NA</option><option>NULL</option><option>-999</option></select></div>
+            </div>
+            <div style="font-size:10px; color:#64748b; margin-top:8px;">ℹ️ Changing any setting will auto-trigger re-parsing with a live preview refresh.</div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <div><button class="btn" onclick="showScreen('s1-dataset-type', null)">← Back</button></div>
+          <div class="form-actions-right">
+            <button class="btn-disabled btn" disabled>Data Looks Good — Proceed to Column Detection →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Screen 4 — Sub-step 2/4 Pre-Upload):</strong> Upload zone triggers file selection. Parse Settings panel is inline (not a modal). Any parse setting change auto-triggers re-parse with loading state. Continue button is disabled until file is uploaded and preview renders. Large file parsing (>60s) shows timeout error with suggestions.
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 2b — FILE UPLOAD (POST-UPLOAD STATE)                  -->
+<!-- ============================================================= -->
+<div id="s2-upload-done" class="screen">
+  <span class="screen-label">Screen 4b (Nav) — Sub-step 2 of 4: Upload & Preview (Post-Upload)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">In progress</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔍</div><div class="tile-text"><div class="tile-title">3. Data Insights</div><div class="tile-subtitle">Locked</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a href="#">MDL-001</a> › Reference Data Ingestion › Upload & Preview</div>
+        <h2 class="page-title">Upload Reference Dataset</h2>
+        <p class="page-subtitle">Dataset Type: <span class="pill pill-green">Account Level (Granular) — Priority 1</span></p>
+
+        <div class="substep-tracker">
+          <div class="substep done clickable" onclick="showScreen('s1-dataset-type', null)"><div class="substep-num">✓</div>1. Dataset Type</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep active"><div class="substep-num">▶</div>2. Upload & Preview</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep"><div class="substep-num">3</div>3. Column Detection</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep"><div class="substep-num">4</div>4. Column Mapping</div>
+        </div>
+
+        <!-- Uploaded file block -->
+        <div class="uploaded-file-block">
+          <div class="file-icon">📄</div>
+          <div class="file-details">
+            <div class="file-name">2_Development_Data.csv</div>
+            <div class="file-meta">22,582 rows · 21 columns · 4.2 MB · Parsed in 1.3s · Encoding: UTF-8 detected</div>
+            <div class="file-badge">✓ Successfully parsed</div>
+          </div>
+          <button class="btn" style="font-size:11px;" onclick="showScreen('s2-upload', null)">🔄 Replace File</button>
+        </div>
+
+        <div class="success-banner">✅ File parsed successfully. Review the data preview below before proceeding. This preview is read-only and does not affect column detection.</div>
+
+        <!-- Data Preview Table -->
+        <div class="form-section">
+          <div class="form-section-title">Data Preview</div>
+          <div class="form-section-desc">First 5 rows of 22,582 · Read-only · Resolve any parsing issues before proceeding.</div>
+          <div class="preview-table-wrap">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th>Acct ID <span class="type-badge">string</span></th>
+                  <th>actual_default <span class="type-badge">int</span></th>
+                  <th>predicted_default_proba <span class="type-badge">float</span></th>
+                  <th>predicted_default <span class="type-badge">int</span></th>
+                  <th>optimal_threshold <span class="type-badge">float</span></th>
+                  <th>person_home_ownership_seg <span class="type-badge">string</span></th>
+                  <th>cb_person_default_on_file_seg <span class="type-badge">string</span></th>
+                  <th>person_age <span class="type-badge">int</span></th>
+                  <th>person_income <span class="type-badge">int</span></th>
+                  <th>person_emp_length <span class="type-badge">float</span></th>
+                  <th>loan_amnt <span class="type-badge">int</span></th>
+                  <th>loan_int_rate <span class="type-badge">float</span></th>
+                  <th>loan_grade <span class="type-badge">int</span> <span class="miss-warn" title=">10% missing in first 100 rows">⚠️</span></th>
+                  <th>loan_intent <span class="type-badge">int</span></th>
+                  <th>Vintage <span class="type-badge">string</span></th>
+                  <th>model_name <span class="type-badge">string</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>ACC-00001</td><td>0</td><td>0.1843</td><td>0</td><td>0.50</td><td>OWN</td><td>N</td><td>32</td><td>62000</td><td>4.0</td><td>5000</td><td>10.25</td><td>2</td><td>1</td><td>2020-Q1</td><td>credit_pd_v2</td></tr>
+                <tr><td>ACC-00002</td><td>1</td><td>0.7241</td><td>1</td><td>0.50</td><td>RENT</td><td>Y</td><td>26</td><td>48000</td><td>2.5</td><td>12000</td><td>13.40</td><td>3</td><td>3</td><td>2020-Q1</td><td>credit_pd_v2</td></tr>
+                <tr><td>ACC-00003</td><td>0</td><td>0.2156</td><td>0</td><td>0.50</td><td>MORTGAGE</td><td>N</td><td>44</td><td>95000</td><td>12.0</td><td>25000</td><td>9.75</td><td>1</td><td>2</td><td>2020-Q1</td><td>credit_pd_v2</td></tr>
+                <tr><td>ACC-00004</td><td>0</td><td>0.3312</td><td>0</td><td>0.50</td><td>OWN</td><td>N</td><td>38</td><td>75000</td><td>8.0</td><td>8500</td><td>11.50</td><td>2</td><td>4</td><td>2020-Q2</td><td>credit_pd_v2</td></tr>
+                <tr><td>ACC-00005</td><td>1</td><td>0.8923</td><td>1</td><td>0.50</td><td>RENT</td><td>Y</td><td>22</td><td>32000</td><td>0.5</td><td>18000</td><td>17.20</td><td>4</td><td>1</td><td>2020-Q2</td><td>credit_pd_v2</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="preview-footer">Showing 5 of 22,582 rows · Read-only · ⚠️ Column <strong>loan_grade</strong> has &gt;10% missing values in the first 100 rows — review before proceeding.</div>
+        </div>
+
+        <div class="form-actions">
+          <div><button class="btn" onclick="showScreen('s2-upload', null)">← Back</button></div>
+          <div class="form-actions-right">
+            <button class="btn-primary btn" onclick="showScreen('s3-detection', null)">Data Looks Good — Proceed to Column Detection →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Screen 4b — Post-Upload):</strong> Uploaded file block shows filename, row/column counts, parse time, encoding. Preview renders first 5 rows with type badges. ⚠️ badge appears on <code>loan_grade</code> header due to >10% missing in first 100 rows. "Replace file" triggers guard: "Replacing the file will clear all column detection results." During parse, navigation is disabled with cancel option. 60s timeout shows error with encoding/size suggestions.
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 3 — COLUMN DETECTION                                  -->
+<!-- ============================================================= -->
+<div id="s3-detection" class="screen">
+  <span class="screen-label">Screen 5 (Nav) — Sub-step 3 of 4: Column Detection</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">In progress</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔍</div><div class="tile-text"><div class="tile-title">3. Data Insights</div><div class="tile-subtitle">Locked</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a href="#">MDL-001</a> › Reference Data Ingestion › Column Detection</div>
+        <h2 class="page-title">Column Detection & Role Assignment</h2>
+        <p class="page-subtitle">File: 2_Development_Data.csv · 22,582 rows · 21 columns</p>
+
+        <div class="substep-tracker">
+          <div class="substep done clickable" onclick="showScreen('s1-dataset-type', null)"><div class="substep-num">✓</div>1. Dataset Type</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep done clickable" onclick="showScreen('s2-upload-done', null)"><div class="substep-num">✓</div>2. Upload & Preview</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep active"><div class="substep-num">▶</div>3. Column Detection</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep"><div class="substep-num">4</div>4. Column Mapping</div>
+        </div>
+
+        <!-- 4-Tier Hierarchy -->
+        <div class="form-section">
+          <div class="form-section-title">4-Tier Detection Hierarchy</div>
+          <div class="form-section-desc">Column roles are resolved using the following priority order. Lower tiers are invoked only when higher tiers cannot resolve a column.</div>
+          <div class="tier-cards">
+            <div class="tier-card t1">
+              <span class="tier-num">1</span>
+              <div class="tier-label">🟢 Model Object</div>
+              <div class="tier-auth" style="color:#166534; font-weight:600;">Highest Authority — Authoritative</div>
+              <div class="tier-status" style="margin-bottom:8px;">
+                <span class="pill pill-green">No file</span>
+              </div>
+              <input type="file" style="display:none" id="mo-upload">
+              <button class="btn" style="font-size:10px; width:100%; justify-content:center;" onclick="document.getElementById('mo-upload').click()">📎 Upload Model Object</button>
+              <div style="font-size:9px; color:#64748b; margin-top:4px;">Accepts: .pkl · .json · .xlsx</div>
+            </div>
+            <div class="tier-card t2">
+              <span class="tier-num">2</span>
+              <div class="tier-label">🔵 Data Dictionary</div>
+              <div class="tier-auth" style="color:#1e3a8a; font-weight:600;">Secondary — Resolves Type/Role</div>
+              <div class="tier-status" style="margin-bottom:8px;">
+                <span class="pill pill-blue">No file</span>
+              </div>
+              <input type="file" style="display:none" id="dd-upload">
+              <button class="btn" style="font-size:10px; width:100%; justify-content:center;" onclick="document.getElementById('dd-upload').click()">📎 Upload Data Dictionary</button>
+              <div style="font-size:9px; color:#64748b; margin-top:4px;">Accepts: .xlsx · .csv</div>
+            </div>
+            <div class="tier-card t3">
+              <span class="tier-num">3</span>
+              <div class="tier-label">🟣 AI-Assisted Inference</div>
+              <div class="tier-auth" style="color:#5b21b6; font-weight:600;">Auto-Active — Pattern Recognition</div>
+              <div class="tier-status">
+                <span class="pill pill-purple">16 resolved · 5 need review</span>
+              </div>
+              <div style="font-size:10px; color:#5b21b6; margin-top:8px; font-style:italic;">Signals: column name patterns, value distributions, identifier detection</div>
+            </div>
+            <div class="tier-card t4">
+              <span class="tier-num">4</span>
+              <div class="tier-label">🟡 Human Manual Selection</div>
+              <div class="tier-auth" style="color:#78350f; font-weight:600;">Final Fallback — Authoritative Override</div>
+              <div class="tier-status">
+                <span class="pill pill-amber">5 pending review →</span>
+              </div>
+              <div style="font-size:10px; color:#78350f; margin-top:8px; font-style:italic;">Manual selections are persisted and pre-populated on future re-ingestion</div>
+            </div>
+          </div>
+
+          <!-- Model Object Mismatch Warning (adversarial fix #4) — shown when MO uploaded -->
+          <div class="warn-banner" style="display:block;">
+            <strong>⚠️ Model Object vs Dataset Mismatch</strong> — If a Model Object were uploaded with columns not found in the dataset, they would appear here. Example: "2 columns from the Model Object were not found in the uploaded dataset: [F3, F4]. These columns will be marked as <em>Missing</em> — monitoring agents will compute N/A for associated metrics." Admin can acknowledge and proceed.
+          </div>
+        </div>
+
+        <!-- Filter bar (adversarial fix #12) -->
+        <div class="filter-bar">
+          <div class="filter-toggle">
+            <button class="ftog-btn" onclick="setDetFilter('review', this)">⚠️ Review Required <span class="unresolved-count">5</span></button>
+            <button class="ftog-btn active" onclick="setDetFilter('all', this)">All (21)</button>
+            <button class="ftog-btn" onclick="setDetFilter('resolved', this)">✓ Resolved (16)</button>
+          </div>
+          <span style="font-size:11px; color:#64748b; flex:1;">All ⚠️ items must be resolved before proceeding. Columns with low distinct counts are flagged as potentially encoded categoricals.</span>
+        </div>
+
+        <!-- Detection Results Table -->
+        <div class="det-table-wrap">
+          <table class="det-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Column Name</th>
+                <th>Data Type</th>
+                <th>Detected Role</th>
+                <th>Source</th>
+                <th>Confidence</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Resolved rows -->
+              <tr class="row-resolved"><td>1</td><td><strong>Acct ID</strong></td><td>String</td><td><span class="role-badge role-identifier">🔑 Identifier / Unique Key</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:97%"></span></span>97%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>2</td><td><strong>actual_default</strong></td><td>Integer (0/1)</td><td><span class="role-badge role-target">🎯 Actual Outcome (Target)</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:99%"></span></span>99%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>3</td><td><strong>predicted_default_proba</strong></td><td>Float (0–1)</td><td><span class="role-badge role-prob">📊 Predicted Probability</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:99%"></span></span>99%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>4</td><td><strong>predicted_default</strong></td><td>Integer (0/1)</td><td><span class="role-badge role-outcome">📤 Predicted Outcome</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:99%"></span></span>99%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>5</td><td><strong>optimal_threshold</strong></td><td>Float</td><td><span class="role-badge role-cutoff">✂️ Probability Cut Off</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:95%"></span></span>95%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>6</td><td><strong>person_home_ownership_seg</strong></td><td>String</td><td><span class="role-badge role-segment">🏷️ Segment Variable</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:93%"></span></span>93%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>7</td><td><strong>cb_person_default_on_file_seg</strong></td><td>String</td><td><span class="role-badge role-segment">🏷️ Segment Variable</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:91%"></span></span>91%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>8</td><td><strong>person_age</strong></td><td>Integer</td><td><span class="role-badge role-feature-num">⚙️ Feature (Numerical)</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:98%"></span></span>98%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>9</td><td><strong>person_income</strong></td><td>Integer</td><td><span class="role-badge role-feature-num">⚙️ Feature (Numerical)</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:97%"></span></span>97%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>10</td><td><strong>person_emp_length</strong></td><td>Float</td><td><span class="role-badge role-feature-num">⚙️ Feature (Numerical)</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:95%"></span></span>95%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>11</td><td><strong>loan_amnt</strong></td><td>Integer</td><td><span class="role-badge role-feature-num">⚙️ Feature (Numerical)</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:96%"></span></span>96%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>12</td><td><strong>loan_int_rate</strong></td><td>Float</td><td><span class="role-badge role-feature-num">⚙️ Feature (Numerical)</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:95%"></span></span>95%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>13</td><td><strong>loan_percent_income</strong></td><td>Float</td><td><span class="role-badge role-feature-num">⚙️ Feature (Numerical)</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:94%"></span></span>94%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>14</td><td><strong>cb_person_cred_hist_length</strong></td><td>Integer</td><td><span class="role-badge role-feature-num">⚙️ Feature (Numerical)</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:93%"></span></span>93%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>15</td><td><strong>Vintage</strong></td><td>String</td><td><span class="role-badge role-metadata">📋 Metadata</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:90%"></span></span>90%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+              <tr class="row-resolved"><td>16</td><td><strong>model_name</strong></td><td>String</td><td><span class="role-badge role-metadata">📋 Metadata</span></td><td><span class="source-badge src-ai">AI</span></td><td><span class="conf-bar"><span class="conf-fill conf-high" style="width:99%"></span></span>99%</td><td><span class="resolved-badge">✓ Resolved</span></td><td><button class="btn" style="font-size:10px; padding:3px 8px;">Edit</button></td></tr>
+
+              <!-- Review rows — adversarial fix #9: individual context instead of Resolve All -->
+              <tr class="row-review">
+                <td>17</td>
+                <td>
+                  <strong>loan_intent</strong>
+                  <div class="tooltip" style="display:inline-block;">
+                    <span style="font-size:9px; color:#b45309; cursor:help;">ℹ️ 6 distinct values</span>
+                    <span class="tooltip-text">This column has integer values but only 6 distinct values (≤20), suggesting it may be a label-encoded categorical variable. Recommended: Feature (Categorical)</span>
+                  </div>
+                </td>
+                <td>Integer</td>
+                <td><span class="role-badge role-ambiguous">⚠️ Ambiguous — Numerical or Categorical?</span></td>
+                <td><span class="source-badge src-ai">AI</span></td>
+                <td><span class="conf-bar"><span class="conf-fill conf-low" style="width:62%"></span></span>62%</td>
+                <td><span class="review-badge">⚠️ Review</span></td>
+                <td><select class="role-select"><option value="">— Select Role —</option><option>Feature (Numerical)</option><option>Feature (Categorical)</option><option>Segment Variable</option><option>Identifier</option><option>Actual Outcome</option><option>Predicted Outcome</option><option>Predicted Probability</option><option>Probability Cut Off</option><option>Metadata / Exclude</option></select></td>
+              </tr>
+              <tr class="row-review">
+                <td>18</td>
+                <td>
+                  <strong>loan_grade</strong>
+                  <div class="tooltip" style="display:inline-block;">
+                    <span style="font-size:9px; color:#b45309; cursor:help;">ℹ️ 7 distinct values</span>
+                    <span class="tooltip-text">7 distinct integer values suggest label-encoded categorical. Recommended: Feature (Categorical)</span>
+                  </div>
+                </td>
+                <td>Integer</td>
+                <td><span class="role-badge role-ambiguous">⚠️ Ambiguous — Numerical or Categorical?</span></td>
+                <td><span class="source-badge src-ai">AI</span></td>
+                <td><span class="conf-bar"><span class="conf-fill conf-low" style="width:60%"></span></span>60%</td>
+                <td><span class="review-badge">⚠️ Review</span></td>
+                <td><select class="role-select"><option value="">— Select Role —</option><option>Feature (Numerical)</option><option>Feature (Categorical)</option><option>Segment Variable</option><option>Identifier</option><option>Actual Outcome</option><option>Predicted Outcome</option><option>Predicted Probability</option><option>Probability Cut Off</option><option>Metadata / Exclude</option></select></td>
+              </tr>
+              <tr class="row-review">
+                <td>19</td>
+                <td>
+                  <strong>person_home_ownership</strong>
+                  <div class="tooltip" style="display:inline-block;">
+                    <span style="font-size:9px; color:#b45309; cursor:help;">ℹ️ 4 distinct values</span>
+                    <span class="tooltip-text">4 distinct values. String equivalent (person_home_ownership_seg) already detected — mapping as categorical may create duplicate coverage. Recommended: Feature (Categorical)</span>
+                  </div>
+                </td>
+                <td>Integer</td>
+                <td><span class="role-badge role-ambiguous">⚠️ Ambiguous — Numerical or Categorical?</span></td>
+                <td><span class="source-badge src-ai">AI</span></td>
+                <td><span class="conf-bar"><span class="conf-fill conf-low" style="width:65%"></span></span>65%</td>
+                <td><span class="review-badge">⚠️ Review</span></td>
+                <td><select class="role-select"><option value="">— Select Role —</option><option>Feature (Numerical)</option><option>Feature (Categorical)</option><option>Segment Variable</option><option>Identifier</option><option>Actual Outcome</option><option>Predicted Outcome</option><option>Predicted Probability</option><option>Probability Cut Off</option><option>Metadata / Exclude</option></select></td>
+              </tr>
+              <tr class="row-review">
+                <td>20</td>
+                <td>
+                  <strong>cb_person_default_on_file</strong>
+                  <div class="tooltip" style="display:inline-block;">
+                    <span style="font-size:9px; color:#b45309; cursor:help;">ℹ️ 2 distinct values</span>
+                    <span class="tooltip-text">2 distinct values (binary). String equivalent (cb_person_default_on_file_seg) already present. Recommended: Feature (Categorical)</span>
+                  </div>
+                </td>
+                <td>Integer</td>
+                <td><span class="role-badge role-ambiguous">⚠️ Ambiguous — Numerical or Categorical?</span></td>
+                <td><span class="source-badge src-ai">AI</span></td>
+                <td><span class="conf-bar"><span class="conf-fill conf-low" style="width:63%"></span></span>63%</td>
+                <td><span class="review-badge">⚠️ Review</span></td>
+                <td><select class="role-select"><option value="">— Select Role —</option><option>Feature (Numerical)</option><option>Feature (Categorical)</option><option>Segment Variable</option><option>Identifier</option><option>Actual Outcome</option><option>Predicted Outcome</option><option>Predicted Probability</option><option>Probability Cut Off</option><option>Metadata / Exclude</option></select></td>
+              </tr>
+              <tr class="row-review">
+                <td>21</td>
+                <td>
+                  <strong>prediction_correct</strong>
+                  <div class="tooltip" style="display:inline-block;">
+                    <span style="font-size:9px; color:#b45309; cursor:help;">ℹ️ Model output column</span>
+                    <span class="tooltip-text">Appears to be a derived model output flag (prediction match). Recommended: Metadata / Exclude — or assign as Model Output if needed for performance tracking.</span>
+                  </div>
+                </td>
+                <td>Integer (0/1)</td>
+                <td><span class="role-badge role-ambiguous">⚠️ Review Required</span></td>
+                <td><span class="source-badge src-ai">AI</span></td>
+                <td><span class="conf-bar"><span class="conf-fill conf-low" style="width:55%"></span></span>55%</td>
+                <td><span class="review-badge">⚠️ Review</span></td>
+                <td><select class="role-select"><option value="">— Select Role —</option><option>Model Output</option><option>Metadata / Exclude</option><option>Feature (Numerical)</option><option>Feature (Categorical)</option><option>Actual Outcome</option><option>Predicted Outcome</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="form-actions">
+          <div><button class="btn" onclick="showScreen('s2-upload-done', null)">← Back</button></div>
+          <div class="form-actions-right">
+            <button class="btn-disabled btn" disabled>Confirm Column Roles → Column Mapping <span class="unresolved-count">5 unresolved</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Screen 5 — Sub-step 3/4):</strong> All 5 ⚠️ rows show individual distinct value counts and role recommendations in tooltips (adversarial fix #9 — "Resolve All" removed). Filter bar lets Admin focus on review items (fix #12). Model Object mismatch section shown when MO uploaded (fix #4). Continue button disabled until all 5 resolved. Completed sub-steps are clickable (review mode with Edit to unlock). Column roles persisted on future re-ingestion.
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 4a — COLUMN MAPPING (ACCOUNT LEVEL)                   -->
+<!-- ============================================================= -->
+<div id="s4a-mapping-acct" class="screen">
+  <span class="screen-label">Screen 6a (Nav) — Sub-step 4 of 4: Column Mapping (Account Level)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">In progress</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔍</div><div class="tile-text"><div class="tile-title">3. Data Insights</div><div class="tile-subtitle">Locked</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a href="#">MDL-001</a> › Reference Data Ingestion › Column Mapping</div>
+        <h2 class="page-title">Column Mapping — Account Level</h2>
+        <p class="page-subtitle">All dropdowns pre-filled by AI inference. Review and adjust if needed. This configuration is persisted and reused at Model Validation.</p>
+
+        <div class="substep-tracker">
+          <div class="substep done clickable" onclick="showScreen('s1-dataset-type', null)"><div class="substep-num">✓</div>1. Type</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep done clickable" onclick="showScreen('s2-upload-done', null)"><div class="substep-num">✓</div>2. Upload</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep done clickable" onclick="showScreen('s3-detection', null)"><div class="substep-num">✓</div>3. Column Roles</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep active"><div class="substep-num">▶</div>4. Column Mapping</div>
+        </div>
+
+        <div class="success-banner">✅ AI inference complete. All mandatory columns resolved. Review and adjust if needed.</div>
+
+        <!-- Section A: Core Column Mappings -->
+        <div class="form-section">
+          <div class="form-section-title">Section A — Core Column Mappings</div>
+          <div class="form-section-desc">Fields marked <span style="color:#dc2626;">✱</span> are mandatory. AI-pre-filled values shown with <span class="ai-badge">AI</span> badge.</div>
+
+          <table class="mapping-table">
+            <thead>
+              <tr>
+                <th style="width:30%">Field</th>
+                <th style="width:10%">Required</th>
+                <th style="width:50%">Mapped Column</th>
+                <th style="width:10%">Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="mapping-icon">🔑</span><span class="mapping-label">Unique Key</span><div style="font-size:10px; color:#64748b;">One unique value per account row</div></td>
+                <td><span style="color:#dc2626; font-weight:700;">✱ Mandatory</span></td>
+                <td>
+                  <select class="mapping-select"><option selected>Acct ID</option><option>— None —</option></select>
+                  <span class="inline-ok">✓ All 22,582 values are unique</span>
+                </td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <tr>
+                <td><span class="mapping-icon">📊</span><span class="mapping-label">Predicted Probability (0–1)</span><div style="font-size:10px; color:#64748b;">Float 0–1 validation applied</div></td>
+                <td><span style="color:#dc2626; font-weight:700;">✱ Mandatory</span></td>
+                <td>
+                  <select class="mapping-select"><option selected>predicted_default_proba</option><option>— None —</option></select>
+                  <span class="inline-ok">✓ All values in [0, 1] range</span>
+                </td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <tr>
+                <td><span class="mapping-icon">📤</span><span class="mapping-label">Predicted Outcome (0/1)</span><div style="font-size:10px; color:#64748b;">Binary — if mapped, Probability Cutoff is disabled</div></td>
+                <td><span style="color:#64748b;">Optional</span></td>
+                <td>
+                  <select class="mapping-select"><option selected>predicted_default</option><option>— None —</option></select>
+                  <span class="inline-ok">✓ All values in {0, 1}</span>
+                </td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <tr>
+                <td><span class="mapping-icon">🎯</span><span class="mapping-label">Actual Outcome / Target (0/1)</span><div style="font-size:10px; color:#64748b;">Ground truth binary</div></td>
+                <td><span style="color:#dc2626; font-weight:700;">✱ Mandatory</span></td>
+                <td>
+                  <select class="mapping-select"><option selected>actual_default</option><option>— None —</option></select>
+                  <span class="inline-ok">✓ All values in {0, 1}</span>
+                </td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <tr>
+                <td><span class="mapping-icon">✂️</span><span class="mapping-label">Probability Cut Off</span><div class="conditional-note">Enabled + required only when Predicted Outcome is not mapped</div></td>
+                <td><span style="color:#f59e0b; font-weight:700;">Conditional</span></td>
+                <td>
+                  <select class="mapping-select disabled" disabled><option>optimal_threshold — disabled</option></select>
+                  <span class="disabled-note">ℹ️ Predicted Outcome is mapped. Probability Cutoff is disabled. To use cutoff-derived predictions, remove the Predicted Outcome mapping above.</span>
+                </td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <tr>
+                <td><span class="mapping-icon">🏷️</span><span class="mapping-label">Segment / Binning Variables</span><div style="font-size:10px; color:#64748b;">For generating granularity views · Max 3 segments · Max 20 distinct values each (Admin-configurable to 30)</div></td>
+                <td><span style="color:#64748b;">Optional</span></td>
+                <td>
+                  <!-- Multi-select segment (adversarial fix #6) -->
+                  <div class="segment-multi">
+                    <div class="segment-row">
+                      <span class="segment-label">Primary:</span>
+                      <select class="mapping-select" style="min-width:190px;"><option selected>person_home_ownership_seg</option><option>cb_person_default_on_file_seg</option><option>Vintage</option><option>— None —</option></select>
+                      <span class="inline-ok">✓ 4 distinct values</span>
+                    </div>
+                    <div class="segment-row">
+                      <span class="segment-label">2nd:</span>
+                      <select class="mapping-select" style="min-width:190px;"><option selected>cb_person_default_on_file_seg</option><option>person_home_ownership_seg</option><option>Vintage</option><option>— None —</option></select>
+                      <span class="inline-ok">✓ 2 distinct values</span>
+                    </div>
+                    <div class="segment-row">
+                      <span class="segment-label">3rd:</span>
+                      <select class="mapping-select" style="min-width:190px;"><option selected>— Add segment —</option><option>Vintage</option><option>person_home_ownership_seg</option></select>
+                    </div>
+                    <div style="margin-top:6px;">
+                      <button class="btn" style="font-size:10px;" onclick="toggleSegCreate()">✚ Create Custom Segment</button>
+                      <span style="font-size:10px; color:#64748b; margin-left:6px;">Max 1 custom segment per ingestion run</span>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Inline segment create panel (adversarial fix #1) -->
+        <div id="seg-create-panel" class="form-section" style="display:none; border-color:#2563eb;">
+          <div class="form-section-title" style="color:#2563eb;">✚ Create Custom Segment</div>
+          <div class="form-section-desc">Bin a numerical feature into a new categorical segment. Max 1 custom segment per ingestion run.</div>
+          <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="form-group"><label>Source Column</label><select><option>person_age</option><option>person_income</option><option>loan_amnt</option><option>loan_percent_income</option></select></div>
+            <div class="form-group"><label>Segment Name</label><input type="text" placeholder="e.g., income_band"></div>
+            <div class="form-group"><label>Binning Method</label><select><option>Quantile (Equal Frequency)</option><option>Equal Width</option><option>Manual Breakpoints</option></select></div>
+            <div class="form-group"><label>Breakpoints (Manual)</label><input type="text" placeholder="e.g., 0, 25000, 55000, 100000, ∞"><div class="help">Comma-separated values. Leave blank for auto-binning.</div></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; margin-top:8px; padding:8px; background:#f8fafc; border-radius:4px;">
+            <strong>Preview:</strong> income_band → 4 segments: Low (0–25k): 4,821 rows · Mid (25k–55k): 9,340 rows · High (55k–100k): 7,213 rows · Very High (100k+): 1,208 rows
+          </div>
+          <div style="margin-top:10px; display:flex; gap:8px;">
+            <button class="btn-primary btn" style="font-size:11px;">Apply Segment</button>
+            <button class="btn" style="font-size:11px;" onclick="toggleSegCreate()">Cancel</button>
+            <button class="btn" style="font-size:11px; color:#dc2626; border-color:#fca5a5;">🗑 Delete</button>
+          </div>
+        </div>
+
+        <!-- Section B: Feature Selection -->
+        <div class="form-section">
+          <div class="form-section-title">Section B — Feature Selection</div>
+          <div class="info-banner">ℹ️ Deselect features that should not be included in feature-level drift analysis. <strong>All selected features are used to compute CSI, JSD, IV, Feature Importance, Variable Level ROB, and SHAP.</strong> At least 1 feature must be selected for feature-level KPI computation.</div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:12px; color:#1e293b; font-weight:600;">Feature columns detected: 11</div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn" style="font-size:10px;">Select All</button>
+              <button class="btn" style="font-size:10px;">Deselect All</button>
+            </div>
+          </div>
+
+          <div class="feature-chip-grid">
+            <div class="fchip num">person_age <span class="type-toggle">NUM ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip num">person_income <span class="type-toggle">NUM ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip num">person_emp_length <span class="type-toggle">NUM ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip num">loan_amnt <span class="type-toggle">NUM ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip num">loan_int_rate <span class="type-toggle">NUM ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip num">loan_percent_income <span class="type-toggle">NUM ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip num">cb_person_cred_hist_length <span class="type-toggle">NUM ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip cat">person_home_ownership <span class="type-toggle">CAT ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip cat">loan_intent <span class="type-toggle">CAT ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip cat">loan_grade <span class="type-toggle">CAT ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip cat">cb_person_default_on_file <span class="type-toggle">CAT ✎</span><span class="edit-icon">✏️</span></div>
+            <div class="fchip warn-chip">prediction_correct ⚠️ Model Output — exclude?</div>
+          </div>
+          <div style="font-size:10px; color:#64748b; margin-top:8px;">💡 Click the type badge to toggle Numerical ↔ Categorical. Hover for edit icon. Chips with ⚠️ require decision.</div>
+        </div>
+
+        <div class="form-actions">
+          <div><button class="btn" onclick="showScreen('s3-detection', null)">← Back</button></div>
+          <div class="form-actions-right">
+            <button class="btn-primary btn" onclick="showScreen('s5-bias', null)">Continue: Bias Data Configuration →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Screen 6a — Sub-step 4/4, Account Level):</strong> All core fields AI-pre-filled. Probability Cutoff disabled because Predicted Outcome is mapped (conditional logic, fix #3). Multi-select segment (up to 3, fix #6). Inline "Create Custom Segment" panel with CRUD affordances, max 1 per run (fix #1). Feature chips with hover-to-edit type toggle (fix #13). Footnote links features to KPIs (fix #14). Post-mapping data validation runs before Save (fix #5) — see Screen 8. Segment cardinality validated inline (fix #16).
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 4b — COLUMN MAPPING (SUMMARIZED LEVEL)                -->
+<!-- ============================================================= -->
+<div id="s4b-mapping-sum" class="screen">
+  <span class="screen-label">Screen 6b (Nav) — Sub-step 4 of 4: Column Mapping (Summarized Level)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">In progress</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a href="#">MDL-001</a> › Reference Data Ingestion › Column Mapping (Summarized)</div>
+        <h2 class="page-title">Column Mapping — Summarized Level</h2>
+        <p class="page-subtitle">Dataset Type: <span class="pill pill-amber">Summarized Level — Priority 2</span></p>
+
+        <div class="substep-tracker">
+          <div class="substep done clickable"><div class="substep-num">✓</div>1. Type: Summarized</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep done clickable"><div class="substep-num">✓</div>2. Upload</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep done clickable"><div class="substep-num">✓</div>3. Column Roles</div>
+          <span class="substep-arrow">›</span>
+          <div class="substep active"><div class="substep-num">▶</div>4. Column Mapping</div>
+        </div>
+
+        <div class="warn-banner">⚠️ <strong>Summarized Level selected.</strong> Feature-level KPIs (CSI, JSD-Feature, IV, SHAP, Feature Importance, Variable Level ROB) will show N/A. Only score-level discrimination and stability metrics will be computed.</div>
+        <div class="success-banner">✅ AI inference complete. Mandatory columns resolved. Review and adjust if needed.</div>
+
+        <!-- Section A -->
+        <div class="form-section">
+          <div class="form-section-title">Section A — Core Column Mappings</div>
+
+          <table class="mapping-table">
+            <thead><tr><th>Field</th><th>Required</th><th>Mapped Column</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="mapping-icon">📊</span><span class="mapping-label">Predicted Probability (0–1)</span></td>
+                <td><span style="color:#dc2626; font-weight:700;">✱ Mandatory</span></td>
+                <td><select class="mapping-select"><option selected>score_band_midpoint</option><option>— None —</option></select></td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <tr>
+                <td><span class="mapping-icon">🎯</span><span class="mapping-label">Actual Outcome / Target (0/1)</span></td>
+                <td><span style="color:#dc2626; font-weight:700;">✱ Mandatory</span></td>
+                <td><select class="mapping-select"><option selected>event_rate</option><option>— None —</option></select></td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <tr>
+                <td><span class="mapping-icon">📤</span><span class="mapping-label">Predicted Outcome (0/1)</span></td>
+                <td><span style="color:#64748b;">Optional</span></td>
+                <td><select class="mapping-select"><option>— None —</option><option>predicted_outcome</option></select></td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <tr>
+                <td><span class="mapping-icon">✂️</span><span class="mapping-label">Probability Cut Off</span><div class="conditional-note">Required if Predicted Outcome not mapped</div></td>
+                <td><span style="color:#f59e0b; font-weight:700;">Conditional</span></td>
+                <td>
+                  <select class="mapping-select"><option selected>threshold_value</option><option>— None —</option></select>
+                  <span class="inline-ok">✓ All values in [0, 1]</span>
+                </td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <!-- Adversarial fix #2: Score Band / Group Key for Summarized Level -->
+              <tr>
+                <td><span class="mapping-icon">📦</span><span class="mapping-label">Score Band / Group Key</span><div style="font-size:10px; color:#64748b;">Aggregation variable — used for segment-level drift display only, not row identification</div></td>
+                <td><span style="color:#64748b;">Optional</span></td>
+                <td><select class="mapping-select"><option selected>score_band_label</option><option>— None —</option><option>date_bucket</option><option>vintage_period</option></select></td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+              <tr>
+                <td><span class="mapping-icon">🏷️</span><span class="mapping-label">Segment / Binning Variable</span></td>
+                <td><span style="color:#64748b;">Optional</span></td>
+                <td>
+                  <div class="segment-multi">
+                    <div class="segment-row">
+                      <span class="segment-label">Primary:</span>
+                      <select class="mapping-select" style="min-width:190px;"><option>score_band_label</option><option selected>vintage_period</option><option>— None —</option></select>
+                    </div>
+                  </div>
+                  <div style="margin-top:6px;"><button class="btn" style="font-size:10px;">✚ Create Custom Segment</button></div>
+                </td>
+                <td><span class="ai-badge">AI</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- No Unique Key note -->
+        <div class="form-section" style="border-color:#e2e8f0; background:#f8fafc;">
+          <div style="font-size:12px; color:#64748b;">ℹ️ <strong>Unique Key field:</strong> Not applicable for Summarized Level datasets. There is no per-account identifier. Row indexing uses the Score Band / Group Key field above for segment-level drift display.</div>
+        </div>
+
+        <!-- Feature Selection — greyed out -->
+        <div class="form-section" style="opacity:0.5; pointer-events:none;">
+          <div class="form-section-title">Section B — Feature Selection (Not Available)</div>
+          <div class="warn-banner" style="pointer-events:none;">📵 Feature-level KPI computation is not available for Summarized Level datasets. Metrics including CSI, JSD-Feature, IV, SHAP, and Feature Importance will show N/A. Upload an Account Level dataset to unlock feature-level analysis.</div>
+        </div>
+
+        <div class="form-actions">
+          <div><button class="btn" onclick="showScreen('s3-detection', null)">← Back</button></div>
+          <div class="form-actions-right">
+            <button class="btn-primary btn" onclick="showScreen('s5-bias', null)">Continue: Bias Data Configuration →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Screen 6b — Summarized Level):</strong> No Unique Key field. Score Band / Group Key added as optional aggregation identifier (adversarial fix #2). Feature Selection greyed out with clear explanation. Mandatory fields: Predicted Probability + Actual Outcome only. Hard validation: if Predicted Outcome absent AND Probability Cutoff absent → block with "Either Predicted Outcome or Probability Cutoff must be mapped" (fix #3).
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 5 — BIAS DATA CONFIGURATION                           -->
+<!-- ============================================================= -->
+<div id="s5-bias" class="screen">
+  <span class="screen-label">Screen 7 — Bias Data Configuration (New Screen)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">In progress</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔍</div><div class="tile-text"><div class="tile-title">3. Data Insights</div><div class="tile-subtitle">Locked</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a href="#">MDL-001</a> › Reference Data Ingestion › Bias Data Configuration</div>
+        <h2 class="page-title">Bias & Fairness Data Configuration</h2>
+        <p class="page-subtitle">Configure protected attribute columns for bias and fairness monitoring. This step is optional but recommended for regulated models.</p>
+
+        <div class="bias-banner">
+          🏛️ <strong>Bias & Fairness Monitoring</strong> — Protected attribute data enables computation of demographic parity, equalized odds, disparate impact, and other fairness metrics. This step is optional. Skip if your model does not require bias monitoring.
+        </div>
+
+        <!-- Enable/skip toggle -->
+        <div class="form-section">
+          <div class="form-section-title">Bias Monitoring — Enable or Skip</div>
+          <div style="display:flex; gap:12px; margin-bottom:14px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; font-weight:600; color:#1e293b;">
+              <input type="radio" name="bias-toggle" checked> Enable Bias & Fairness Monitoring
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:#64748b;">
+              <input type="radio" name="bias-toggle"> Skip — Not Required
+            </label>
+          </div>
+        </div>
+
+        <!-- Protected Attribute Source -->
+        <div class="form-section">
+          <div class="form-section-title">Protected Attribute Data Source</div>
+          <div class="form-section-desc">Protected attribute data may be present in the reference dataset, or provided as a separate file linked by the Unique Key.</div>
+
+          <div class="bias-cards">
+            <div class="bias-card selected">
+              <div class="bias-card-title">📄 In Reference Dataset</div>
+              <div class="bias-card-desc">Protected attribute columns are already present in the uploaded reference file. Select them below.</div>
+            </div>
+            <div class="bias-card">
+              <div class="bias-card-title">📂 Separate Bias File</div>
+              <div class="bias-card-desc">Upload a separate CSV containing Unique Key + protected attribute columns. Will be joined to the reference dataset on Unique Key.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Protected Attribute Configuration -->
+        <div class="form-section">
+          <div class="form-section-title">Protected Attribute Column Configuration</div>
+          <div class="form-section-desc">Map protected attributes from the dataset. For each attribute, specify the privileged group (reference group for disparity calculations). Up to 5 protected attributes.</div>
+
+          <table class="mapping-table" style="margin-bottom:10px;">
+            <thead><tr><th>Protected Attribute</th><th>Mapped Column</th><th>Attribute Type</th><th>Privileged Group (Reference)</th><th>Distinct Values Detected</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Age Group</strong></td>
+                <td><select class="mapping-select" style="min-width:160px;"><option selected>person_age</option><option>— None —</option></select></td>
+                <td><select style="padding:5px; font-size:11px; border:1px dashed #94a3b8; border-radius:4px;"><option>Numerical (binned)</option><option>Categorical</option></select></td>
+                <td><input type="text" style="padding:5px 8px; border:1px dashed #94a3b8; border-radius:4px; font-size:11px; width:120px;" placeholder="e.g., 30-50"></td>
+                <td><span class="pill pill-blue">Continuous (bins required)</span></td>
+                <td><button class="btn" style="font-size:10px; color:#dc2626; border-color:#fca5a5;">Remove</button></td>
+              </tr>
+              <tr>
+                <td><strong>Gender</strong></td>
+                <td><select class="mapping-select" style="min-width:160px;"><option>— Select column —</option><option>person_gender</option></select></td>
+                <td><select style="padding:5px; font-size:11px; border:1px dashed #94a3b8; border-radius:4px;"><option>Categorical</option><option>Numerical (binned)</option></select></td>
+                <td><input type="text" style="padding:5px 8px; border:1px dashed #94a3b8; border-radius:4px; font-size:11px; width:120px;" placeholder="e.g., Male"></td>
+                <td><span class="pill pill-amber">Column not found in dataset</span></td>
+                <td><button class="btn" style="font-size:10px; color:#dc2626; border-color:#fca5a5;">Remove</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button class="btn" style="font-size:11px;">✚ Add Protected Attribute</button>
+          <div style="font-size:10px; color:#64748b; margin-top:6px;">Max 5 protected attributes · Age, Gender, Race/Ethnicity, Geography, and custom attributes supported.</div>
+        </div>
+
+        <!-- Bias Metrics to Compute -->
+        <div class="form-section">
+          <div class="form-section-title">Fairness Metrics to Compute</div>
+          <div class="form-section-desc">Select which fairness metrics should be computed for this model. All require protected attribute mapping above.</div>
+          <div class="feature-chip-grid">
+            <div class="fchip cat">✓ Demographic Parity</div>
+            <div class="fchip cat">✓ Equalized Odds</div>
+            <div class="fchip cat">✓ Equal Opportunity</div>
+            <div class="fchip cat">✓ Disparate Impact Ratio</div>
+            <div class="fchip num">✓ Average Odds Difference</div>
+            <div class="fchip num">✓ Statistical Parity Difference</div>
+            <div class="fchip cat">✓ Predictive Parity</div>
+            <div class="fchip warn-chip">Calibration by Group (requires actual outcome)</div>
+          </div>
+        </div>
+
+        <!-- Reference Population -->
+        <div class="form-section">
+          <div class="form-section-title">Reference Population Definition</div>
+          <div class="form-section-desc">Define how the reference population is segmented for fairness metric computation.</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Binning for Numerical Protected Attributes</label>
+              <select><option selected>Quantile (Equal Frequency)</option><option>Equal Width</option><option>Manual Breakpoints</option></select>
+              <div class="help">Applies to age, income, and other continuous protected attributes.</div>
+            </div>
+            <div class="form-group">
+              <label>Minimum Group Size for Reporting</label>
+              <input type="number" value="30">
+              <div class="help">Groups with fewer rows will not have metrics computed (privacy protection).</div>
+            </div>
+            <div class="form-group">
+              <label>Fairness Threshold (Disparate Impact)</label>
+              <input type="number" value="0.80" step="0.01">
+              <div class="help">Default: 4/5ths rule (0.80). Ratio below this triggers a fairness alert.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <div><button class="btn" onclick="showScreen('s4a-mapping-acct', null)">← Back to Column Mapping</button></div>
+          <div class="form-actions-right">
+            <button class="btn" onclick="showScreen('s6-validation', null)">Skip Bias Configuration →</button>
+            <button class="btn-primary btn" onclick="showScreen('s6-validation', null)">Save Bias Config & Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Screen 7 — Bias Data Configuration — NEW):</strong> Bias & fairness monitoring is a new optional step inserted after Column Mapping. Supports protected attributes from the reference dataset or a separately uploaded file joined on Unique Key. Configures: protected attribute columns + privileged groups, fairness metrics to compute, binning strategy for continuous attributes, minimum group size (privacy protection), and fairness thresholds. Skippable — not required for all models. Gender column flagged as "not found in dataset" to prompt resolution.
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 6 — POST-MAPPING DATA VALIDATION                      -->
+<!-- ============================================================= -->
+<div id="s6-validation" class="screen">
+  <span class="screen-label">Screen 8 — Post-Mapping Column Validation (Adversarial Fix #5)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">In progress</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔍</div><div class="tile-text"><div class="tile-title">3. Data Insights</div><div class="tile-subtitle">Locked</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a href="#">MDL-001</a> › Reference Data Ingestion › Column Validation</div>
+        <h2 class="page-title">Column Data Validation</h2>
+        <p class="page-subtitle">Post-mapping validation checks run on all mapped columns before saving. Resolve blocking errors to proceed.</p>
+
+        <div class="success-banner">✅ Column mapping saved. Running data validation checks on 22,582 rows across 5 mapped columns…</div>
+
+        <!-- Validation Summary Cards -->
+        <div class="val-results">
+          <div class="val-card ok">
+            <div class="vc-label">Unique Key</div>
+            <div class="vc-value">✓</div>
+            <div class="vc-note">22,582 unique values · 0 duplicates</div>
+          </div>
+          <div class="val-card ok">
+            <div class="vc-label">Predicted Probability</div>
+            <div class="vc-value">✓</div>
+            <div class="vc-note">22,579 in [0,1] · 3 nulls flagged</div>
+          </div>
+          <div class="val-card err">
+            <div class="vc-label">Predicted Outcome</div>
+            <div class="vc-value">⚠️</div>
+            <div class="vc-note">22,580 binary · 2 rows = 2 (out of {0,1})</div>
+          </div>
+          <div class="val-card ok">
+            <div class="vc-label">Actual Outcome</div>
+            <div class="vc-value">✓</div>
+            <div class="vc-note">22,582 binary · 0 issues</div>
+          </div>
+          <div class="val-card ok">
+            <div class="vc-label">Probability Cutoff</div>
+            <div class="vc-value">✓</div>
+            <div class="vc-note">Disabled (Predicted Outcome mapped)</div>
+          </div>
+        </div>
+
+        <!-- Validation Detail Table -->
+        <div class="form-section">
+          <div class="form-section-title">Validation Detail</div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Column</th>
+                <th>Mapped To Field</th>
+                <th>Check</th>
+                <th>Result</th>
+                <th>Issue Count</th>
+                <th>Action Required</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Acct ID</strong></td>
+                <td>🔑 Unique Key</td>
+                <td>No duplicate values</td>
+                <td><span class="pill pill-green">✓ Pass</span></td>
+                <td>0 duplicates</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>predicted_default_proba</strong></td>
+                <td>📊 Predicted Probability</td>
+                <td>All values in [0, 1]</td>
+                <td><span class="pill pill-amber">⚠️ Warning</span></td>
+                <td>3 null rows</td>
+                <td>Non-blocking · Nulls will be excluded from metric computation</td>
+              </tr>
+              <tr style="background:#fef2f2;">
+                <td><strong>predicted_default</strong></td>
+                <td>📤 Predicted Outcome</td>
+                <td>All values in {0, 1}</td>
+                <td><span class="pill pill-red">✕ Error</span></td>
+                <td>2 rows with value = 2</td>
+                <td>
+                  <strong style="color:#dc2626;">⛔ Blocking</strong> — Review rows #14,891 and #22,100 in your source file. Either fix the values or remap to a different column.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>actual_default</strong></td>
+                <td>🎯 Actual Outcome</td>
+                <td>All values in {0, 1}</td>
+                <td><span class="pill pill-green">✓ Pass</span></td>
+                <td>0 issues</td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="error-banner" style="margin-top:12px; margin-bottom:0;">
+            ⛔ <strong>1 blocking validation error.</strong> Rows with out-of-range values in <code>predicted_default</code> (rows #14,891, #22,100) must be resolved. Options: (1) Fix values in source file and replace upload, (2) Remap Predicted Outcome to a different column, (3) Remove Predicted Outcome mapping and use Probability Cutoff instead.
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <div><button class="btn" onclick="showScreen('s4a-mapping-acct', null)">← Back to Column Mapping</button></div>
+          <div class="form-actions-right">
+            <button class="btn-disabled btn" disabled>⛔ Save & Run Data Insights (blocked — resolve 1 error)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Screen 8 — Adversarial Fix #5):</strong> Post-mapping column validation runs checks: (a) Predicted Probability values in [0,1]; (b) Predicted Outcome/Actual Outcome values in {0,1} binary; (c) Unique Key has no duplicates. Warnings (nulls) are non-blocking. Errors (out-of-range values) are blocking. Admin must resolve before "Save & Run Data Insights" is enabled. Row-level issue counts given.
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 7 — DATA INSIGHTS (EDA)                               -->
+<!-- ============================================================= -->
+<div id="s7-eda" class="screen">
+  <span class="screen-label">Screen 9 — Data Insights (EDA)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">Completed ✓</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">🔍</div><div class="tile-text"><div class="tile-title">3. Data Insights</div><div class="tile-subtitle">In progress</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">⚙️</div><div class="tile-text"><div class="tile-title">4. KPI Configuration</div><div class="tile-subtitle">Locked</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a href="#">MDL-001</a> › Data Insights (EDA)</div>
+        <h2 class="page-title">Data Insights — Automated EDA Report</h2>
+        <p class="page-subtitle">Reference dataset: 2_Development_Data.csv · 22,582 rows · 21 columns · Generated: 2026-05-08 09:42 UTC</p>
+
+        <!-- EDA Summary Cards -->
+        <div class="eda-summary-cards">
+          <div class="eda-card info"><div class="eda-label">Total Rows</div><div class="eda-value">22,582</div></div>
+          <div class="eda-card info"><div class="eda-label">Features</div><div class="eda-value">11</div></div>
+          <div class="eda-card info"><div class="eda-label">Segments</div><div class="eda-value">2</div></div>
+          <div class="eda-card ok"><div class="eda-label">Overall Event Rate</div><div class="eda-value">21.8%</div></div>
+          <div class="eda-card warn"><div class="eda-label">Columns w/ Missing</div><div class="eda-value">3</div></div>
+          <div class="eda-card info"><div class="eda-label">Numeric Features</div><div class="eda-value">7</div></div>
+          <div class="eda-card info"><div class="eda-label">Categorical Features</div><div class="eda-value">4</div></div>
+        </div>
+
+        <!-- AI Summary Collapsible -->
+        <div class="collapsible">
+          <div class="collapsible-header" onclick="toggleCollapsible(this)">
+            🤖 AI-Generated Data Summary <span style="font-size:11px; color:#64748b; margin-left:8px;">Click to expand · Generated from EDA analysis</span>
+            <span>▼</span>
+          </div>
+          <div class="collapsible-body" style="display:none;">
+            <p style="font-size:12px; color:#475569; line-height:1.7;">
+              The reference dataset (2_Development_Data.csv) contains 22,582 accounts with a binary default target. <strong>Overall event rate is 21.8%</strong>, indicating a moderately imbalanced dataset. The <strong>RENT</strong> home ownership segment shows the highest event rate at 31.2%, while <strong>OWN</strong> records 12.4%. Borrowers with prior defaults on file (cb_person_default_on_file_seg = Y) exhibit a dramatically elevated event rate of 48.6% versus 15.2% for N, suggesting this is a strong discriminating feature. <strong>loan_int_rate</strong> and <strong>loan_percent_income</strong> show the highest spread between default and non-default groups in the numerical analysis. <strong>loan_grade</strong> has >10% missing values — review before KPI configuration. Three metadata columns (Vintage, model_name, optimal_threshold) are excluded from EDA analysis.
+            </p>
+          </div>
+        </div>
+
+        <!-- Section 1: Segment Event Rate -->
+        <div class="form-section">
+          <div class="eda-section-title">1. Segment-Wise Event Rate Analysis</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+            <label style="font-size:11px; font-weight:600; color:#475569;">Segment:</label>
+            <select style="padding:5px 8px; border:1px dashed #94a3b8; border-radius:4px; font-size:11px;">
+              <option selected>person_home_ownership_seg</option>
+              <option>cb_person_default_on_file_seg</option>
+              <option>Overall Only</option>
+            </select>
+          </div>
+          <div style="overflow:auto;">
+            <table class="seg-table">
+              <thead><tr><th>Segment</th><th>Accounts</th><th>Account%</th><th>Events</th><th>Event%</th><th>Event Rate</th></tr></thead>
+              <tbody>
+                <tr class="overall-row"><td>Overall</td><td>22,582</td><td>100.0%</td><td>4,923</td><td>100.0%</td><td><div class="event-rate-bar"><div class="er-bar"><div class="er-fill" style="width:21.8%;"></div></div>21.8%</div></td></tr>
+                <tr class="seg-row"><td>&nbsp;&nbsp;┗ OWN</td><td>7,841</td><td>34.7%</td><td>972</td><td>19.7%</td><td><div class="event-rate-bar"><div class="er-bar"><div class="er-fill" style="width:12.4%;"></div></div>12.4%</div></td></tr>
+                <tr class="seg-row"><td>&nbsp;&nbsp;┗ RENT</td><td>9,215</td><td>40.8%</td><td>2,876</td><td>58.4%</td><td><div class="event-rate-bar"><div class="er-bar"><div class="er-fill" style="width:31.2%;"></div></div>31.2%</div></td></tr>
+                <tr class="seg-row"><td>&nbsp;&nbsp;┗ MORTGAGE</td><td>4,921</td><td>21.8%</td><td>918</td><td>18.6%</td><td><div class="event-rate-bar"><div class="er-bar"><div class="er-fill" style="width:18.7%;"></div></div>18.7%</div></td></tr>
+                <tr class="seg-row"><td>&nbsp;&nbsp;┗ OTHER</td><td>605</td><td>2.7%</td><td>157</td><td>3.2%</td><td><div class="event-rate-bar"><div class="er-bar"><div class="er-fill" style="width:25.9%;"></div></div>25.9%</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 2: Numerical Variables -->
+        <div class="form-section">
+          <div class="eda-section-title">2. Segment-Wise Numerical Variable Statistics</div>
+          <div style="overflow:auto;">
+            <table class="seg-table">
+              <thead><tr><th>Variable</th><th>Segment</th><th>Count</th><th>Missing</th><th>Missing%</th><th>Min</th><th>Max</th><th>Mean</th><th>Median</th><th>Std Dev</th><th>Outlier%</th></tr></thead>
+              <tbody>
+                <tr class="overall-row"><td>person_age</td><td>Overall</td><td>22,582</td><td>0</td><td>0.0%</td><td>20</td><td>144</td><td>27.7</td><td>26</td><td>6.3</td><td>2.1%</td></tr>
+                <tr class="seg-row"><td></td><td>▸ OWN</td><td>7,841</td><td>0</td><td>0.0%</td><td>20</td><td>89</td><td>31.2</td><td>29</td><td>7.1</td><td>1.8%</td></tr>
+                <tr class="overall-row"><td>person_income</td><td>Overall</td><td>22,582</td><td>0</td><td>0.0%</td><td>4,000</td><td>6,000,000</td><td>66,074</td><td>55,000</td><td>61,983</td><td>3.4%</td></tr>
+                <tr class="overall-row"><td>loan_amnt</td><td>Overall</td><td>22,582</td><td>0</td><td>0.0%</td><td>500</td><td>35,000</td><td>9,589</td><td>8,000</td><td>6,321</td><td>1.2%</td></tr>
+                <tr class="overall-row"><td>loan_int_rate</td><td>Overall</td><td>22,582</td><td>0</td><td>0.0%</td><td>5.42</td><td>23.22</td><td>11.01</td><td>10.99</td><td>3.24</td><td>0.5%</td></tr>
+                <tr class="overall-row"><td>loan_percent_income</td><td>Overall</td><td>22,582</td><td>0</td><td>0.0%</td><td>0.00</td><td>0.83</td><td>0.17</td><td>0.15</td><td>0.11</td><td>1.8%</td></tr>
+                <tr class="overall-row"><td>cb_person_cred_hist_length</td><td>Overall</td><td>22,582</td><td>0</td><td>0.0%</td><td>2</td><td>30</td><td>5.8</td><td>4</td><td>4.1</td><td>3.2%</td></tr>
+                <tr class="overall-row"><td style="font-weight:700; color:#b45309;">loan_grade ⚠️</td><td>Overall</td><td>22,582</td><td>2,301</td><td>10.2%</td><td>1</td><td>7</td><td>2.9</td><td>3</td><td>1.4</td><td>0.0%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 3: Categorical Variables -->
+        <div class="form-section">
+          <div class="eda-section-title">3. Segment-Wise Categorical Variable Statistics</div>
+          <div style="overflow:auto;">
+            <table class="seg-table">
+              <thead><tr><th>Variable</th><th>Segment</th><th>Count</th><th>Missing</th><th>Missing%</th><th>Distinct</th><th>Mode</th><th>Top Category%</th><th>Lowest Category%</th></tr></thead>
+              <tbody>
+                <tr class="overall-row"><td>person_home_ownership_seg</td><td>Overall</td><td>22,582</td><td>0</td><td>0.0%</td><td>4</td><td>RENT</td><td>40.8%</td><td>2.7%</td></tr>
+                <tr class="overall-row"><td>cb_person_default_on_file_seg</td><td>Overall</td><td>22,582</td><td>0</td><td>0.0%</td><td>2</td><td>N</td><td>82.4%</td><td>17.6%</td></tr>
+                <tr class="overall-row"><td>loan_intent (encoded cat)</td><td>Overall</td><td>22,582</td><td>0</td><td>0.0%</td><td>6</td><td>3</td><td>24.1%</td><td>8.3%</td></tr>
+                <tr class="overall-row"><td>loan_grade (encoded cat)</td><td>Overall</td><td>20,281</td><td>2,301</td><td>10.2%</td><td>7</td><td>2</td><td>28.4%</td><td>3.1%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 4: Charts -->
+        <div class="form-section">
+          <div class="eda-section-title">4. Univariate & Bivariate Feature Charts</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+            <label style="font-size:11px; font-weight:600; color:#475569;">Features shown (max 4):</label>
+            <select style="padding:5px 8px; border:1px dashed #94a3b8; border-radius:4px; font-size:11px; min-width:200px;">
+              <option>person_age, person_income, loan_amnt, loan_int_rate</option>
+              <option>loan_percent_income, cb_person_cred_hist_length…</option>
+            </select>
+            <span style="font-size:10px; color:#64748b;">🔍 Search/filter to change selected features (11 total)</span>
+          </div>
+
+          <div class="chart-grid">
+            <!-- Chart 1 -->
+            <div class="chart-box">
+              <div class="chart-title">person_age</div>
+              <div class="chart-type-tabs">
+                <button class="chart-tab active">Univariate</button>
+                <button class="chart-tab">Bivariate</button>
+              </div>
+              <div class="chart-placeholder">
+                <div class="bar bar-blue" style="height:40%"></div>
+                <div class="bar bar-blue" style="height:65%"></div>
+                <div class="bar bar-blue" style="height:90%"></div>
+                <div class="bar bar-blue" style="height:80%"></div>
+                <div class="bar bar-blue" style="height:55%"></div>
+                <div class="bar bar-blue" style="height:30%"></div>
+                <div class="bar bar-blue" style="height:20%"></div>
+              </div>
+              <div style="font-size:9px; color:#94a3b8; margin-top:4px; text-align:center;">Distribution — Numerical · n=22,582</div>
+            </div>
+            <!-- Chart 2 -->
+            <div class="chart-box">
+              <div class="chart-title">person_income</div>
+              <div class="chart-type-tabs">
+                <button class="chart-tab active">Univariate</button>
+                <button class="chart-tab">Bivariate</button>
+              </div>
+              <div class="chart-placeholder">
+                <div class="bar bar-blue" style="height:90%"></div>
+                <div class="bar bar-blue" style="height:75%"></div>
+                <div class="bar bar-blue" style="height:50%"></div>
+                <div class="bar bar-blue" style="height:30%"></div>
+                <div class="bar bar-blue" style="height:15%"></div>
+                <div class="bar bar-blue" style="height:8%"></div>
+                <div class="bar bar-blue" style="height:4%"></div>
+              </div>
+              <div style="font-size:9px; color:#94a3b8; margin-top:4px; text-align:center;">Distribution — Right-skewed · n=22,582</div>
+            </div>
+            <!-- Chart 3 -->
+            <div class="chart-box">
+              <div class="chart-title">loan_amnt</div>
+              <div class="chart-type-tabs">
+                <button class="chart-tab">Univariate</button>
+                <button class="chart-tab active">Bivariate</button>
+              </div>
+              <div class="chart-placeholder" style="position:relative;">
+                <div class="bar bar-blue" style="height:55%"></div>
+                <div class="bar bar-blue" style="height:70%"></div>
+                <div class="bar bar-blue" style="height:85%"></div>
+                <div class="bar bar-blue" style="height:75%"></div>
+                <div class="bar bar-blue" style="height:60%"></div>
+                <div class="bar bar-blue" style="height:40%"></div>
+                <!-- Event rate overlay approximation -->
+                <div style="position:absolute; bottom:8px; left:0; right:0; display:flex; align-items:flex-end; padding:0 4px; gap:3px; pointer-events:none;">
+                  <div style="flex:1; border-top:2px solid #dc2626; margin-bottom:8px;"></div>
+                </div>
+              </div>
+              <div style="font-size:9px; color:#94a3b8; margin-top:4px; text-align:center;">Bar=Distribution · Line=Event Rate (Bivariate)</div>
+            </div>
+            <!-- Chart 4 -->
+            <div class="chart-box">
+              <div class="chart-title">loan_int_rate</div>
+              <div class="chart-type-tabs">
+                <button class="chart-tab">Univariate</button>
+                <button class="chart-tab active">Bivariate</button>
+              </div>
+              <div class="chart-placeholder">
+                <div class="bar bar-blue" style="height:30%"></div>
+                <div class="bar bar-blue" style="height:55%"></div>
+                <div class="bar bar-blue" style="height:85%"></div>
+                <div class="bar bar-blue" style="height:70%"></div>
+                <div class="bar bar-blue" style="height:45%"></div>
+                <div class="bar bar-blue" style="height:20%"></div>
+                <div class="bar bar-blue" style="height:10%"></div>
+              </div>
+              <div style="font-size:9px; color:#94a3b8; margin-top:4px; text-align:center;">Strong positive correlation with event rate</div>
+            </div>
+          </div>
+          <div style="font-size:10px; color:#64748b;">ℹ️ Univariate: distribution bar chart. Bivariate: primary axis = distribution, secondary axis = event rate by bin. Use the feature selector above to navigate all 11 features.</div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+          <div><button class="btn" onclick="showScreen('s4a-mapping-acct', null)">← Back to Column Mapping</button></div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn">📥 Download EDA Report (CSV)</button>
+            <button class="btn-primary btn">Continue to KPI Configuration →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Screen 9 — Data Insights EDA):</strong> Step 3 auto-generated EDA report. AI Summary collapsible at top. Segment selector drives all 4 EDA tables. Numerical EDA only on detected Feature (Numerical) columns. Categorical EDA on Segment Variables + Feature (Categorical) columns. Charts show max 4 features with search/filter dropdown for all 11 features (fix from spec). Univariate and Bivariate tabs per chart. loan_grade flagged ⚠️ for >10% missing. Download CSV + Continue to KPI Config.
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- SCREEN 8 — EDA LOADING / TRANSITION SCREEN                   -->
+<!-- ============================================================= -->
+<div id="s-transition" class="screen">
+  <span class="screen-label">EDA Loading Transition Screen (Adversarial Fix #15)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div>Model Monitoring Platform</div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Model Setup</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">1. KPI Review</div><div class="tile-subtitle">Confirmed ✓</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">2. Reference Ingestion</div><div class="tile-subtitle">Saving…</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">🔍</div><div class="tile-text"><div class="tile-title">3. Data Insights</div><div class="tile-subtitle">Computing…</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="transition-screen">
+          <div class="success-banner" style="max-width:480px; margin:0 auto 20px;">✅ Configuration saved. Running automated EDA on 22,582 rows…</div>
+          <div class="transition-icon">🔍</div>
+          <h3 style="color:#1e293b; margin-bottom:8px;">Computing Data Insights</h3>
+          <p style="color:#64748b; font-size:13px; margin-bottom:16px;">Analysing 22,582 rows × 11 features across 2 segments. This usually takes 5–15 seconds.</p>
+          <div class="progress-bar-wrap">
+            <div class="progress-fill"></div>
+          </div>
+          <p style="color:#94a3b8; font-size:11px; margin-top:8px;">Computing segment event rates · Building numerical profiles · Generating categorical distributions…</p>
+          <div style="margin-top:24px; display:flex; gap:10px; justify-content:center;">
+            <button class="btn" style="font-size:11px; color:#dc2626;" onclick="alert('EDA computation cancelled.')">✕ Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (Transition Screen — Adversarial Fix #15):</strong> "Save & Run Data Insights" immediately saves the column mapping config (server-side) then shows this transition screen with animated progress bar. Displays what is being computed. Cancel button available. On completion, navigates automatically to the Data Insights screen (Step 3). If EDA takes >60s, timeout error appears with retry option.
+  </div>
+</div>
+
+<script>
+  function showScreen(id, btn) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      const map = {
+        's1-dataset-type': 0, 's2-upload': 1, 's2-upload-done': 2,
+        's3-detection': 3, 's4a-mapping-acct': 4, 's4b-mapping-sum': 5,
+        's5-bias': 6, 's6-validation': 7, 's7-eda': 8, 's-transition': 9
+      };
+      const navBtns = document.querySelectorAll('.nav-btn');
+      if (map[id] !== undefined && navBtns[map[id]]) navBtns[map[id]].classList.add('active');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function selectDatasetType(card, type) {
+    document.querySelectorAll('.dataset-card').forEach(c => {
+      c.classList.remove('selected', 'selected-warn');
+    });
+    document.getElementById('radio-acct').classList.remove('checked');
+    document.getElementById('radio-sum').classList.remove('checked');
+
+    if (type === 'acct') {
+      card.classList.add('selected');
+      document.getElementById('radio-acct').classList.add('checked');
+      document.getElementById('sum-warn').style.display = 'none';
+    } else {
+      card.classList.add('selected-warn');
+      document.getElementById('radio-sum').classList.add('checked');
+      document.getElementById('sum-warn').style.display = 'block';
+    }
+  }
+
+  function toggleParsePanel() {
+    const p = document.getElementById('parse-panel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function toggleCollapsible(header) {
+    const body = header.nextElementSibling;
+    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    header.querySelector('span:last-child').textContent = body.style.display === 'none' ? '▼' : '▲';
+  }
+
+  function toggleSegCreate() {
+    const p = document.getElementById('seg-create-panel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function setDetFilter(type, btn) {
+    document.querySelectorAll('.ftog-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // In wireframe, filter is visual-only
+  }
+</script>
+</body>
+</html>
