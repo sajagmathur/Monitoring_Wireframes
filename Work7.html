@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WF7 — Admin: Governance</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#eef1f5;color:#1e293b;line-height:1.5}
+/* Nav */
+.nav-bar{background:#1f2937;color:#fff;padding:9px 14px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;position:sticky;top:0;z-index:1000;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.nav-bar h1{font-size:11px;font-weight:700;margin-right:6px;white-space:nowrap}
+.nb{background:#374151;color:#fff;border:1px solid #4b5563;padding:3px 8px;cursor:pointer;font-size:10px;border-radius:3px;white-space:nowrap}
+.nb:hover{background:#4b5563}.nb.on{background:#2563eb;border-color:#2563eb}
+/* Screen */
+.screen{display:none;min-height:calc(100vh - 44px);padding:12px}
+.screen.on{display:block}
+.slabel{background:#fbbf24;color:#78350f;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+/* Shell */
+.shell{display:flex;flex-direction:column;min-height:calc(100vh - 80px);background:#fff;border:2px dashed #94a3b8;border-radius:8px;overflow:hidden;max-width:1500px;margin:0 auto}
+/* App header */
+.aph{background:#1e3a8a;color:#fff;padding:9px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:7px}
+.apb{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13px}
+.apl{width:26px;height:26px;background:#fff;color:#1e3a8a;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.aphr{display:flex;align-items:center;gap:12px;font-size:12px}
+.rp{background:#fbbf24;color:#78350f;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.nw{position:relative;cursor:pointer}
+.nb2{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:8px;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.up{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);padding:3px 9px;border-radius:20px}
+.ua{width:20px;height:20px;background:#fbbf24;color:#78350f;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+/* Layout */
+.ab{display:flex;flex:1}
+.ln{width:215px;background:#f8fafc;border-right:1px solid #e2e8f0;padding:14px 9px;flex-shrink:0}
+.lnt{font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;letter-spacing:.5px;margin-bottom:9px;padding:0 5px}
+.tni{display:flex;align-items:center;gap:9px;padding:9px;border:1px dashed #cbd5e1;border-radius:5px;margin-bottom:5px;cursor:pointer;background:#fff;position:relative}
+.tni:hover{border-color:#2563eb;border-style:solid;background:#eff6ff}
+.tni.on{background:#dbeafe;border-color:#2563eb;border-style:solid}
+.tio{width:26px;height:26px;background:#dbeafe;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.tio.red{background:#fee2e2}
+.tit{flex:1;min-width:0}.tit-t{font-size:11px;font-weight:600;color:#1e293b}.tit-s{font-size:9px;color:#64748b}
+.alert-badge{position:absolute;top:6px;right:6px;background:#ef4444;color:#fff;font-size:8px;font-weight:700;padding:2px 5px;border-radius:9px}
+.mc{flex:1;padding:18px;background:#f1f5f9;overflow-y:auto}
+/* Breadcrumb */
+.bc{font-size:10px;color:#64748b;margin-bottom:7px}
+.bc a{color:#2563eb;cursor:pointer;text-decoration:none}
+.pgt{font-size:19px;color:#1e293b;margin-bottom:3px}
+.pgs{font-size:11px;color:#64748b;margin-bottom:14px}
+/* KPI */
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-bottom:14px}
+.kc{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;padding:12px}
+.kl{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kv{font-size:24px;font-weight:700;color:#1e293b}.ks{font-size:10px;color:#64748b;margin-top:2px}
+.kc.w .kv{color:#d97706}.kc.d .kv{color:#dc2626}.kc.p .kv{color:#2563eb}.kc.s .kv{color:#16a34a}
+/* Sub-section tiles (homepage) */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:14px}
+.sc{background:#fff;border:1px dashed #cbd5e1;border-radius:8px;overflow:hidden;cursor:pointer;position:relative}
+.sc:hover{border-color:#2563eb;border-style:solid;box-shadow:0 3px 10px rgba(37,99,235,.12)}
+.sc-alert{position:absolute;top:10px;right:10px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:3px 7px;border-radius:9px;display:flex;align-items:center;gap:3px}
+.sch{padding:14px 15px 10px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px dashed #e2e8f0}
+.sct{font-size:14px;font-weight:700;color:#1e293b}.scs{font-size:11px;color:#64748b;margin-top:2px}
+.sc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.scbody{padding:10px 15px;font-size:11px;color:#475569;line-height:1.5}
+.sc-kpi{padding:8px 15px;background:#f8fafc;display:flex;justify-content:space-between;align-items:center;font-size:11px;border-top:1px dashed #e2e8f0}
+.sc-kpi-val{font-weight:700;color:#1e3a8a;font-size:14px}
+.sca{display:block;padding:8px 15px;background:#eff6ff;color:#2563eb;font-size:11px;font-weight:600;text-align:center;border-top:1px dashed #e2e8f0}
+/* Toolbar */
+.tb{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;padding:9px 11px;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.tbl{display:flex;gap:7px;flex-wrap:wrap;align-items:center;flex:1}
+.tbr{display:flex;gap:7px}
+.sb3{position:relative;flex:1;min-width:160px;max-width:260px}
+.sb3 input{width:100%;padding:5px 9px 5px 24px;border:1px dashed #94a3b8;border-radius:4px;font-size:11px}
+.sb3::before{content:'🔍';position:absolute;left:6px;top:4px;font-size:10px;opacity:.6}
+.fc{background:#fff;border:1px dashed #94a3b8;padding:4px 8px;border-radius:4px;font-size:10px;cursor:pointer}
+.fc.on{background:#dbeafe;border-color:#2563eb;color:#1e3a8a;font-weight:600}
+.fc select{border:none;background:transparent;font-size:10px;cursor:pointer;outline:none}
+/* Buttons */
+.btn{background:#fff;border:1px solid #cbd5e1;padding:5px 11px;border-radius:4px;cursor:pointer;font-size:11px;color:#1e293b;display:inline-flex;align-items:center;gap:4px}
+.btn:hover{background:#f1f5f9}
+.btn-p{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:600}.btn-p:hover{background:#1e3a8a}
+.btn-d{color:#dc2626;border-color:#fca5a5}.btn-d:hover{background:#fef2f2}
+.btn-w{background:#f59e0b;color:#fff;border-color:#f59e0b;font-weight:600}
+.btn-sm{padding:3px 8px;font-size:10px}
+/* Table */
+.dtw{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;overflow:auto;margin-bottom:10px}
+.dt{width:100%;border-collapse:collapse;font-size:11px;min-width:700px}
+.dt th{background:#f8fafc;padding:8px 7px;text-align:left;font-weight:600;color:#475569;border-bottom:1px solid #e2e8f0;font-size:9px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.dt td{padding:8px 7px;border-bottom:1px dashed #e2e8f0;vertical-align:middle}
+.dt tbody tr:hover{background:#f8fafc;cursor:pointer}
+.dt tbody tr.fail-row{background:#fef2f2}
+.dt tbody tr.fail-row:hover{background:#fee2e2}
+/* Badges */
+.badge{display:inline-block;padding:2px 7px;border-radius:9px;font-size:9px;font-weight:700;white-space:nowrap}
+.b-green{background:#dcfce7;color:#166534}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-amber{background:#fef3c7;color:#92400e}
+.b-grey{background:#f1f5f9;color:#475569}
+.b-blue{background:#dbeafe;color:#1e3a8a}
+/* Expand row */
+.exp-row{display:none;background:#f8fafc}
+.exp-row.on{display:table-row}
+.exp-cell{padding:10px 14px;font-size:11px;color:#374151;border-bottom:1px dashed #e2e8f0}
+.json-box{background:#1e293b;color:#86efac;padding:10px;border-radius:5px;font-size:10px;font-family:monospace;margin-top:6px;white-space:pre-wrap;max-height:120px;overflow-y:auto}
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.chip{background:#dbeafe;color:#1e3a8a;padding:3px 9px;border-radius:12px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:4px}
+.chip span{cursor:pointer;opacity:.6}.chip span:hover{opacity:1}
+/* Info banner */
+.info-banner{background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:8px 12px;font-size:11px;color:#1e3a8a;margin-bottom:10px;display:flex;gap:7px;align-items:flex-start}
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center}
+.modal-overlay.on{display:flex}
+.modal{background:#fff;border-radius:10px;padding:24px;max-width:520px;width:90%;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.modal-title{font-size:16px;font-weight:700;color:#1e293b;margin-bottom:4px}
+.modal-sub{font-size:11px;color:#64748b;margin-bottom:14px}
+.warn-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:10px 12px;font-size:11px;color:#991b1b;margin-bottom:12px}
+.modal-confirm-field{width:100%;border:1px solid #e2e8f0;border-radius:4px;padding:6px 10px;font-size:12px;margin-top:4px;margin-bottom:12px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+/* Retention panel */
+.ret-panel{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;padding:14px;margin-bottom:10px}
+.ret-title{font-size:12px;font-weight:700;color:#1e293b;margin-bottom:10px}
+.ret-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed #f1f5f9}
+.ret-row:last-child{border-bottom:none}
+.ret-label{flex:1;font-size:11px;color:#374151}
+.ret-cat{font-size:9px;color:#64748b;font-weight:600;text-transform:uppercase;width:130px}
+.ret-val{font-size:13px;font-weight:700;color:#1e3a8a;width:100px}
+.ret-badge{font-size:9px;background:#fef3c7;color:#92400e;padding:2px 7px;border-radius:8px;font-weight:600}
+.ret-badge.platform{background:#dcfce7;color:#166534}
+/* Report tiles */
+.rpt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:14px}
+.rpt-tile{background:#fff;border:1px dashed #cbd5e1;border-radius:8px;padding:14px;cursor:pointer}
+.rpt-tile:hover{border-color:#2563eb;border-style:solid}
+.rpt-icon{font-size:22px;margin-bottom:6px}
+.rpt-name{font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px}
+.rpt-desc{font-size:10px;color:#64748b;line-height:1.4;margin-bottom:8px}
+.rpt-formats{display:flex;gap:4px}
+.rpt-fmt{font-size:9px;background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#374151}
+/* Drawer */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1500}
+.drawer-overlay.on{display:block}
+.drawer{position:fixed;right:0;top:0;height:100vh;width:380px;background:#fff;box-shadow:-4px 0 20px rgba(0,0,0,.15);z-index:1501;padding:20px;overflow-y:auto;transform:translateX(100%);transition:transform .2s}
+.drawer.on{transform:translateX(0)}
+.drawer-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.drawer-sub{font-size:11px;color:#64748b;margin-bottom:14px}
+.form-group{margin-bottom:10px}
+.form-label{font-size:11px;font-weight:600;color:#374151;margin-bottom:3px;display:block}
+.form-control{width:100%;border:1px solid #e2e8f0;border-radius:4px;padding:6px 10px;font-size:11px}
+/* Annotation */
+.ann{background:#fef3c7;border:1px solid #fbbf24;border-radius:4px;padding:3px 7px;font-size:9px;color:#78350f;display:inline-block;margin-left:6px}
+</style>
+</head>
+<body>
+
+<!-- NAV BAR -->
+<div class="nav-bar">
+  <h1>🛡️ WF7 — Admin: Governance</h1>
+  <button class="nb on" onclick="show('s1')">S1: Homepage</button>
+  <button class="nb" onclick="show('s2')">S2: Audit Log</button>
+  <button class="nb" onclick="show('s3')">S3: Run Log</button>
+  <button class="nb" onclick="show('s4')">S4: Request History</button>
+  <button class="nb" onclick="show('s5')">S5: Notification Log</button>
+  <button class="nb" onclick="show('s6')">S6: Data Retention</button>
+  <button class="nb" onclick="show('s7')">S7: Agent Run Monitor</button>
+  <button class="nb" onclick="show('s8')">S8: Reports</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S1: GOVERNANCE HOMEPAGE -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen on" id="s1">
+  <div class="slabel">Screen 1 — Governance Homepage</div>
+  <div class="shell">
+    <!-- App Header -->
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr">
+        <span class="rp">Admin</span>
+        <div class="nw">🔔<div class="nb2">3</div></div>
+        <div class="up"><div class="ua">AD</div> Admin User ▾</div>
+      </div>
+    </div>
+    <div class="ab">
+      <!-- Left Nav -->
+      <div class="ln">
+        <div class="lnt">Admin Menu</div>
+        <div class="tni"><div class="tio">📋</div><div class="tit"><div class="tit-t">Model Inventory</div></div></div>
+        <div class="tni"><div class="tio">⚙️</div><div class="tit"><div class="tit-t">KPI Config</div></div></div>
+        <div class="tni"><div class="tio">📥</div><div class="tit"><div class="tit-t">Data Ingestion</div></div></div>
+        <div class="tni"><div class="tio">🔐</div><div class="tit"><div class="tit-t">Access Control</div></div></div>
+        <div class="tni"><div class="tio">🕐</div><div class="tit"><div class="tit-t">Scheduler</div></div></div>
+        <div class="tni on"><div class="tio">🛡️</div><div class="tit"><div class="tit-t">Governance</div></div></div>
+      </div>
+      <!-- Main Content -->
+      <div class="mc">
+        <div class="bc"><a>Home</a> › Governance</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+          <div>
+            <div class="pgt">Governance</div>
+            <div class="pgs">Centralised oversight, audit, and compliance hub — all sub-sections are read-only unless noted</div>
+          </div>
+          <button class="btn btn-sm">🔄 Refresh</button>
+        </div>
+
+        <!-- KPI row -->
+        <div class="kg">
+          <div class="kc s"><div class="kl">Events Today</div><div class="kv">1,284</div><div class="ks">Across all workflows</div></div>
+          <div class="kc d"><div class="kl">Agent Failures (24h)</div><div class="kv">3</div><div class="ks">Requires attention</div></div>
+          <div class="kc p"><div class="kl">Open Requests</div><div class="kv">7</div><div class="ks">Pending action in ACC</div></div>
+          <div class="kc w"><div class="kl">Notif. Failures (24h)</div><div class="kv">2</div><div class="ks">Email delivery failures</div></div>
+          <div class="kc"><div class="kl">Models Purge-Eligible</div><div class="kv">4</div><div class="ks">Review required</div></div>
+        </div>
+
+        <!-- Sub-section tiles -->
+        <div class="sg">
+          <!-- Audit Log -->
+          <div class="sc" onclick="show('s2')">
+            <div class="sch">
+              <div><div class="sct">Audit Log</div><div class="scs">Immutable cross-workflow action record</div></div>
+              <div class="sc-icon" style="background:#dbeafe">📜</div>
+            </div>
+            <div class="scbody">Tamper-evident record of every material platform action across all roles and workflows. Read-only.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Events today</span><span class="sc-kpi-val">1,284</span></div>
+            <span class="sca">View Audit Log →</span>
+          </div>
+          <!-- Run Log -->
+          <div class="sc" onclick="show('s3')">
+            <div class="sch">
+              <div><div class="sct">Run Log</div><div class="scs">Agent & scheduler execution history</div></div>
+              <div class="sc-icon" style="background:#dcfce7">▶️</div>
+            </div>
+            <div class="scbody">Operational log of all agent executions, scheduler triggers, ingestion jobs, and report generation events.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Success rate today</span><span class="sc-kpi-val">97.2%</span></div>
+            <span class="sca">View Run Log →</span>
+          </div>
+          <!-- Request History -->
+          <div class="sc" onclick="show('s4')">
+            <div class="sch">
+              <div><div class="sct">Request History</div><div class="scs">Access & provisioning request trail</div></div>
+              <div class="sc-icon" style="background:#fef3c7">📨</div>
+            </div>
+            <div class="scbody">Consolidated historical record of all access requests, model assignments, data deletions, and provisioning events.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Open / pending</span><span class="sc-kpi-val">7</span></div>
+            <span class="sca">View Request History →</span>
+          </div>
+          <!-- Notification Log -->
+          <div class="sc" onclick="show('s5')">
+            <div class="sch">
+              <div><div class="sct">Notification Log</div><div class="scs">Delivery status for all notifications</div></div>
+              <div class="sc-icon" style="background:#fce7f3">🔔</div>
+            </div>
+            <div class="scbody">Tracks delivery status of all email and in-platform notifications. Privacy masking applied to sensitive events.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Failures (24h)</span><span class="sc-kpi-val" style="color:#dc2626">2</span></div>
+            <span class="sca">View Notification Log →</span>
+          </div>
+          <!-- Data Retention -->
+          <div class="sc" onclick="show('s6')">
+            <div class="sch">
+              <div><div class="sct">Data Retention</div><div class="scs">Retention policy & purge management</div></div>
+              <div class="sc-icon" style="background:#e0e7ff">🗄️</div>
+            </div>
+            <div class="scbody">Configure retention windows (Platform Admin only). Review hard-delete eligibility queue and execute purge operations.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Purge-eligible models</span><span class="sc-kpi-val" style="color:#d97706">4</span></div>
+            <span class="sca">Manage Data Retention →</span>
+          </div>
+          <!-- Agent Run Monitor — with alert badge -->
+          <div class="sc" onclick="show('s7')" style="border-color:#fca5a5;border-style:solid">
+            <div class="sc-alert">🔴 3 Failures</div>
+            <div class="sch">
+              <div><div class="sct">Agent Run Monitor</div><div class="scs">Per-agent per-model diagnostic view</div></div>
+              <div class="sc-icon red">🤖</div>
+            </div>
+            <div class="scbody">Real-time status of all 7 platform agents. Alert badge fires when failed/timed-out runs exist in the last 24 hours.</div>
+            <div class="sc-kpi"><span style="color:#dc2626;font-weight:600">⚠ 3 failed runs require attention</span></div>
+            <span class="sca" style="background:#fef2f2;color:#dc2626">View Agent Run Monitor →</span>
+          </div>
+          <!-- Reports -->
+          <div class="sc" onclick="show('s8')">
+            <div class="sch">
+              <div><div class="sct">Reports</div><div class="scs">Compliance & audit report templates</div></div>
+              <div class="sc-icon" style="background:#f0fdf4">📊</div>
+            </div>
+            <div class="scbody">7 pre-built compliance report templates. Run, parameterise, and export to CSV or PDF for audit and regulatory use.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Last generated</span><span class="sc-kpi-val">Today 09:14</span></div>
+            <span class="sca">View Reports →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S2: AUDIT LOG -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s2">
+  <div class="slabel">Screen 2 — Audit Log <span class="ann">WF7-AUD-001 to 010</span></div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni on"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div><div class="tit-s">All workflows</div></div></div>
+        <div class="tni" onclick="show('s3')"><div class="tio">▶️</div><div class="tit"><div class="tit-t">Run Log</div></div></div>
+        <div class="tni" onclick="show('s4')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni" onclick="show('s5')"><div class="tio">🔔</div><div class="tit"><div class="tit-t">Notification Log</div></div></div>
+        <div class="tni" onclick="show('s6')"><div class="tio">🗄️</div><div class="tit"><div class="tit-t">Data Retention</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio red">🤖</div><div class="tit"><div class="tit-t">Agent Run Monitor</div></div><div class="alert-badge">3</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Audit Log</div>
+        <div class="pgt">Audit Log</div>
+        <div class="pgs">Immutable, tamper-evident record of all material platform actions — read-only to all roles</div>
+        <!-- Filter chips -->
+        <div class="chips">
+          <div class="chip">Date: Last 7 days <span onclick="this.parentElement.remove()">×</span></div>
+          <div class="chip">Workflow: WF5 — Access Control <span onclick="this.parentElement.remove()">×</span></div>
+        </div>
+        <!-- Toolbar -->
+        <div class="tb">
+          <div class="tbl">
+            <div class="sb3"><input type="text" placeholder="Search actor, entity…"></div>
+            <div class="fc"><select><option>All Workflows</option><option>WF1 — Landing Page</option><option>WF2 — Model Inventory</option><option>WF3 — KPI Config</option><option>WF4 — Data Ingestion</option><option selected>WF5 — Access Control</option><option>WF6 — Scheduler</option><option>WF12 — Repository</option></select></div>
+            <div class="fc"><select><option>All Action Types</option><option>User Provisioned</option><option>Model Access Granted</option><option>Data Deleted</option><option>Account Deactivated</option><option>Schedule Created</option></select></div>
+            <div class="fc"><select><option>All Roles</option><option>Admin</option><option>User</option><option>External</option><option>System</option></select></div>
+            <div class="fc"><select><option>All Outcomes</option><option>Success</option><option>Failure</option></select></div>
+            <input type="date" class="fc" style="font-size:10px"> <span style="font-size:10px;color:#64748b">to</span> <input type="date" class="fc" style="font-size:10px">
+          </div>
+          <div class="tbr">
+            <button class="btn btn-sm">⬇ CSV</button>
+            <button class="btn btn-sm">⬇ PDF</button>
+          </div>
+        </div>
+        <!-- Table -->
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr>
+                <th style="width:28px"></th>
+                <th>Event ID</th><th>Timestamp ↓</th><th>Actor</th><th>Role</th>
+                <th>Action Type</th><th>Workflow</th><th>Target Entity</th><th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="toggleExp('exp1')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009821</td>
+                <td>2026-05-11 14:32 IST (UTC+5:30)</td>
+                <td>Sarah Chen</td><td><span class="badge b-blue">Admin</span></td>
+                <td>User Provisioned</td><td>WF5 — ACC</td>
+                <td>User: Raj Mehta (USR-0291)</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp1"><td colspan="9" class="exp-cell">
+                <strong>Full Entry Detail</strong> &nbsp;<span class="ann">WF7-AUD-005</span><br>
+                <strong>IP:</strong> 10.44.12.98 &nbsp; <strong>Session:</strong> SES-48271 &nbsp; <strong>Failure Reason:</strong> —<br>
+                <strong>Before State:</strong><div class="json-box">{ "userID": "USR-0291", "status": "pending_approval" }</div>
+                <strong>After State:</strong><div class="json-box">{ "userID": "USR-0291", "status": "active", "role": "User", "provisionedBy": "ADM-001", "provisionedAt": "2026-05-11T08:32:00Z" }</div>
+              </td></tr>
+              <tr onclick="toggleExp('exp2')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009820</td>
+                <td>2026-05-11 14:28 IST (UTC+5:30)</td>
+                <td>James Park</td><td><span class="badge b-blue">Admin</span></td>
+                <td>Model Access Granted</td><td>WF5 — ACC</td>
+                <td>Model: CR_CLF_001 (Priya Nair)</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp2"><td colspan="9" class="exp-cell">
+                <strong>IP:</strong> 10.44.12.55 &nbsp; <strong>Session:</strong> SES-48268<br>
+                <strong>Before State:</strong><div class="json-box">{ "modelID": "CR_CLF_001", "assignedUsers": ["USR-0188"] }</div>
+                <strong>After State:</strong><div class="json-box">{ "modelID": "CR_CLF_001", "assignedUsers": ["USR-0188", "USR-0291"] }</div>
+              </td></tr>
+              <tr onclick="toggleExp('exp3')" class="fail-row">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009819</td>
+                <td>2026-05-11 13:55 IST (UTC+5:30)</td>
+                <td>System</td><td><span class="badge b-grey">System</span></td>
+                <td>Scheduler Trigger</td><td>WF6 — Scheduler</td>
+                <td>Model: MKT_REG_004</td>
+                <td><span class="badge b-red">Failure</span></td>
+              </tr>
+              <tr class="exp-row" id="exp3"><td colspan="9" class="exp-cell">
+                <strong>Failure Reason:</strong> Source data unavailable — ingestion job did not complete within the scheduled window.<br>
+                <strong>IP:</strong> System &nbsp; <strong>Session:</strong> SCHED-7741
+              </td></tr>
+              <tr onclick="toggleExp('exp4')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009818</td>
+                <td>2026-05-11 11:10 IST (UTC+5:30)</td>
+                <td>Sarah Chen</td><td><span class="badge b-blue">Admin</span></td>
+                <td>Account Deactivated</td><td>WF5 — ACC</td>
+                <td>User: [MASKED] (USR-0177)</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp4"><td colspan="9" class="exp-cell">
+                <strong>Note:</strong> Recipient details masked per privacy policy (sensitive event type: Account Deactivated). <span class="ann">WF7-NTF-002</span>
+              </td></tr>
+              <tr onclick="toggleExp('exp5')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009817</td>
+                <td>2026-05-11 09:45 IST (UTC+5:30)</td>
+                <td>System</td><td><span class="badge b-grey">System</span></td>
+                <td>Model Registered</td><td>WF2 — Inventory</td>
+                <td>Model: FRD_CLF_012</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp5"><td colspan="9" class="exp-cell">
+                <strong>Before State:</strong><div class="json-box">null</div>
+                <strong>After State:</strong><div class="json-box">{ "modelID": "FRD_CLF_012", "modelName": "Fraud Classifier v3", "domain": "Fraud", "status": "Active", "registeredBy": "ADM-003", "registeredAt": "2026-05-11T04:15:00Z" }</div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b">
+          <span>Showing 1–5 of 1,284 entries &nbsp;|&nbsp; Page size: <select style="font-size:10px;border:1px solid #e2e8f0;border-radius:3px"><option>25</option><option selected>50</option><option>100</option></select></span>
+          <div style="display:flex;gap:5px"><button class="btn btn-sm">‹ Prev</button><button class="btn btn-sm btn-p">Next ›</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S3: RUN LOG -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s3">
+  <div class="slabel">Screen 3 — Run Log <span class="ann">WF7-RUN-001 to 008</span></div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div></div></div>
+        <div class="tni on"><div class="tio">▶️</div><div class="tit"><div class="tit-t">Run Log</div><div class="tit-s">Agent & scheduler events</div></div></div>
+        <div class="tni" onclick="show('s4')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni" onclick="show('s5')"><div class="tio">🔔</div><div class="tit"><div class="tit-t">Notification Log</div></div></div>
+        <div class="tni" onclick="show('s6')"><div class="tio">🗄️</div><div class="tit"><div class="tit-t">Data Retention</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio red">🤖</div><div class="tit"><div class="tit-t">Agent Run Monitor</div></div><div class="alert-badge">3</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Run Log</div>
+        <div class="pgt">Run Log</div>
+        <div class="pgs">Operational log of all agent executions, scheduler triggers, ingestion jobs, and monitoring runs — read-only</div>
+        <div class="tb">
+          <div class="tbl">
+            <div class="sb3"><input type="text" placeholder="Search model…"></div>
+            <div class="fc"><select><option>All Run Types</option><option>Agent Run</option><option>Scheduler Trigger</option><option>Ingestion Job</option><option>Report Generation</option></select></div>
+            <div class="fc"><select><option>All Statuses</option><option>Running</option><option>Completed</option><option>Failed</option><option>Timed Out</option></select></div>
+            <div class="fc"><select><option>All Triggers</option><option>Scheduled</option><option>On-Demand</option><option>System</option></select></div>
+            <input type="date" class="fc" style="font-size:10px"> <span style="font-size:10px;color:#64748b">to</span> <input type="date" class="fc" style="font-size:10px">
+          </div>
+          <div class="tbr"><button class="btn btn-sm">⬇ CSV</button></div>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr><th style="width:28px"></th><th>Run ID</th><th>Run Type</th><th>Agent / Process</th><th>Model</th><th>Trigger</th><th>Start</th><th>Duration</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr onclick="toggleExp('rexp1')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RUN-44821</td>
+                <td>Agent Run</td><td>Drift Detection Agent</td>
+                <td><a style="color:#2563eb;cursor:pointer">CR_CLF_001</a></td>
+                <td><span class="badge b-blue">Scheduled</span></td>
+                <td>05-11 06:00</td><td>4m 12s</td>
+                <td><span class="badge b-green">Completed</span></td>
+              </tr>
+              <tr class="exp-row" id="rexp1"><td colspan="9" class="exp-cell">Run completed successfully. No drift thresholds breached.</td></tr>
+              <tr onclick="toggleExp('rexp2')" class="fail-row">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RUN-44820</td>
+                <td>Agent Run</td><td>Data Ingestion Agent</td>
+                <td><a style="color:#2563eb;cursor:pointer">MKT_REG_004</a></td>
+                <td><span class="badge b-blue">Scheduled</span></td>
+                <td>05-11 05:00</td><td>—</td>
+                <td><span class="badge b-red">Failed</span></td>
+              </tr>
+              <tr class="exp-row on" id="rexp2"><td colspan="9" class="exp-cell">
+                <strong>Failure Reason:</strong> Source connection timeout — database host unreachable after 3 connection attempts. Recommended action: verify source database connectivity and re-trigger via Scheduler (WF6).
+              </td></tr>
+              <tr onclick="toggleExp('rexp3')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RUN-44819</td>
+                <td>Ingestion Job</td><td>Data Ingestion Agent</td>
+                <td><a style="color:#2563eb;cursor:pointer">FRD_CLF_012</a></td>
+                <td><span class="badge b-grey">On-Demand</span></td>
+                <td>05-11 04:15</td><td>11m 33s</td>
+                <td><span class="badge b-green">Completed</span></td>
+              </tr>
+              <tr class="exp-row" id="rexp3"><td colspan="9" class="exp-cell">Ingestion completed. 48,210 records processed. 0 schema validation errors.</td></tr>
+              <tr onclick="toggleExp('rexp4')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RUN-44818</td>
+                <td>Agent Run</td><td>Report Generation Agent</td>
+                <td><a style="color:#2563eb;cursor:pointer">CR_CLF_001</a></td>
+                <td><span class="badge b-blue">Scheduled</span></td>
+                <td>05-11 06:08</td><td>1m 04s</td>
+                <td><span class="badge b-green">Completed</span></td>
+              </tr>
+              <tr class="exp-row" id="rexp4"><td colspan="9" class="exp-cell">Report generated and deposited to Repository (WF12). Notification sent to model owner.</td></tr>
+              <tr onclick="toggleExp('rexp5')" class="fail-row">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RUN-44817</td>
+                <td>Agent Run</td><td>Bias Evaluation Agent</td>
+                <td><a style="color:#2563eb;cursor:pointer">CR_CLF_001</a></td>
+                <td><span class="badge b-blue">Scheduled</span></td>
+                <td>05-10 06:00</td><td>—</td>
+                <td><span class="badge b-amber">Timed Out</span></td>
+              </tr>
+              <tr class="exp-row" id="rexp5"><td colspan="9" class="exp-cell"><strong>Failure Reason:</strong> Agent exceeded maximum execution window of 60 minutes. Last checkpoint: feature 22 of 47.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S4: REQUEST HISTORY -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s4">
+  <div class="slabel">Screen 4 — Request History <span class="ann">WF7-REQ-001 to 006</span></div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div></div></div>
+        <div class="tni" onclick="show('s3')"><div class="tio">▶️</div><div class="tit"><div class="tit-t">Run Log</div></div></div>
+        <div class="tni on"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni" onclick="show('s5')"><div class="tio">🔔</div><div class="tit"><div class="tit-t">Notification Log</div></div></div>
+        <div class="tni" onclick="show('s6')"><div class="tio">🗄️</div><div class="tit"><div class="tit-t">Data Retention</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio red">🤖</div><div class="tit"><div class="tit-t">Agent Run Monitor</div></div><div class="alert-badge">3</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Request History</div>
+        <div class="pgt">Request History</div>
+        <div class="pgs">Consolidated read-only record of all platform requests and decisions — actioning is done in Access Control Center</div>
+        <div class="tb">
+          <div class="tbl">
+            <div class="sb3"><input type="text" placeholder="Search requester, target…"></div>
+            <div class="fc"><select><option>All Categories</option><option>New User Access</option><option>External Access</option><option>Admin Provisioning</option><option>Model Access</option><option>Data Deletion</option><option>Account Deactivation</option><option>Expiry Renewal</option></select></div>
+            <div class="fc"><select><option>All Statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option><option>Expired</option><option>Withdrawn</option></select></div>
+            <input type="date" class="fc" style="font-size:10px"> <span style="font-size:10px;color:#64748b">to</span> <input type="date" class="fc" style="font-size:10px">
+          </div>
+          <div class="tbr"><button class="btn btn-sm">⬇ CSV</button><button class="btn btn-sm">⬇ PDF</button></div>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr><th>Req ID</th><th>Category</th><th>Requester</th><th>Request Date</th><th>Target</th><th>Status</th><th>Decision By</th><th>Decision Date</th><th>Audit Trail</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0821</td>
+                <td>New User Access</td><td>Raj Mehta</td>
+                <td>2026-05-10</td><td>Platform User Role</td>
+                <td><span class="badge b-green">Approved</span></td>
+                <td>Sarah Chen</td><td>2026-05-11</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009821 ↗</a></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0820</td>
+                <td>Model Access</td><td>Priya Nair</td>
+                <td>2026-05-09</td><td>CR_CLF_001, CR_CLF_002</td>
+                <td><span class="badge b-green">Approved</span></td>
+                <td>James Park</td><td>2026-05-11</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009820 ↗</a></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0819</td>
+                <td>Data Deletion</td><td>Ali Hassan</td>
+                <td>2026-05-08</td><td>Scoring data — MKT_REG_004 (Apr 2026)</td>
+                <td><span class="badge b-amber">Pending</span></td>
+                <td>—</td><td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0818</td>
+                <td>External Access</td><td>vendor@ext.com</td>
+                <td>2026-05-05</td><td>External Stakeholder Role</td>
+                <td><span class="badge b-red">Rejected</span></td>
+                <td>Sarah Chen</td><td>2026-05-06</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009804 ↗</a></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0817</td>
+                <td>Admin Provisioning</td><td>James Park</td>
+                <td>2026-04-28</td><td>Admin: New Admin Account</td>
+                <td><span class="badge b-green">Approved</span></td>
+                <td>Sarah Chen (dual-auth)</td><td>2026-04-29</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009612 ↗</a></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0816</td>
+                <td>Expiry Renewal</td><td>Mei Lin</td>
+                <td>2026-04-20</td><td>Model Access: FRD_CLF_009</td>
+                <td><span class="badge b-grey">Expired</span></td>
+                <td>—</td><td>—</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009521 ↗</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S5: NOTIFICATION LOG -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s5">
+  <div class="slabel">Screen 5 — Notification Log <span class="ann">WF7-NTF-001 to 007</span></div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div></div></div>
+        <div class="tni" onclick="show('s3')"><div class="tio">▶️</div><div class="tit"><div class="tit-t">Run Log</div></div></div>
+        <div class="tni" onclick="show('s4')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni on"><div class="tio">🔔</div><div class="tit"><div class="tit-t">Notification Log</div></div></div>
+        <div class="tni" onclick="show('s6')"><div class="tio">🗄️</div><div class="tit"><div class="tit-t">Data Retention</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio red">🤖</div><div class="tit"><div class="tit-t">Agent Run Monitor</div></div><div class="alert-badge">3</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Notification Log</div>
+        <div class="pgt">Notification Log</div>
+        <div class="pgs">Delivery status for all platform notifications — sensitive events are privacy-masked</div>
+        <div class="info-banner">🔒 <span><strong>Privacy Masking Active:</strong> Recipient details for Account Deactivated, Data Deletion Approved, and Role Revoked notifications are masked per Section 4.5.3. Exports apply the same masking.</span></div>
+        <div class="tb">
+          <div class="tbl">
+            <div class="fc"><select><option>All Types</option><option>User Provisioned</option><option>Model Access Approved</option><option>Schedule Failed</option><option>Account Deactivated</option><option>Data Deletion Approved</option><option>Monitoring Complete</option></select></div>
+            <div class="fc"><select><option>All Channels</option><option>Email</option><option>In-Platform</option></select></div>
+            <div class="fc"><select><option>All Statuses</option><option>Sent</option><option>Delivered</option><option>Failed</option><option>Bounced</option></select></div>
+            <input type="date" class="fc" style="font-size:10px">
+          </div>
+          <div class="tbr"><button class="btn btn-sm">⬇ CSV</button></div>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr><th>Notif. ID</th><th>Timestamp</th><th>Type</th><th>Channel</th><th>Recipient</th><th>Related Entity</th><th>Status</th><th>Failure Reason</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">NTF-18821</td>
+                <td>2026-05-11 14:33</td>
+                <td>User Provisioned</td><td><span class="badge b-blue">Email</span></td>
+                <td>Raj Mehta</td><td>Platform User Role</td>
+                <td><span class="badge b-green">Delivered</span></td><td>—</td>
+              </tr>
+              <tr class="fail-row">
+                <td style="font-family:monospace;font-size:10px">NTF-18820</td>
+                <td>2026-05-11 14:33</td>
+                <td>User Provisioned</td><td><span class="badge b-blue">Email</span></td>
+                <td>admin@company.com</td><td>Platform User Role</td>
+                <td><span class="badge b-red">Failed</span></td>
+                <td style="font-size:10px;color:#991b1b">MX lookup failed — domain unreachable after 3 retries</td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">NTF-18819</td>
+                <td>2026-05-11 14:28</td>
+                <td>Model Access Approved</td><td><span class="badge b-grey">In-Platform</span></td>
+                <td>Priya Nair</td><td>CR_CLF_001</td>
+                <td><span class="badge b-green">Delivered</span></td><td>—</td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">NTF-18818</td>
+                <td>2026-05-11 11:10</td>
+                <td>Account Deactivated</td><td><span class="badge b-blue">Email</span></td>
+                <td style="color:#94a3b8;font-style:italic">USR-0177 [masked]</td>
+                <td>[masked]</td>
+                <td><span class="badge b-green">Delivered</span></td><td>—</td>
+              </tr>
+              <tr class="fail-row">
+                <td style="font-family:monospace;font-size:10px">NTF-18817</td>
+                <td>2026-05-11 06:00</td>
+                <td>Schedule Failed</td><td><span class="badge b-blue">Email</span></td>
+                <td>Ali Hassan</td><td>MKT_REG_004</td>
+                <td><span class="badge b-red">Bounced</span></td>
+                <td style="font-size:10px;color:#991b1b">550 Mailbox unavailable — user inbox full</td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">NTF-18816</td>
+                <td>2026-05-11 06:08</td>
+                <td>Monitoring Complete</td><td><span class="badge b-grey">In-Platform</span></td>
+                <td>Raj Mehta</td><td>CR_CLF_001</td>
+                <td><span class="badge b-green">Delivered</span></td><td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S6: DATA RETENTION -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s6">
+  <div class="slabel">Screen 6 — Data Retention <span class="ann">WF7-RET-001 to 010</span></div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div></div></div>
+        <div class="tni" onclick="show('s3')"><div class="tio">▶️</div><div class="tit"><div class="tit-t">Run Log</div></div></div>
+        <div class="tni" onclick="show('s4')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni" onclick="show('s5')"><div class="tio">🔔</div><div class="tit"><div class="tit-t">Notification Log</div></div></div>
+        <div class="tni on"><div class="tio">🗄️</div><div class="tit"><div class="tit-t">Data Retention</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio red">🤖</div><div class="tit"><div class="tit-t">Agent Run Monitor</div></div><div class="alert-badge">3</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Data Retention</div>
+        <div class="pgt">Data Retention</div>
+        <div class="pgs">Retention policy configuration and hard-delete management</div>
+        <div class="info-banner">🔒 <span><strong>Platform Admin Required:</strong> Retention window configuration and purge execution require Platform Admin privilege. You are viewing in read-only mode. Contact Platform Admin to modify policies. <span class="ann">WF7-RET-001, WF7-PRM-003</span></span></div>
+
+        <!-- Retention Policy -->
+        <div class="ret-panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div class="ret-title">Retention Policy Configuration</div>
+            <button class="btn btn-sm" disabled style="opacity:.4;cursor:not-allowed">✏️ Edit (Platform Admin only)</button>
+          </div>
+          <div class="ret-row">
+            <div class="ret-cat">Category A</div>
+            <div class="ret-label"><strong>Raw Ingested Data</strong><br><span style="font-size:10px;color:#64748b">Training, scoring, and outcome data ingested by the Data Ingestion Agent</span></div>
+            <div class="ret-val">180 days</div>
+            <div class="ret-badge">Rolling window</div>
+          </div>
+          <div class="ret-row">
+            <div class="ret-cat">Category B</div>
+            <div class="ret-label"><strong>Monitoring Outputs</strong><br><span style="font-size:10px;color:#64748b">Drift scores, performance metrics, bias metrics, RCA findings, trigger hit records</span></div>
+            <div class="ret-val">3 years</div>
+            <div class="ret-badge">Fixed</div>
+          </div>
+          <div class="ret-row">
+            <div class="ret-cat">Category C</div>
+            <div class="ret-label"><strong>Reports & Audit Logs</strong><br><span style="font-size:10px;color:#64748b">Generated reports and full platform audit trail — tamper-evident</span></div>
+            <div class="ret-val">7 years</div>
+            <div class="ret-badge platform">Regulatory minimum</div>
+          </div>
+        </div>
+
+        <!-- Hard Delete Queue -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#1e293b">Hard-Delete Eligibility Queue</div>
+            <div style="font-size:11px;color:#64748b">Models archived beyond their retention window — sorted oldest eligible first</div>
+          </div>
+          <span class="badge b-amber">4 models eligible</span>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr><th>Model ID</th><th>Model Name</th><th>Domain</th><th>Archive Date</th><th>Eligibility Date</th><th>Days Overdue</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">CR_CLF_001_arch</td>
+                <td>Credit Scorecard v1</td><td>Credit Risk</td>
+                <td>2019-02-14</td><td>2026-02-14</td>
+                <td style="color:#dc2626;font-weight:700">86 days</td>
+                <td><button class="btn btn-sm btn-d" onclick="openPurgeModal('Credit Scorecard v1','CR_CLF_001_arch')" disabled style="opacity:.4;cursor:not-allowed">Purge (Platform Admin)</button></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">MKT_REG_002_arch</td>
+                <td>Marketing Propensity v2</td><td>Marketing</td>
+                <td>2019-03-01</td><td>2026-03-01</td>
+                <td style="color:#dc2626;font-weight:700">71 days</td>
+                <td><button class="btn btn-sm btn-d" onclick="openPurgeModal('Marketing Propensity v2','MKT_REG_002_arch')" disabled style="opacity:.4;cursor:not-allowed">Purge (Platform Admin)</button></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">FRD_CLF_005_arch</td>
+                <td>Fraud Detector v5</td><td>Fraud</td>
+                <td>2019-04-10</td><td>2026-04-10</td>
+                <td style="color:#d97706;font-weight:700">31 days</td>
+                <td><button class="btn btn-sm btn-d" onclick="openPurgeModal('Fraud Detector v5','FRD_CLF_005_arch')" disabled style="opacity:.4;cursor:not-allowed">Purge (Platform Admin)</button></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">CR_REG_008_arch</td>
+                <td>PD Model LGD</td><td>Credit Risk</td>
+                <td>2019-05-22</td><td>2026-05-22</td>
+                <td style="color:#64748b;font-weight:700">−11 days</td>
+                <td><button class="btn btn-sm" disabled style="opacity:.4;cursor:not-allowed">Not yet eligible</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Purge History -->
+        <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px;margin-top:14px">Purge History</div>
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr><th>Model ID</th><th>Model Name</th><th>Purge Date</th><th>Executed By</th><th>Audit Entry</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">MKT_CLF_001_arch</td>
+                <td>Campaign Classifier v1</td>
+                <td>2026-01-15</td><td>Platform Admin (ADM-001)</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-006214 ↗</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Purge Confirmation Modal -->
+<div class="modal-overlay" id="purgeModal">
+  <div class="modal">
+    <div class="modal-title">⚠️ Confirm Permanent Purge</div>
+    <div class="modal-sub">This action is irreversible. All data listed below will be permanently deleted.</div>
+    <div class="warn-box">
+      <strong id="purgeModelName">Model Name</strong> &nbsp; <span style="font-family:monospace;font-size:10px" id="purgeModelId">MODEL-ID</span><br><br>
+      The following will be permanently deleted simultaneously:<br>
+      • Model record from platform inventory<br>
+      • All repository components and version histories<br>
+      • All monitoring outputs (drift scores, performance, bias, RCA)<br>
+      • All ingestion job records<br><br>
+      <strong>Audit log entry and request history are retained permanently (Category C).</strong>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Type the Model ID to confirm: <span style="font-family:monospace;color:#dc2626" id="purgeConfirmId">MODEL-ID</span></label>
+      <input class="modal-confirm-field" type="text" placeholder="Type Model ID here…" id="purgeInput" oninput="checkPurge()">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closePurgeModal()">Cancel</button>
+      <button class="btn btn-d" id="purgeBtn" disabled onclick="closePurgeModal()">Execute Purge</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S7: AGENT RUN MONITOR -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s7">
+  <div class="slabel">Screen 7 — Agent Run Monitor <span class="ann">WF7-AGT-001 to 008</span></div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div></div></div>
+        <div class="tni" onclick="show('s3')"><div class="tio">▶️</div><div class="tit"><div class="tit-t">Run Log</div></div></div>
+        <div class="tni" onclick="show('s4')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni" onclick="show('s5')"><div class="tio">🔔</div><div class="tit"><div class="tit-t">Notification Log</div></div></div>
+        <div class="tni" onclick="show('s6')"><div class="tio">🗄️</div><div class="tit"><div class="tit-t">Data Retention</div></div></div>
+        <div class="tni on"><div class="tio red">🤖</div><div class="tit"><div class="tit-t">Agent Run Monitor</div></div><div class="alert-badge">3</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Agent Run Monitor</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+          <div>
+            <div class="pgt">Agent Run Monitor <span style="background:#ef4444;color:#fff;font-size:11px;padding:3px 9px;border-radius:9px;margin-left:8px">🔴 3 Failures (24h)</span></div>
+            <div class="pgs">Diagnostic view of all 7 platform agents — read-only, no re-trigger controls <span class="ann">WF7-AGT-006</span></div>
+          </div>
+          <button class="btn btn-sm">⬇ CSV</button>
+        </div>
+        <div class="tb">
+          <div class="tbl">
+            <div class="fc"><select><option>All Agents</option><option>Data Ingestion Agent</option><option>Data Insights Agent</option><option>Drift Detection Agent</option><option>Performance Assessment Agent</option><option>Bias Evaluation Agent</option><option>RCA Agent</option><option>Report Generation Agent</option></select></div>
+            <div class="sb3"><input type="text" placeholder="Search model…"></div>
+            <div class="fc"><select><option>All Statuses</option><option>Running</option><option>Completed</option><option>Failed</option><option>Timed Out</option></select></div>
+            <div class="fc"><select><option>All Triggers</option><option>Scheduled</option><option>On-Demand</option></select></div>
+            <input type="date" class="fc" style="font-size:10px"> <span style="font-size:10px;color:#64748b">to</span> <input type="date" class="fc" style="font-size:10px">
+          </div>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr><th style="width:28px"></th><th>Agent Name</th><th>Model ID</th><th>Model Name</th><th>Trigger</th><th>Run Start</th><th>Run End</th><th>Duration</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr onclick="toggleExp('aexp1')" class="fail-row">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td>Data Ingestion Agent</td>
+                <td style="font-family:monospace;font-size:10px">MKT_REG_004</td>
+                <td><a style="color:#2563eb;cursor:pointer">Mkt Propensity v4</a></td>
+                <td><span class="badge b-blue">Scheduled</span></td>
+                <td>05-11 05:00</td><td>05-11 05:03</td><td>3m 12s</td>
+                <td><span class="badge b-red">Failed</span></td>
+              </tr>
+              <tr class="exp-row on" id="aexp1"><td colspan="9" class="exp-cell">
+                <strong>Failure Reason:</strong> Source connection timeout — database host 10.22.4.81 unreachable after 3 attempts (timeout: 30s each).<br>
+                <span style="color:#64748b;font-size:10px">→ To re-trigger: navigate to Scheduler (WF6) and reset next run date for this model.</span>
+              </td></tr>
+              <tr onclick="toggleExp('aexp2')" class="fail-row">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td>Bias Evaluation Agent</td>
+                <td style="font-family:monospace;font-size:10px">CR_CLF_001</td>
+                <td><a style="color:#2563eb;cursor:pointer">Credit Scorecard v3</a></td>
+                <td><span class="badge b-blue">Scheduled</span></td>
+                <td>05-10 06:00</td><td>05-10 07:01</td><td>61m 00s</td>
+                <td><span class="badge b-amber">Timed Out</span></td>
+              </tr>
+              <tr class="exp-row" id="aexp2"><td colspan="9" class="exp-cell">
+                <strong>Failure Reason:</strong> Agent exceeded 60-minute execution window. Last checkpoint: feature 22 of 47. Possible cause: protected attribute lookup query performance degradation.
+              </td></tr>
+              <tr onclick="toggleExp('aexp3')" class="fail-row">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td>RCA Agent</td>
+                <td style="font-family:monospace;font-size:10px">FRD_CLF_012</td>
+                <td><a style="color:#2563eb;cursor:pointer">Fraud Detector v3</a></td>
+                <td><span class="badge b-grey">On-Demand</span></td>
+                <td>05-11 09:15</td><td>05-11 09:18</td><td>3m 44s</td>
+                <td><span class="badge b-red">Failed</span></td>
+              </tr>
+              <tr class="exp-row" id="aexp3"><td colspan="9" class="exp-cell">
+                <strong>Failure Reason:</strong> Reference dataset not found — no ingested reference data available for this model. Complete data ingestion (WF4) before triggering RCA.
+              </td></tr>
+              <tr onclick="toggleExp('aexp4')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td>Drift Detection Agent</td>
+                <td style="font-family:monospace;font-size:10px">CR_CLF_001</td>
+                <td><a style="color:#2563eb;cursor:pointer">Credit Scorecard v3</a></td>
+                <td><span class="badge b-blue">Scheduled</span></td>
+                <td>05-11 06:00</td><td>05-11 06:04</td><td>4m 12s</td>
+                <td><span class="badge b-green">Completed</span></td>
+              </tr>
+              <tr class="exp-row" id="aexp4"><td colspan="9" class="exp-cell">Run completed successfully. PSI threshold breached on feature_age (PSI: 0.32 > threshold: 0.25). Trigger logged.</td></tr>
+              <tr onclick="toggleExp('aexp5')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td>Report Generation Agent</td>
+                <td style="font-family:monospace;font-size:10px">CR_CLF_001</td>
+                <td><a style="color:#2563eb;cursor:pointer">Credit Scorecard v3</a></td>
+                <td><span class="badge b-blue">Scheduled</span></td>
+                <td>05-11 06:08</td><td>05-11 06:09</td><td>1m 04s</td>
+                <td><span class="badge b-green">Completed</span></td>
+              </tr>
+              <tr class="exp-row" id="aexp5"><td colspan="9" class="exp-cell">Report generated and deposited to Repository (WF12). User notification dispatched.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S8: REPORTS -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s8">
+  <div class="slabel">Screen 8 — Reports <span class="ann">WF7-RPT-001 to 007</span></div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div></div></div>
+        <div class="tni" onclick="show('s3')"><div class="tio">▶️</div><div class="tit"><div class="tit-t">Run Log</div></div></div>
+        <div class="tni" onclick="show('s4')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni" onclick="show('s5')"><div class="tio">🔔</div><div class="tit"><div class="tit-t">Notification Log</div></div></div>
+        <div class="tni" onclick="show('s6')"><div class="tio">🗄️</div><div class="tit"><div class="tit-t">Data Retention</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio red">🤖</div><div class="tit"><div class="tit-t">Agent Run Monitor</div></div><div class="alert-badge">3</div></div>
+        <div class="tni on"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Reports</div>
+        <div class="pgt">Reports</div>
+        <div class="pgs">Pre-built compliance and audit report templates — run, parameterise, and export</div>
+
+        <div class="rpt-grid">
+          <div class="rpt-tile" onclick="openDrawer('Full Audit Trail Export','Date Range, Workflow Source, Actor, Outcome')">
+            <div class="rpt-icon">📜</div>
+            <div class="rpt-name">Full Audit Trail Export</div>
+            <div class="rpt-desc">Complete export of all Audit Log entries for a date range with optional workflow and actor filters.</div>
+            <div class="rpt-formats"><span class="rpt-fmt">CSV</span><span class="rpt-fmt">PDF</span></div>
+          </div>
+          <div class="rpt-tile" onclick="openDrawer('User Access Summary','As-At Date, Role Filter')">
+            <div class="rpt-icon">👥</div>
+            <div class="rpt-name">User Access Summary</div>
+            <div class="rpt-desc">All current platform users, roles, model assignments, and access expiry dates at a point in time.</div>
+            <div class="rpt-formats"><span class="rpt-fmt">CSV</span><span class="rpt-fmt">PDF</span></div>
+          </div>
+          <div class="rpt-tile" onclick="openDrawer('Data Deletion Certificate','Request ID / Model ID / Date Range')">
+            <div class="rpt-icon">🗑️</div>
+            <div class="rpt-name">Data Deletion Certificate</div>
+            <div class="rpt-desc">Formal record of an approved data deletion event. Suitable for regulatory submission.</div>
+            <div class="rpt-formats"><span class="rpt-fmt">PDF only</span></div>
+          </div>
+          <div class="rpt-tile" onclick="openDrawer('Model Monitoring Coverage','Date Range, Domain, Status')">
+            <div class="rpt-icon">🤖</div>
+            <div class="rpt-name">Model Monitoring Coverage</div>
+            <div class="rpt-desc">All registered models with scheduled status, last run date, outcome, and breach count for the period.</div>
+            <div class="rpt-formats"><span class="rpt-fmt">CSV</span><span class="rpt-fmt">PDF</span></div>
+          </div>
+          <div class="rpt-tile" onclick="openDrawer('Agent Run Summary','Date Range, Agent Name')">
+            <div class="rpt-icon">▶️</div>
+            <div class="rpt-name">Agent Run Summary</div>
+            <div class="rpt-desc">Aggregated run outcome counts by agent, status, and domain for a reporting period.</div>
+            <div class="rpt-formats"><span class="rpt-fmt">CSV</span><span class="rpt-fmt">PDF</span></div>
+          </div>
+          <div class="rpt-tile" onclick="openDrawer('Notification Delivery Summary','Date Range, Channel, Notification Type')">
+            <div class="rpt-icon">🔔</div>
+            <div class="rpt-name">Notification Delivery Summary</div>
+            <div class="rpt-desc">Delivery outcomes by channel and notification type. Privacy masking applied.</div>
+            <div class="rpt-formats"><span class="rpt-fmt">CSV</span><span class="rpt-fmt">PDF</span></div>
+          </div>
+          <div class="rpt-tile" onclick="openDrawer('Retention Policy Audit','Date Range')">
+            <div class="rpt-icon">🗄️</div>
+            <div class="rpt-name">Retention Policy Audit</div>
+            <div class="rpt-desc">Record of all retention policy changes with before/after values and Platform Admin attribution.</div>
+            <div class="rpt-formats"><span class="rpt-fmt">CSV</span><span class="rpt-fmt">PDF</span></div>
+          </div>
+        </div>
+
+        <!-- Report Run History -->
+        <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px">Report Run History</div>
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr><th>Report Name</th><th>Generated By</th><th>Parameters</th><th>Generated At</th><th>Download</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Full Audit Trail Export</td><td>Sarah Chen</td>
+                <td style="font-size:10px;color:#64748b">Date: 2026-04-01 to 2026-04-30 | WF5 — ACC</td>
+                <td>2026-05-11 09:14</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">⬇ audit_trail_apr2026.pdf</a></td>
+              </tr>
+              <tr>
+                <td>User Access Summary</td><td>James Park</td>
+                <td style="font-size:10px;color:#64748b">As-at: 2026-05-01 | All roles</td>
+                <td>2026-05-08 14:30</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">⬇ user_access_may2026.csv</a></td>
+              </tr>
+              <tr>
+                <td>Model Monitoring Coverage</td><td>Sarah Chen</td>
+                <td style="font-size:10px;color:#64748b">Date: 2026-Q1 | Domain: Credit Risk</td>
+                <td>2026-04-03 10:00</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">⬇ monitoring_coverage_Q1.pdf</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Parameter Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="paramDrawer">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div>
+      <div class="drawer-title" id="drawerTitle">Report Name</div>
+      <div class="drawer-sub">Configure parameters and generate report</div>
+    </div>
+    <button class="btn btn-sm" onclick="closeDrawer()">✕</button>
+  </div>
+  <div id="drawerParams"></div>
+  <div style="margin-top:16px;display:flex;gap:8px">
+    <button class="btn btn-p" style="flex:1" onclick="closeDrawer()">▶ Generate Report</button>
+    <button class="btn" onclick="closeDrawer()">Cancel</button>
+  </div>
+</div>
+
+<script>
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const idx = {s1:0,s2:1,s3:2,s4:3,s5:4,s6:5,s7:6,s8:7}[id];
+  document.querySelectorAll('.nb')[idx].classList.add('on');
+}
+function toggleExp(id){
+  const el = document.getElementById(id);
+  el.classList.toggle('on');
+  const row = el.previousElementSibling;
+  const arrow = row.querySelector('td');
+  if(el.classList.contains('on')){ arrow.textContent='▼'; }else{ arrow.textContent='▶'; }
+}
+let purgeModelIdVal='';
+function openPurgeModal(name,id){
+  purgeModelIdVal=id;
+  document.getElementById('purgeModelName').textContent=name;
+  document.getElementById('purgeModelId').textContent=id;
+  document.getElementById('purgeConfirmId').textContent=id;
+  document.getElementById('purgeInput').value='';
+  document.getElementById('purgeBtn').disabled=true;
+  document.getElementById('purgeModal').classList.add('on');
+}
+function closePurgeModal(){ document.getElementById('purgeModal').classList.remove('on'); }
+function checkPurge(){
+  const val=document.getElementById('purgeInput').value.trim();
+  document.getElementById('purgeBtn').disabled=(val!==purgeModelIdVal);
+}
+function openDrawer(title, params){
+  document.getElementById('drawerTitle').textContent=title;
+  const paramList = params.split(',').map(p=>`
+    <div class="form-group">
+      <label class="form-label">${p.trim()}</label>
+      <input class="form-control" type="text" placeholder="Enter ${p.trim()}…">
+    </div>`).join('');
+  document.getElementById('drawerParams').innerHTML = paramList +
+    `<div class="form-group"><label class="form-label">Export Format</label>
+    <select class="form-control"><option>PDF</option><option>CSV</option></select></div>`;
+  document.getElementById('drawerOverlay').classList.add('on');
+  document.getElementById('paramDrawer').classList.add('on');
+}
+function closeDrawer(){
+  document.getElementById('drawerOverlay').classList.remove('on');
+  document.getElementById('paramDrawer').classList.remove('on');
+}
+</script>
+</body>
+</html>
