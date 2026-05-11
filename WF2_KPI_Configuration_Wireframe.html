@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Monitoring Platform — Workflow 3: Admin KPI Configuration</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; color: #2c3e50; line-height: 1.5; }
+
+  .nav-bar { background: #1f2937; color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+  .nav-bar h1 { font-size: 12px; font-weight: 600; margin-right: 8px; white-space: nowrap; }
+  .nav-btn { background: #374151; color: #fff; border: 1px solid #4b5563; padding: 5px 9px; cursor: pointer; font-size: 11px; border-radius: 4px; transition: background 0.2s; white-space: nowrap; }
+  .nav-btn:hover { background: #4b5563; }
+  .nav-btn.active { background: #2563eb; border-color: #2563eb; }
+
+  .screen { display: none; min-height: calc(100vh - 46px); padding: 14px; }
+  .screen.active { display: block; }
+  .screen-label { background: #fbbf24; color: #78350f; padding: 5px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; display: inline-block; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .app-shell { display: flex; flex-direction: column; min-height: calc(100vh - 80px); background: #fff; border: 2px dashed #94a3b8; border-radius: 8px; overflow: hidden; max-width: 1600px; margin: 0 auto; }
+  .app-header { background: #1e3a8a; color: #fff; padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .app-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; }
+  .app-brand-logo { width: 28px; height: 28px; background: #fff; color: #1e3a8a; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .app-header-right { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+  .role-pill { background: #fbbf24; color: #78350f; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .user-pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; }
+  .user-avatar { width: 22px; height: 22px; background: #fbbf24; color: #78350f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+  .icon-btn { background: transparent; border: none; color: #fff; cursor: pointer; font-size: 14px; }
+
+  .app-body { display: flex; flex: 1; }
+  .left-nav { width: 215px; background: #f8fafc; border-right: 1px solid #e2e8f0; padding: 14px 10px; flex-shrink: 0; }
+  .nav-section-title { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px; padding: 0 6px; }
+  .tile-nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border: 1px dashed #cbd5e1; border-radius: 6px; margin-bottom: 6px; cursor: pointer; background: #fff; transition: all 0.2s; }
+  .tile-nav-item:hover { border-color: #2563eb; border-style: solid; background: #eff6ff; }
+  .tile-nav-item.active { background: #dbeafe; border-color: #2563eb; border-style: solid; }
+  .tile-icon { width: 26px; height: 26px; background: #dbeafe; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+  .tile-text { flex: 1; min-width: 0; }
+  .tile-title { font-size: 11px; font-weight: 600; color: #1e293b; }
+  .tile-subtitle { font-size: 10px; color: #64748b; margin-top: 1px; }
+  .tile-badge { background: #ef4444; color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+
+  .main-content { flex: 1; padding: 18px; background: #f1f5f9; overflow-y: auto; min-width: 0; }
+  .breadcrumb { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+  .breadcrumb a { color: #2563eb; text-decoration: none; cursor: pointer; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .page-title { font-size: 19px; color: #1e293b; margin-bottom: 3px; font-weight: 700; }
+  .page-subtitle { font-size: 12px; color: #64748b; margin-bottom: 16px; }
+
+  .toolbar { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .toolbar-left { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex: 1; }
+  .toolbar-right { display: flex; gap: 8px; flex-wrap: wrap; }
+  .search-box { position: relative; flex: 1; min-width: 180px; max-width: 280px; }
+  .search-box input { width: 100%; padding: 7px 10px 7px 28px; border: 1px dashed #94a3b8; border-radius: 5px; font-size: 12px; background: #fff; }
+  .search-box::before { content: '🔍'; position: absolute; left: 8px; top: 6px; font-size: 12px; opacity: 0.6; }
+  .filter-chip { background: #fff; border: 1px dashed #94a3b8; padding: 5px 9px; border-radius: 5px; font-size: 11px; cursor: pointer; }
+  .filter-chip.active { background: #dbeafe; border-color: #2563eb; color: #1e3a8a; font-weight: 600; border-style: solid; }
+
+  .btn { background: #fff; border: 1px solid #cbd5e1; padding: 7px 13px; border-radius: 5px; cursor: pointer; font-size: 12px; color: #1e293b; display: inline-flex; align-items: center; gap: 5px; }
+  .btn:hover { background: #f1f5f9; }
+  .btn-primary { background: #2563eb; color: #fff; border-color: #2563eb; font-weight: 600; }
+  .btn-primary:hover { background: #1e3a8a; }
+  .btn-warn { background: #f59e0b; color: #fff; border-color: #f59e0b; font-weight: 600; }
+  .btn-ghost { background: transparent; border: 1px dashed #cbd5e1; color: #64748b; }
+
+  /* Family cards */
+  .family-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .family-card { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s; border-left: 3px solid #2563eb; border-left-style: solid; }
+  .family-card:hover { border-color: #2563eb; border-style: solid; border-left-style: solid; box-shadow: 0 2px 8px rgba(37,99,235,0.1); }
+  .family-card.pending { border-left-color: #f59e0b; }
+  .family-card-title { font-size: 13px; font-weight: 700; color: #1e3a8a; margin-bottom: 10px; line-height: 1.3; }
+  .family-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+  .family-meta-item { font-size: 11px; }
+  .family-meta-label { color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .family-meta-value { color: #1e293b; font-weight: 500; }
+  .family-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #e2e8f0; font-size: 11px; color: #64748b; }
+  .family-card-footer strong { color: #1e3a8a; }
+
+  /* Pack list within family */
+  .pack-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .pack-row { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 14px; transition: all 0.2s; }
+  .pack-row:hover { border-color: #2563eb; border-style: solid; }
+  .pack-row-left { flex: 1; }
+  .pack-row-name { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 3px; }
+  .pack-row-meta { font-size: 11px; color: #64748b; }
+  .pack-row-right { display: flex; align-items: center; gap: 10px; }
+
+  /* Pack detail header */
+  .pack-detail-header { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  .pack-detail-title { font-size: 17px; font-weight: 700; color: #1e3a8a; margin-bottom: 12px; }
+  .pack-detail-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+  .detail-field-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+  .detail-field-value { font-size: 13px; color: #1e293b; font-weight: 500; }
+
+  /* KPI type sections */
+  .kpi-section { margin-bottom: 14px; }
+  .kpi-section-header { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 6px 6px 0 0; font-size: 12px; font-weight: 700; }
+  .kpi-data-drift { background: #eff6ff; color: #1e3a8a; border: 1px dashed #93c5fd; border-bottom: none; }
+  .kpi-perf-drift { background: #fef9ee; color: #854d0e; border: 1px dashed #fcd34d; border-bottom: none; }
+  .kpi-concept-drift { background: #f0fdf4; color: #166534; border: 1px dashed #86efac; border-bottom: none; }
+  .kpi-count { background: rgba(0,0,0,0.08); padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: auto; font-weight: 600; }
+
+  /* Metric table */
+  .table-scroll { overflow-x: auto; }
+  .metric-table-wrap { background: #fff; border: 1px dashed #cbd5e1; border-radius: 0 0 6px 6px; overflow: hidden; }
+  .metric-table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 860px; }
+  .metric-table th { background: #f8fafc; padding: 7px 8px; text-align: left; font-weight: 600; color: #475569; border-bottom: 1px solid #e2e8f0; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+  .metric-table td { padding: 8px 8px; border-bottom: 1px dashed #e2e8f0; vertical-align: middle; }
+  .metric-table tr:last-child td { border-bottom: none; }
+  .metric-table tr:hover td { background: #f8fafc; }
+  .subtype-row td { background: #f1f5f9; font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; padding: 5px 8px; }
+  .metric-checkbox { width: 15px; height: 15px; accent-color: #2563eb; cursor: pointer; }
+  .threshold-input { width: 65px; padding: 5px 6px; border: 1px dashed #94a3b8; border-radius: 4px; font-size: 11px; text-align: center; background: #fff; }
+  .threshold-input:focus { outline: none; border-color: #2563eb; border-style: solid; }
+  .threshold-input.readonly { background: #f8fafc; color: #64748b; }
+  .threshold-input.na-field { background: #f1f5f9; border-style: dashed; color: #94a3b8; cursor: not-allowed; font-size: 10px; }
+  .threshold-input.not-set { background: #fffbeb; border-color: #fcd34d; border-style: dashed; color: #92400e; font-size: 10px; }
+  .dir-select { padding: 5px 6px; border: 1px dashed #94a3b8; border-radius: 4px; font-size: 11px; background: #fff; }
+  .toggle-switch { position: relative; display: inline-block; width: 30px; height: 16px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 16px; }
+  .toggle-slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: white; transition: .3s; border-radius: 50%; }
+  input:checked + .toggle-slider { background-color: #2563eb; }
+  input:checked + .toggle-slider:before { transform: translateX(14px); }
+
+  /* RAG dots */
+  .rag-r { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #dc2626; margin-right: 2px; }
+  .rag-a { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; margin-right: 2px; }
+  .rag-g { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; margin-right: 2px; }
+  .rag-rule { font-size: 10px; color: #64748b; white-space: nowrap; }
+  .no-thresh-label { font-size: 10px; color: #92400e; background: #fef3c7; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+
+  /* Pills */
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+  .pill-active { background: #dcfce7; color: #166534; }
+  .pill-draft { background: #fef3c7; color: #78350f; }
+  .pill-system { background: #dbeafe; color: #1e3a8a; }
+  .pill-custom { background: #dcfce7; color: #166534; }
+  .pill-override { background: #e0e7ff; color: #3730a3; }
+  .pill-pending { background: #fef3c7; color: #78350f; }
+  .pill-delta-only { background: #f0fdf4; color: #166534; border: 1px solid #86efac; }
+
+  /* Model selector */
+  .model-table-wrap { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+  .model-table-header { padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #1e293b; display: flex; justify-content: space-between; align-items: center; }
+  .model-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .model-table th { background: #f8fafc; padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 600; color: #475569; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; }
+  .model-table td { padding: 9px 12px; border-bottom: 1px dashed #e2e8f0; }
+  .model-table tr:hover td { background: #f8fafc; }
+  .model-table tr.selected-row td { background: #eff6ff; }
+
+  /* Form elements */
+  .form-section { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  .form-section-title { font-size: 12px; font-weight: 700; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group label { font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px; }
+  .form-group .req { color: #dc2626; }
+  .form-group input, .form-group select { padding: 8px 10px; border: 1px dashed #94a3b8; border-radius: 4px; font-size: 12px; font-family: inherit; background: #fff; }
+  .form-group .help { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+  .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+
+  /* Steps */
+  .steps { display: flex; gap: 0; margin-bottom: 14px; background: #fff; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 10px; }
+  .step { flex: 1; text-align: center; font-size: 11px; color: #94a3b8; padding: 4px 6px; }
+  .step.active { color: #2563eb; font-weight: 600; }
+  .step.done { color: #16a34a; }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; margin-bottom: 3px; font-size: 12px; }
+  .step.active .step-num { background: #2563eb; color: #fff; }
+  .step.done .step-num { background: #16a34a; color: #fff; }
+
+  /* Banners */
+  .warn-banner { background: #fef3c7; border-left: 3px solid #f59e0b; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #78350f; margin-bottom: 12px; }
+  .info-banner { background: #dbeafe; border-left: 3px solid #2563eb; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #1e3a8a; margin-bottom: 12px; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 20px; }
+  .modal-box { background: #fff; border: 2px dashed #94a3b8; border-radius: 8px; padding: 22px; max-width: 540px; width: 100%; }
+  .modal-box h3 { color: #1e293b; margin-bottom: 10px; font-size: 16px; }
+  .modal-box p { font-size: 12px; color: #475569; margin-bottom: 12px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+  .changes-list { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 10px 12px; margin-bottom: 12px; }
+  .change-item { display: flex; align-items: flex-start; gap: 6px; padding: 4px 0; border-bottom: 1px dashed #e2e8f0; font-size: 12px; }
+  .change-item:last-child { border-bottom: none; }
+
+  /* Annotation */
+  .annotation { background: #fef9c3; border-left: 3px solid #ca8a04; padding: 10px 14px; margin: 12px auto; font-size: 11px; color: #713f12; border-radius: 3px; max-width: 1600px; }
+  .annotation strong { color: #422006; }
+
+  @media (max-width: 768px) {
+    .app-body { flex-direction: column; }
+    .left-nav { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-bar">
+  <h1>📐 WF3 — KPI Configuration</h1>
+  <button class="nav-btn active" onclick="showScreen('family-list', this)">1. Model Family List</button>
+  <button class="nav-btn" onclick="showScreen('pack-list', this)">2. KPI Pack List (Family)</button>
+  <button class="nav-btn" onclick="showScreen('pack-detail', this)">3. Pack Detail View</button>
+  <button class="nav-btn" onclick="showScreen('new-pack', this)">4. New KPI Pack</button>
+  <button class="nav-btn" onclick="showScreen('model-override', this)">5. Model Override</button>
+  <button class="nav-btn" onclick="showScreen('publish-confirm', this)">6. Publish Confirm</button>
+</div>
+
+<!-- ================================================================ -->
+<!-- SCREEN 1: MODEL FAMILY LIST                                       -->
+<!-- ================================================================ -->
+<div id="family-list" class="screen active">
+  <span class="screen-label">Screen 1 — Model Family List View</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right">
+        <div class="role-pill">👤 ADMIN</div>
+        <button class="icon-btn">🔔</button>
+        <div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div>
+        <button class="icon-btn">⏻</button>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Admin Console</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Manage Model Inventory</div><div class="tile-subtitle">Register, archive</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">⚙️</div><div class="tile-text"><div class="tile-title">KPI Configuration</div><div class="tile-subtitle">Packs & thresholds</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">Model Data Ingestion</div><div class="tile-subtitle">Pipelines</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔐</div><div class="tile-text"><div class="tile-title">Access Control</div><div class="tile-subtitle">Users & approvals</div></div><span class="tile-badge">3</span></div>
+        <div class="tile-nav-item"><div class="tile-icon">⏰</div><div class="tile-text"><div class="tile-title">Set-up Scheduler</div><div class="tile-subtitle">Jobs & batch</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🛡️</div><div class="tile-text"><div class="tile-title">Governance</div><div class="tile-subtitle">Audit & compliance</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🗄️</div><div class="tile-text"><div class="tile-title">Data Center</div><div class="tile-subtitle">Infrastructure &amp; repos</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb">Admin &nbsp;›&nbsp; KPI Configuration</div>
+        <h2 class="page-title">KPI Configuration</h2>
+        <p class="page-subtitle">Model Families are auto-derived from the inventory. Select a family to view and manage its KPI Packs.</p>
+
+        <div class="warn-banner">⚠️ <strong>2 models</strong> have no KPI Pack assigned (unrecognised Model Family). <a href="#" style="color:#78350f;font-weight:600;text-decoration:underline;">View affected models →</a></div>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><input type="text" placeholder="Search by domain, technique, data type..."></div>
+            <div class="filter-chip active">🏷️ Domain: Credit Risk ✕</div>
+            <div class="filter-chip">📦 Technique ▾</div>
+          </div>
+        </div>
+
+        <div class="family-grid">
+
+          <div class="family-card" onclick="showScreen('pack-list', null)">
+            <div class="family-card-title">Credit Risk_Classification_Account level_Cross sectional</div>
+            <div class="family-meta">
+              <div class="family-meta-item"><div class="family-meta-label">Domain</div><div class="family-meta-value">Credit Risk</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Technique</div><div class="family-meta-value">Classification</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Type</div><div class="family-meta-value">Account level</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Structure</div><div class="family-meta-value">Cross sectional</div></div>
+            </div>
+            <div class="family-card-footer">
+              <span><strong>24</strong> models</span>
+              <span><strong>2</strong> KPI Packs (1 default, 1 custom)</span>
+            </div>
+          </div>
+
+          <div class="family-card" onclick="showScreen('pack-list', null)">
+            <div class="family-card-title">Credit Risk_Classification_Summarized level_Cross sectional</div>
+            <div class="family-meta">
+              <div class="family-meta-item"><div class="family-meta-label">Domain</div><div class="family-meta-value">Credit Risk</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Technique</div><div class="family-meta-value">Classification</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Type</div><div class="family-meta-value">Summarized level</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Structure</div><div class="family-meta-value">Cross sectional</div></div>
+            </div>
+            <div class="family-card-footer">
+              <span><strong>18</strong> models</span>
+              <span><strong>1</strong> KPI Pack (default)</span>
+            </div>
+          </div>
+
+          <div class="family-card" onclick="showScreen('pack-list', null)">
+            <div class="family-card-title">Credit Risk_Continuous_Account level_Cross sectional</div>
+            <div class="family-meta">
+              <div class="family-meta-item"><div class="family-meta-label">Domain</div><div class="family-meta-value">Credit Risk</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Technique</div><div class="family-meta-value">Continuous</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Type</div><div class="family-meta-value">Account level</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Structure</div><div class="family-meta-value">Cross sectional</div></div>
+            </div>
+            <div class="family-card-footer">
+              <span><strong>9</strong> models</span>
+              <span><strong>1</strong> KPI Pack (default)</span>
+            </div>
+          </div>
+
+          <div class="family-card" onclick="showScreen('pack-list', null)">
+            <div class="family-card-title">Credit Risk_Classification_Account level_Panel</div>
+            <div class="family-meta">
+              <div class="family-meta-item"><div class="family-meta-label">Domain</div><div class="family-meta-value">Credit Risk</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Technique</div><div class="family-meta-value">Classification</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Type</div><div class="family-meta-value">Account level</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Structure</div><div class="family-meta-value">Panel</div></div>
+            </div>
+            <div class="family-card-footer">
+              <span><strong>7</strong> models</span>
+              <span><strong>1</strong> KPI Pack (default)</span>
+            </div>
+          </div>
+
+          <div class="family-card" onclick="showScreen('pack-list', null)">
+            <div class="family-card-title">Fraud_Classification_Account level_Cross sectional</div>
+            <div class="family-meta">
+              <div class="family-meta-item"><div class="family-meta-label">Domain</div><div class="family-meta-value">Fraud</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Technique</div><div class="family-meta-value">Classification</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Type</div><div class="family-meta-value">Account level</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Structure</div><div class="family-meta-value">Cross sectional</div></div>
+            </div>
+            <div class="family-card-footer">
+              <span><strong>11</strong> models</span>
+              <span><strong>1</strong> KPI Pack (default)</span>
+            </div>
+          </div>
+
+          <div class="family-card" onclick="showScreen('pack-list', null)">
+            <div class="family-card-title">Marketing_Classification_Account level_Cross sectional</div>
+            <div class="family-meta">
+              <div class="family-meta-item"><div class="family-meta-label">Domain</div><div class="family-meta-value">Marketing</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Technique</div><div class="family-meta-value">Classification</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Type</div><div class="family-meta-value">Account level</div></div>
+              <div class="family-meta-item"><div class="family-meta-label">Data Structure</div><div class="family-meta-value">Cross sectional</div></div>
+            </div>
+            <div class="family-card-footer">
+              <span><strong>7</strong> models</span>
+              <span><strong>1</strong> KPI Pack (default)</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (WF3-FAM-001 to 006):</strong> Entry point to the module. Each card represents a distinct Model Family derived from the inventory. Clicking a card navigates to Screen 2 — the KPI Pack List scoped to that family. Pack Pending warning (WF3-FAM-004) surfaces models with no auto-generated pack. The remaining 3 families (CR Continuous Panel, CR Class Time-series, CR Continuous Time-series) are not shown here for brevity.
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SCREEN 2: KPI PACK LIST (WITHIN A FAMILY)                         -->
+<!-- ================================================================ -->
+<div id="pack-list" class="screen">
+  <span class="screen-label">Screen 2 — KPI Pack List (within Family)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right">
+        <div class="role-pill">👤 ADMIN</div>
+        <div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div>
+        <button class="icon-btn">⏻</button>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Admin Console</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Manage Model Inventory</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">⚙️</div><div class="tile-text"><div class="tile-title">KPI Configuration</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">Model Data Ingestion</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔐</div><div class="tile-text"><div class="tile-title">Access Control</div></div><span class="tile-badge">3</span></div>
+        <div class="tile-nav-item"><div class="tile-icon">⏰</div><div class="tile-text"><div class="tile-title">Set-up Scheduler</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🛡️</div><div class="tile-text"><div class="tile-title">Governance</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🗄️</div><div class="tile-text"><div class="tile-title">Data Center</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('family-list', null)">KPI Configuration</a> &nbsp;›&nbsp; Credit Risk_Classification_Account level_Cross sectional</div>
+        <h2 class="page-title">Credit Risk_Classification_Account level_Cross sectional</h2>
+        <p class="page-subtitle">KPI Packs for this Model Family — 24 models assigned</p>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="filter-chip active">📦 Type: All ▾</div>
+            <div class="filter-chip">⚡ Status: All ▾</div>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn-primary btn" onclick="showScreen('new-pack', null)">＋ New KPI Pack</button>
+          </div>
+        </div>
+
+        <div class="pack-list">
+
+          <div class="pack-row" onclick="showScreen('pack-detail', null)">
+            <div class="pack-row-left">
+              <div class="pack-row-name">Credit Risk_Classification_Account level_Cross sectional</div>
+              <div class="pack-row-meta">System Default &nbsp;|&nbsp; 20 models using this pack &nbsp;|&nbsp; Last modified: 2026-03-14 by Admin &nbsp;|&nbsp; 28 metrics configured</div>
+            </div>
+            <div class="pack-row-right">
+              <span class="pill pill-system">System Default</span>
+              <span class="pill pill-active">Active</span>
+              <span style="font-size:12px;color:#2563eb;">View →</span>
+            </div>
+          </div>
+
+          <div class="pack-row" onclick="showScreen('pack-detail', null)">
+            <div class="pack-row-left">
+              <div class="pack-row-name">Credit Risk_Classification_Account level_Cross sectional_HighRisk</div>
+              <div class="pack-row-meta">Admin Custom (cloned from system default) &nbsp;|&nbsp; 4 models using this pack &nbsp;|&nbsp; Last modified: 2026-04-12 by John Doe &nbsp;|&nbsp; 28 metrics, tighter thresholds</div>
+            </div>
+            <div class="pack-row-right">
+              <span class="pill pill-custom">Admin Custom</span>
+              <span class="pill pill-active">Active</span>
+              <span style="font-size:12px;color:#2563eb;">View →</span>
+            </div>
+          </div>
+
+          <div class="pack-row">
+            <div class="pack-row-left">
+              <div class="pack-row-name">Credit Risk_Classification_Account level_Cross sectional_Q2Review</div>
+              <div class="pack-row-meta">Admin Custom (draft) &nbsp;|&nbsp; 0 models assigned &nbsp;|&nbsp; Last modified: 2026-05-05 by Jane Smith</div>
+            </div>
+            <div class="pack-row-right">
+              <span class="pill pill-custom">Admin Custom</span>
+              <span class="pill pill-draft">Draft</span>
+              <span style="font-size:12px;color:#2563eb;">View →</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (WF3-LST-001 to 004):</strong> Pack list is scoped to the selected Model Family. Shows system default + any Admin custom packs. "New KPI Pack" button (top right) is pre-scoped to this family. Clicking any row opens the Pack Detail View (Screen 3).
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SCREEN 3: KPI PACK DETAIL VIEW                                    -->
+<!-- ================================================================ -->
+<div id="pack-detail" class="screen">
+  <span class="screen-label">Screen 3 — KPI Pack Detail View (read-only)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right">
+        <div class="role-pill">👤 ADMIN</div>
+        <div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div>
+        <button class="icon-btn">⏻</button>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Admin Console</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Manage Model Inventory</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">⚙️</div><div class="tile-text"><div class="tile-title">KPI Configuration</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">Model Data Ingestion</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔐</div><div class="tile-text"><div class="tile-title">Access Control</div></div><span class="tile-badge">3</span></div>
+        <div class="tile-nav-item"><div class="tile-icon">⏰</div><div class="tile-text"><div class="tile-title">Set-up Scheduler</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🛡️</div><div class="tile-text"><div class="tile-title">Governance</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🗄️</div><div class="tile-text"><div class="tile-title">Data Center</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb">
+          <a onclick="showScreen('family-list', null)">KPI Configuration</a> &nbsp;›&nbsp;
+          <a onclick="showScreen('pack-list', null)">CR_Classification_Account level_Cross sectional</a> &nbsp;›&nbsp;
+          Pack Detail
+        </div>
+        <h2 class="page-title">Pack Detail View</h2>
+        <p class="page-subtitle">Only metrics applicable to this Model Family are shown. Metrics with no thresholds are computed without RAG status.</p>
+
+        <!-- Pack header -->
+        <div class="pack-detail-header">
+          <div class="pack-detail-title">Credit Risk_Classification_Account level_Cross sectional</div>
+          <div class="pack-detail-meta">
+            <div><div class="detail-field-label">Domain</div><div class="detail-field-value">Credit Risk</div></div>
+            <div><div class="detail-field-label">Technique</div><div class="detail-field-value">Classification</div></div>
+            <div><div class="detail-field-label">Data Type</div><div class="detail-field-value">Account level</div></div>
+            <div><div class="detail-field-label">Data Structure</div><div class="detail-field-value">Cross sectional</div></div>
+            <div><div class="detail-field-label">Pack Type</div><div class="detail-field-value"><span class="pill pill-system">System Default</span></div></div>
+            <div><div class="detail-field-label">Status</div><div class="detail-field-value"><span class="pill pill-active">Active</span></div></div>
+            <div><div class="detail-field-label">Models Assigned</div><div class="detail-field-value"><strong style="color:#1e3a8a;">20 models</strong> <a href="#" style="font-size:11px;color:#2563eb;">(view list)</a></div></div>
+            <div><div class="detail-field-label">Last Modified</div><div class="detail-field-value">2026-03-14 by Admin</div></div>
+          </div>
+        </div>
+
+        <!-- Action bar -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+          <button class="btn-primary btn">✏️ Edit Pack</button>
+          <button class="btn" onclick="showScreen('model-override', null)">🎯 Override for Specific Models</button>
+          <button class="btn">📋 Clone as New Pack</button>
+          <button class="btn-ghost btn">🕒 Version History</button>
+        </div>
+
+        <!-- DATA DRIFT -->
+        <div class="kpi-section">
+          <div class="kpi-section-header kpi-data-drift">
+            📊 Data Drift <span class="kpi-count">5 metrics</span>
+          </div>
+          <div class="table-scroll"><div class="metric-table-wrap">
+            <table class="metric-table">
+              <thead><tr>
+                <th style="width:28px;">✓</th>
+                <th style="min-width:200px;">Metric Name</th>
+                <th>Sub KPI Type</th>
+                <th>Higher/Lower</th>
+                <th>Warning (Abs)</th>
+                <th>Breach (Abs)</th>
+                <th>Delta</th>
+                <th>Δ Warning</th>
+                <th>Δ Breach</th>
+                <th>RAG Logic</th>
+              </tr></thead>
+              <tbody>
+                <tr class="subtype-row"><td colspan="10">Stability</td></tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>PSI (Population Stability Index)</strong></td>
+                  <td>Stability</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.25" readonly></td>
+                  <td><span class="pill" style="background:#fee2e2;color:#991b1b;font-size:10px;">No</span></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.25 &nbsp;<span class="rag-a"></span>≥0.20 &nbsp;<span class="rag-g"></span>&lt;0.20</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Jensen Shannon Divergence</strong></td>
+                  <td>Stability</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.05" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><span class="pill" style="background:#fee2e2;color:#991b1b;font-size:10px;">No</span></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.10 &nbsp;<span class="rag-a"></span>≥0.05</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>CSI — Feature Level</strong></td>
+                  <td>Stability</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.25" readonly></td>
+                  <td><span class="pill" style="background:#fee2e2;color:#991b1b;font-size:10px;">No</span></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.25 &nbsp;<span class="rag-a"></span>≥0.10</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>JSD — Feature Level</strong></td>
+                  <td>Stability</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.05" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><span class="pill" style="background:#fee2e2;color:#991b1b;font-size:10px;">No</span></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.10 &nbsp;<span class="rag-a"></span>≥0.05</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></div>
+        </div>
+
+        <!-- PERFORMANCE DRIFT -->
+        <div class="kpi-section">
+          <div class="kpi-section-header kpi-perf-drift">
+            📈 Performance Drift <span class="kpi-count">22 metrics</span>
+          </div>
+          <div class="table-scroll"><div class="metric-table-wrap">
+            <table class="metric-table">
+              <thead><tr>
+                <th style="width:28px;">✓</th>
+                <th style="min-width:200px;">Metric Name</th>
+                <th>Sub KPI Type</th>
+                <th>Higher/Lower</th>
+                <th>Warning (Abs)</th>
+                <th>Breach (Abs)</th>
+                <th>Delta</th>
+                <th>Δ Warning</th>
+                <th>Δ Breach</th>
+                <th>RAG Logic</th>
+              </tr></thead>
+              <tbody>
+                <tr class="subtype-row"><td colspan="10">Discrimination</td></tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>KS</strong></td><td>Discrimination</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.35" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.30" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.25" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≤0.30 &nbsp;<span class="rag-a"></span>≤0.35</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>AUC</strong></td><td>Discrimination</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.70" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.65" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.05" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≤0.65 &nbsp;<span class="rag-a"></span>≤0.70</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Gini Coefficient</strong></td><td>Discrimination</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.40" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.30" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.05" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≤0.30 &nbsp;<span class="rag-a"></span>≤0.40</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Pietra Index</strong></td><td>Discrimination</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.25" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.05" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≤0.20 &nbsp;<span class="rag-a"></span>≤0.25</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>ROB (Rank Order Break)</strong></td><td>Discrimination</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.25" readonly></td>
+                  <td><span class="pill" style="background:#fee2e2;color:#991b1b;font-size:10px;">No</span></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.25 &nbsp;<span class="rag-a"></span>≥0.20</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>AUPRC</strong></td><td>Discrimination</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.15" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≤0.15 &nbsp;<span class="rag-a"></span>≤0.20</td>
+                </tr>
+                <tr class="subtype-row"><td colspan="10">Calibration</td></tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>ECE (Expected Calibration Error)</strong></td><td>Calibration</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.03" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.07" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.05" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.07 &nbsp;<span class="rag-a"></span>≥0.03</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>PDO (Points to Double Odds)</strong></td><td>Calibration</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.25" readonly></td>
+                  <td><span class="pill" style="background:#fee2e2;color:#991b1b;font-size:10px;">No</span></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td><input class="threshold-input na-field" value="N/A" disabled></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.25 &nbsp;<span class="rag-a"></span>≥0.20</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Log Loss</strong></td><td>Calibration</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.50" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.60" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.05" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.60 &nbsp;<span class="rag-a"></span>≥0.50</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Brier Score</strong></td><td>Calibration</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.25" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.30" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.30 &nbsp;<span class="rag-a"></span>≥0.25</td>
+                </tr>
+                <tr class="subtype-row"><td colspan="10">Classification Performance</td></tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Accuracy</strong></td><td>Class. Performance</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.70" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.65" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.05" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≤0.65 &nbsp;<span class="rag-a"></span>≤0.70</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Precision</strong></td><td>Class. Performance</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.35" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.25" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≤0.25 &nbsp;<span class="rag-a"></span>≤0.35</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Recall</strong></td><td>Class. Performance</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.45" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.35" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≤0.35 &nbsp;<span class="rag-a"></span>≤0.45</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>F1 Score</strong></td><td>Class. Performance</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.35" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.25" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≤0.25 &nbsp;<span class="rag-a"></span>≤0.35</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Type 1 Error</strong></td><td>Class. Performance</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.40" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.50" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.50 &nbsp;<span class="rag-a"></span>≥0.40</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Type 2 Error</strong></td><td>Class. Performance</td>
+                  <td><select class="dir-select"><option>Lower ▾</option></select></td>
+                  <td><input class="threshold-input readonly" value="0.40" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.50" readonly></td>
+                  <td><span class="pill" style="background:#dcfce7;color:#166534;font-size:10px;">Yes</span></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>≥0.50 &nbsp;<span class="rag-a"></span>≥0.40</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></div>
+        </div>
+
+        <!-- CONCEPT DRIFT — delta only, no absolute threshold fields -->
+        <div class="kpi-section">
+          <div class="kpi-section-header kpi-concept-drift">
+            🧠 Concept Drift <span class="kpi-count">3 metrics — delta thresholds only</span>
+          </div>
+          <div class="info-banner" style="border-radius:0;margin-bottom:0;border-left:none;border-right:none;border-top:1px dashed #86efac;">
+            ℹ️ Concept Drift metrics have no absolute thresholds. Only delta (relative change) thresholds apply. Metrics without delta values configured are still computed and displayed as raw values without RAG status.
+          </div>
+          <div class="table-scroll"><div class="metric-table-wrap">
+            <table class="metric-table">
+              <thead><tr>
+                <th style="width:28px;">✓</th>
+                <th style="min-width:220px;">Metric Name</th>
+                <th>Sub KPI Type</th>
+                <th>Higher/Lower</th>
+                <th style="color:#94a3b8;">Warning (Abs)</th>
+                <th style="color:#94a3b8;">Breach (Abs)</th>
+                <th>Delta</th>
+                <th>Δ Warning</th>
+                <th>Δ Breach</th>
+                <th>RAG Logic</th>
+              </tr></thead>
+              <tbody>
+                <tr class="subtype-row"><td colspan="10">Explainability</td></tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>IV — Feature Level</strong></td>
+                  <td>Explainability</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                  <td><span class="pill pill-delta-only">Delta only</span></td>
+                  <td><input class="threshold-input readonly" value="0.10" readonly></td>
+                  <td><input class="threshold-input readonly" value="0.20" readonly></td>
+                  <td class="rag-rule"><span class="rag-r"></span>Δ≥0.20 &nbsp;<span class="rag-a"></span>Δ≥0.10</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>Feature Importance — Feature Level</strong></td>
+                  <td>Explainability</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                  <td><span class="pill pill-delta-only">Delta only</span></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly></td>
+                  <td class="rag-rule"><span class="no-thresh-label">No threshold — raw value only</span></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="metric-checkbox" checked></td>
+                  <td><strong>SHAP — Feature Level</strong></td>
+                  <td>Explainability</td>
+                  <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                  <td><span class="pill pill-delta-only">Delta only</span></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly></td>
+                  <td class="rag-rule"><span class="no-thresh-label">No threshold — raw value only</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (WF3-DTL-001 to 012, WF3-THR-001 to 008, WF3-NTH-001 to 005):</strong>
+    Only ✓ metrics for this family are shown — no inapplicable rows displayed (WF3-DTL-002).
+    Concept Drift metrics show "Not applicable" for absolute fields and delta fields only (WF3-DTL-005, WF3-THR-002).
+    Feature Importance and SHAP show "Not set" in amber — computed without RAG status (WF3-NTH-005).
+    PDO thresholds: Warning=0.20, Breach=0.25 (confirmed values).
+    Note: KS is not shown for CR_Continuous_Account level_Cross sectional — this screen shows the Classification family only.
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SCREEN 4: NEW KPI PACK                                            -->
+<!-- ================================================================ -->
+<div id="new-pack" class="screen">
+  <span class="screen-label">Screen 4 — New KPI Pack (Clone & Configure)</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right">
+        <div class="role-pill">👤 ADMIN</div>
+        <div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div>
+        <button class="icon-btn">⏻</button>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Admin Console</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Manage Model Inventory</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">⚙️</div><div class="tile-text"><div class="tile-title">KPI Configuration</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">Model Data Ingestion</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔐</div><div class="tile-text"><div class="tile-title">Access Control</div></div><span class="tile-badge">3</span></div>
+        <div class="tile-nav-item"><div class="tile-icon">⏰</div><div class="tile-text"><div class="tile-title">Set-up Scheduler</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🛡️</div><div class="tile-text"><div class="tile-title">Governance</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🗄️</div><div class="tile-text"><div class="tile-title">Data Center</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb">
+          <a onclick="showScreen('family-list', null)">KPI Configuration</a> &nbsp;›&nbsp;
+          <a onclick="showScreen('pack-list', null)">CR_Classification_Account level_Cross sectional</a> &nbsp;›&nbsp;
+          New KPI Pack
+        </div>
+        <h2 class="page-title">New KPI Pack</h2>
+        <p class="page-subtitle">Clone an existing pack within this family, customise metrics and thresholds, then assign to specific Model IDs.</p>
+
+        <div class="steps">
+          <div class="step active"><div class="step-num">1</div><br>Select Base &amp; Name</div>
+          <div class="step"><div class="step-num">2</div><br>Configure Metrics</div>
+          <div class="step"><div class="step-num">3</div><br>Assign to Models</div>
+          <div class="step"><div class="step-num">4</div><br>Review &amp; Save</div>
+        </div>
+
+        <div class="info-banner">ℹ️ New KPI Packs are scoped to a single Model Family. Only metrics applicable to <strong>Credit Risk_Classification_Account level_Cross sectional</strong> will be available for configuration.</div>
+
+        <div class="form-section">
+          <div class="form-section-title">Step 1 — Select Base Pack &amp; Name Your Pack</div>
+          <div class="form-grid">
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>Base KPI Pack to Clone <span class="req">*</span></label>
+              <select>
+                <option>-- Select base pack --</option>
+                <option selected>Credit Risk_Classification_Account level_Cross sectional (System Default — 20 models)</option>
+                <option>Credit Risk_Classification_Account level_Cross sectional_HighRisk (Admin Custom — 4 models)</option>
+              </select>
+              <div class="help">Only packs within this Model Family are available as a base.</div>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>New Pack Name <span class="req">*</span></label>
+              <input type="text" placeholder="e.g., Credit Risk_Classification_Account level_Cross sectional_Tier1" value="Credit Risk_Classification_Account level_Cross sectional_HighRisk">
+              <div class="help">Must be unique across all packs. Max 100 characters.</div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+            <div style="background:#eff6ff;border:1px dashed #93c5fd;border-radius:6px;padding:10px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:#1e3a8a;">4</div>
+              <div style="font-size:11px;color:#64748b;">Data Drift metrics</div>
+            </div>
+            <div style="background:#fef9ee;border:1px dashed #fcd34d;border-radius:6px;padding:10px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:#854d0e;">21</div>
+              <div style="font-size:11px;color:#64748b;">Performance Drift metrics</div>
+            </div>
+            <div style="background:#f0fdf4;border:1px dashed #86efac;border-radius:6px;padding:10px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:#166534;">3</div>
+              <div style="font-size:11px;color:#64748b;">Concept Drift metrics (delta only)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn" onclick="showScreen('pack-list', null)">Cancel</button>
+          <button class="btn-primary btn">Next: Configure Metrics →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (WF3-NEW-001 to 007):</strong> Base pack selection is scoped to the current Model Family only (WF3-NEW-001). Metric count preview shows the breakdown by KPI Type — Concept Drift is labelled "delta only" to set expectation. Step 2 (not shown separately) presents the same metric table as Screen 3 in edit mode. Step 3 opens the model selector. Step 4 is the review before Save as Draft or Publish.
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SCREEN 5: MODEL-LEVEL OVERRIDE                                    -->
+<!-- ================================================================ -->
+<div id="model-override" class="screen">
+  <span class="screen-label">Screen 5 — Model-Level KPI Override</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right">
+        <div class="role-pill">👤 ADMIN</div>
+        <div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div>
+        <button class="icon-btn">⏻</button>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">Admin Console</div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Manage Model Inventory</div></div></div>
+        <div class="tile-nav-item active"><div class="tile-icon">⚙️</div><div class="tile-text"><div class="tile-title">KPI Configuration</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📥</div><div class="tile-text"><div class="tile-title">Model Data Ingestion</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔐</div><div class="tile-text"><div class="tile-title">Access Control</div></div><span class="tile-badge">3</span></div>
+        <div class="tile-nav-item"><div class="tile-icon">⏰</div><div class="tile-text"><div class="tile-title">Set-up Scheduler</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🛡️</div><div class="tile-text"><div class="tile-title">Governance</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🗄️</div><div class="tile-text"><div class="tile-title">Data Center</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb">
+          <a onclick="showScreen('family-list', null)">KPI Configuration</a> &nbsp;›&nbsp;
+          <a onclick="showScreen('pack-list', null)">CR_Classification_Account level_Cross sectional</a> &nbsp;›&nbsp;
+          <a onclick="showScreen('pack-detail', null)">Pack Detail</a> &nbsp;›&nbsp;
+          Override for Specific Models
+        </div>
+        <h2 class="page-title">Model-Level KPI Override</h2>
+        <p class="page-subtitle">Changes apply only to selected models. The family default pack is unchanged for all other models.</p>
+
+        <div class="warn-banner">⚠️ Changes here apply <strong>only to the selected models</strong>. The pack <em>Credit Risk_Classification_Account level_Cross sectional</em> remains unchanged for the remaining 18 models.</div>
+
+        <!-- Step 1: Model selector -->
+        <div class="form-section">
+          <div class="form-section-title">Step 1 — Select Models to Override</div>
+          <div class="toolbar" style="margin-bottom:10px;padding:8px 10px;">
+            <div class="toolbar-left">
+              <div class="search-box"><input type="text" placeholder="Search Model ID or Name..."></div>
+              <div class="filter-chip active">🏷️ Override Status: All ▾</div>
+            </div>
+            <div class="toolbar-right"><span style="font-size:12px;color:#64748b;">2 of 20 selected</span></div>
+          </div>
+          <div class="model-table-wrap">
+            <div class="model-table-header">
+              <span>Models using this pack (20 total)</span>
+              <span style="font-size:12px;color:#64748b;font-weight:400;">Tick to select for override</span>
+            </div>
+            <table class="model-table">
+              <thead><tr>
+                <th style="width:36px;"><input type="checkbox"></th>
+                <th>Model ID</th>
+                <th>Model Name</th>
+                <th>Geography</th>
+                <th>KPI Pack ID (model-level)</th>
+                <th>Override Status</th>
+              </tr></thead>
+              <tbody>
+                <tr class="selected-row">
+                  <td><input type="checkbox" checked></td>
+                  <td><strong>MDL-001</strong></td>
+                  <td>Credit Risk PD v2.3</td>
+                  <td>NA</td>
+                  <td style="font-family:monospace;font-size:10px;">...Cross sectional_MDL-001</td>
+                  <td><span class="pill pill-pending" style="font-size:10px;">No Override</span></td>
+                </tr>
+                <tr class="selected-row">
+                  <td><input type="checkbox" checked></td>
+                  <td><strong>MDL-004</strong></td>
+                  <td>Cards Fraud Score</td>
+                  <td>NA</td>
+                  <td style="font-family:monospace;font-size:10px;">...Cross sectional_MDL-004</td>
+                  <td><span class="pill pill-pending" style="font-size:10px;">No Override</span></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><strong>MDL-002</strong></td>
+                  <td>Mortgage LGD Model</td>
+                  <td>EMEA</td>
+                  <td style="font-family:monospace;font-size:10px;">...Cross sectional_MDL-002</td>
+                  <td><span class="pill pill-override" style="font-size:10px;">Override Active</span></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><strong>MDL-007</strong></td>
+                  <td>Cards Approval Score</td>
+                  <td>NA</td>
+                  <td style="font-family:monospace;font-size:10px;">...Cross sectional_MDL-007</td>
+                  <td><span class="pill pill-pending" style="font-size:10px;">No Override</span></td>
+                </tr>
+                <tr>
+                  <td colspan="6" style="text-align:center;color:#94a3b8;padding:10px;font-size:11px;">… 16 more models …</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 2: Edit metrics — abbreviated, showing KS modification and Concept Drift delta-only -->
+        <div class="form-section">
+          <div class="form-section-title">Step 2 — Edit Configuration for MDL-001 &amp; MDL-004 (edit mode)</div>
+          <div class="info-banner" style="margin-bottom:12px;">ℹ️ Pre-loaded with family default configuration. Only ✓ metrics for this family are shown. Edit only the rows you wish to change.</div>
+
+          <div class="kpi-section">
+            <div class="kpi-section-header kpi-perf-drift">📈 Performance Drift — Discrimination (edit mode)</div>
+            <div class="table-scroll"><div class="metric-table-wrap">
+              <table class="metric-table">
+                <thead><tr>
+                  <th style="width:28px;">✓</th>
+                  <th style="min-width:180px;">Metric</th>
+                  <th>Higher/Lower</th>
+                  <th>Warning ⚠️</th>
+                  <th>Breach 🔴</th>
+                  <th>Delta</th>
+                  <th>Δ Warning</th>
+                  <th>Δ Breach</th>
+                  <th></th>
+                </tr></thead>
+                <tbody>
+                  <tr style="background:#fffbeb;">
+                    <td><input type="checkbox" class="metric-checkbox" checked></td>
+                    <td><strong>KS</strong> <span style="font-size:10px;color:#f59e0b;">✏️ Modified</span></td>
+                    <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                    <td><input class="threshold-input" value="0.40" style="border-color:#f59e0b;border-style:solid;"></td>
+                    <td><input class="threshold-input" value="0.35" style="border-color:#f59e0b;border-style:solid;"></td>
+                    <td><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                    <td><input class="threshold-input" value="0.15"></td>
+                    <td><input class="threshold-input" value="0.20"></td>
+                    <td><button class="btn" style="font-size:10px;padding:3px 7px;color:#64748b;">↺ Reset</button></td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" class="metric-checkbox" checked></td>
+                    <td><strong>AUC</strong></td>
+                    <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                    <td><input class="threshold-input" value="0.70"></td>
+                    <td><input class="threshold-input" value="0.65"></td>
+                    <td><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                    <td><input class="threshold-input" value="0.05"></td>
+                    <td><input class="threshold-input" value="0.10"></td>
+                    <td><button class="btn" style="font-size:10px;padding:3px 7px;color:#64748b;">↺ Reset</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div></div>
+          </div>
+
+          <div class="kpi-section" style="margin-top:10px;">
+            <div class="kpi-section-header kpi-concept-drift">🧠 Concept Drift — delta thresholds only (edit mode)</div>
+            <div class="table-scroll"><div class="metric-table-wrap">
+              <table class="metric-table">
+                <thead><tr>
+                  <th style="width:28px;">✓</th>
+                  <th style="min-width:200px;">Metric</th>
+                  <th>Higher/Lower</th>
+                  <th style="color:#94a3b8;">Warning (Abs)</th>
+                  <th style="color:#94a3b8;">Breach (Abs)</th>
+                  <th>Delta</th>
+                  <th>Δ Warning</th>
+                  <th>Δ Breach</th>
+                  <th></th>
+                </tr></thead>
+                <tbody>
+                  <tr>
+                    <td><input type="checkbox" class="metric-checkbox" checked></td>
+                    <td><strong>IV — Feature Level</strong></td>
+                    <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                    <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                    <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                    <td><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                    <td><input class="threshold-input" value="0.10"></td>
+                    <td><input class="threshold-input" value="0.20"></td>
+                    <td><button class="btn" style="font-size:10px;padding:3px 7px;color:#64748b;">↺ Reset</button></td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" class="metric-checkbox" checked></td>
+                    <td><strong>SHAP — Feature Level</strong></td>
+                    <td><select class="dir-select"><option>Higher ▾</option></select></td>
+                    <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                    <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                    <td><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                    <td><input class="threshold-input not-set" value="Not set" readonly></td>
+                    <td><input class="threshold-input not-set" value="Not set" readonly></td>
+                    <td><button class="btn" style="font-size:10px;padding:3px 7px;color:#64748b;">↺ Reset</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn" onclick="showScreen('pack-detail', null)">← Back</button>
+          <button class="btn-warn btn">💾 Save as Draft</button>
+          <button class="btn-primary btn" onclick="showScreen('publish-confirm', null)">🚀 Publish Override</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (WF3-OVR-001 to 007, WF3-THR-002, WF3-NTH-003):</strong> Only metrics applicable to this family shown — no inapplicable rows. Concept Drift metrics show "Not applicable" for absolute fields in edit mode (WF3-THR-002). "Override Active" badge on MDL-002. Modified rows highlighted amber with Reset button. Family default unchanged for other 18 models (WF3-OVR-005).
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SCREEN 6: PUBLISH CONFIRMATION MODAL                              -->
+<!-- ================================================================ -->
+<div id="publish-confirm" class="screen">
+  <span class="screen-label">Screen 6 — Publish Confirmation Modal</span>
+  <div class="app-shell" style="filter:blur(2px);pointer-events:none;max-height:380px;overflow:hidden;">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right"><div class="role-pill">👤 ADMIN</div><div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav" style="padding:14px;"></div>
+      <div class="main-content"><h2 class="page-title">Model-Level KPI Override</h2><div style="height:200px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;margin-top:14px;"></div></div>
+    </div>
+  </div>
+  <div class="modal-overlay">
+    <div class="modal-box">
+      <h3>🚀 Confirm Publish — KPI Override</h3>
+      <p>Publishing a model-level override for <strong>MDL-001</strong> (Credit Risk PD v2.3) and <strong>MDL-004</strong> (Cards Fraud Score). Changes take effect on the next agent run for these models.</p>
+      <div class="changes-list">
+        <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Changes Summary</div>
+        <div class="change-item"><span style="color:#f59e0b;font-weight:700;">↔</span><span><strong>KS</strong> — Warning: 0.35 → <strong>0.40</strong> &nbsp;|&nbsp; Breach: 0.30 → <strong>0.35</strong></span></div>
+        <div class="change-item"><span style="color:#f59e0b;font-weight:700;">↔</span><span><strong>KS Delta</strong> — Δ Warning: 0.20 → <strong>0.15</strong> &nbsp;|&nbsp; Δ Breach: 0.25 → <strong>0.20</strong></span></div>
+      </div>
+      <div class="warn-banner" style="margin-bottom:0;">
+        ⚠️ <strong>Affected models:</strong> MDL-001, MDL-004<br>
+        <strong>Family default pack:</strong> Unchanged for remaining 18 models<br>
+        <strong>Audit log:</strong> Logged with Admin ID, timestamp, and before/after values (WF3-AUD-001)
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="showScreen('model-override', null)">← Back</button>
+        <button class="btn-warn btn">💾 Save as Draft instead</button>
+        <button class="btn-primary btn" onclick="showScreen('pack-detail', null)">✓ Confirm Publish</button>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>📝 Note (WF3-DTL-009, WF3-OVR-007, WF3-AUD-001):</strong> Confirmation modal shows structured diff (field by field, old → new), lists affected models, and confirms family default is unchanged. Three actions: Back, Save as Draft, Confirm Publish (writes to audit log within same transaction).
+  </div>
+</div>
+
+<script>
+  function showScreen(id, btn) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const t = document.getElementById(id);
+    if (t) t.classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      const map = { 'family-list':0,'pack-list':1,'pack-detail':2,'new-pack':3,'model-override':4,'publish-confirm':5 };
+      const btns = document.querySelectorAll('.nav-btn');
+      if (map[id] !== undefined) btns[map[id]].classList.add('active');
+    }
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+</script>
+</body>
+</html>

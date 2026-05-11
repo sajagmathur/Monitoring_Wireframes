@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WF7 — Admin: Governance</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#eef1f5;color:#1e293b;line-height:1.5}
+/* Nav */
+.nav-bar{background:#1f2937;color:#fff;padding:9px 14px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;position:sticky;top:0;z-index:1000;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.nav-bar h1{font-size:11px;font-weight:700;margin-right:6px;white-space:nowrap}
+.nb{background:#374151;color:#fff;border:1px solid #4b5563;padding:3px 8px;cursor:pointer;font-size:10px;border-radius:3px;white-space:nowrap}
+.nb:hover{background:#4b5563}.nb.on{background:#2563eb;border-color:#2563eb}
+/* Screen */
+.screen{display:none;min-height:calc(100vh - 44px);padding:12px}
+.screen.on{display:block}
+.slabel{background:#fbbf24;color:#78350f;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+/* Shell */
+.shell{display:flex;flex-direction:column;min-height:calc(100vh - 80px);background:#fff;border:2px dashed #94a3b8;border-radius:8px;overflow:hidden;max-width:1500px;margin:0 auto}
+/* App header */
+.aph{background:#1e3a8a;color:#fff;padding:9px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:7px}
+.apb{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13px}
+.apl{width:26px;height:26px;background:#fff;color:#1e3a8a;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.aphr{display:flex;align-items:center;gap:12px;font-size:12px}
+.rp{background:#fbbf24;color:#78350f;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.nw{position:relative;cursor:pointer}
+.nb2{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:8px;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.up{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);padding:3px 9px;border-radius:20px}
+.ua{width:20px;height:20px;background:#fbbf24;color:#78350f;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+/* Layout */
+.ab{display:flex;flex:1}
+.ln{width:215px;background:#f8fafc;border-right:1px solid #e2e8f0;padding:14px 9px;flex-shrink:0}
+.lnt{font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;letter-spacing:.5px;margin-bottom:9px;padding:0 5px}
+.tni{display:flex;align-items:center;gap:9px;padding:9px;border:1px dashed #cbd5e1;border-radius:5px;margin-bottom:5px;cursor:pointer;background:#fff;position:relative}
+.tni:hover{border-color:#2563eb;border-style:solid;background:#eff6ff}
+.tni.on{background:#dbeafe;border-color:#2563eb;border-style:solid}
+.tio{width:26px;height:26px;background:#dbeafe;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.tit{flex:1;min-width:0}.tit-t{font-size:11px;font-weight:600;color:#1e293b}.tit-s{font-size:9px;color:#64748b}
+.mc{flex:1;padding:18px;background:#f1f5f9;overflow-y:auto}
+/* Breadcrumb */
+.bc{font-size:10px;color:#64748b;margin-bottom:7px}
+.bc a{color:#2563eb;cursor:pointer;text-decoration:none}
+.pgt{font-size:19px;color:#1e293b;margin-bottom:3px}
+.pgs{font-size:11px;color:#64748b;margin-bottom:14px}
+/* KPI */
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-bottom:14px}
+.kc{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;padding:12px}
+.kl{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kv{font-size:24px;font-weight:700;color:#1e293b}.ks{font-size:10px;color:#64748b;margin-top:2px}
+.kc.w .kv{color:#d97706}.kc.d .kv{color:#dc2626}.kc.p .kv{color:#2563eb}.kc.s .kv{color:#16a34a}
+/* Sub-section tiles (homepage) */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:14px}
+.sc{background:#fff;border:1px dashed #cbd5e1;border-radius:8px;overflow:hidden;cursor:pointer;position:relative}
+.sc:hover{border-color:#2563eb;border-style:solid;box-shadow:0 3px 10px rgba(37,99,235,.12)}
+.sch{padding:14px 15px 10px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px dashed #e2e8f0}
+.sct{font-size:14px;font-weight:700;color:#1e293b}.scs{font-size:11px;color:#64748b;margin-top:2px}
+.sc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.scbody{padding:10px 15px;font-size:11px;color:#475569;line-height:1.5}
+.sc-kpi{padding:8px 15px;background:#f8fafc;display:flex;justify-content:space-between;align-items:center;font-size:11px;border-top:1px dashed #e2e8f0}
+.sc-kpi-val{font-weight:700;color:#1e3a8a;font-size:14px}
+.sca{display:block;padding:8px 15px;background:#eff6ff;color:#2563eb;font-size:11px;font-weight:600;text-align:center;border-top:1px dashed #e2e8f0}
+/* Toolbar */
+.tb{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;padding:9px 11px;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.tbl{display:flex;gap:7px;flex-wrap:wrap;align-items:center;flex:1}
+.tbr{display:flex;gap:7px}
+.sb3{position:relative;flex:1;min-width:160px;max-width:260px}
+.sb3 input{width:100%;padding:5px 9px 5px 24px;border:1px dashed #94a3b8;border-radius:4px;font-size:11px}
+.sb3::before{content:'🔍';position:absolute;left:6px;top:4px;font-size:10px;opacity:.6}
+.fc{background:#fff;border:1px dashed #94a3b8;padding:4px 8px;border-radius:4px;font-size:10px;cursor:pointer}
+.fc select{border:none;background:transparent;font-size:10px;cursor:pointer;outline:none}
+/* Buttons */
+.btn{background:#fff;border:1px solid #cbd5e1;padding:5px 11px;border-radius:4px;cursor:pointer;font-size:11px;color:#1e293b;display:inline-flex;align-items:center;gap:4px}
+.btn:hover{background:#f1f5f9}
+.btn-p{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:600}.btn-p:hover{background:#1e3a8a}
+.btn-sm{padding:3px 8px;font-size:10px}
+/* Table */
+.dtw{background:#fff;border:1px dashed #cbd5e1;border-radius:7px;overflow:auto;margin-bottom:10px}
+.dt{width:100%;border-collapse:collapse;font-size:11px;min-width:700px}
+.dt th{background:#f8fafc;padding:8px 7px;text-align:left;font-weight:600;color:#475569;border-bottom:1px solid #e2e8f0;font-size:9px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.dt td{padding:8px 7px;border-bottom:1px dashed #e2e8f0;vertical-align:middle}
+.dt tbody tr:hover{background:#f8fafc;cursor:pointer}
+.dt tbody tr.fail-row{background:#fef2f2}
+.dt tbody tr.fail-row:hover{background:#fee2e2}
+/* Badges */
+.badge{display:inline-block;padding:2px 7px;border-radius:9px;font-size:9px;font-weight:700;white-space:nowrap}
+.b-green{background:#dcfce7;color:#166534}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-amber{background:#fef3c7;color:#92400e}
+.b-grey{background:#f1f5f9;color:#475569}
+.b-blue{background:#dbeafe;color:#1e3a8a}
+.b-purple{background:#ede9fe;color:#5b21b6}
+/* Expand row */
+.exp-row{display:none;background:#f8fafc}
+.exp-row.on{display:table-row}
+.exp-cell{padding:10px 14px;font-size:11px;color:#374151;border-bottom:1px dashed #e2e8f0}
+.json-box{background:#1e293b;color:#86efac;padding:10px;border-radius:5px;font-size:10px;font-family:monospace;margin-top:6px;white-space:pre-wrap;max-height:120px;overflow-y:auto}
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.chip{background:#dbeafe;color:#1e3a8a;padding:3px 9px;border-radius:12px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:4px}
+.chip span{cursor:pointer;opacity:.6}.chip span:hover{opacity:1}
+/* Report tiles */
+.rpt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:14px}
+.rpt-tile{background:#fff;border:1px dashed #cbd5e1;border-radius:8px;padding:14px;cursor:pointer}
+.rpt-tile:hover{border-color:#2563eb;border-style:solid}
+.rpt-icon{font-size:22px;margin-bottom:6px}
+.rpt-name{font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px}
+.rpt-desc{font-size:10px;color:#64748b;line-height:1.4;margin-bottom:8px}
+.rpt-formats{display:flex;gap:4px}
+.rpt-fmt{font-size:9px;background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#374151}
+/* Drawer */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1500}
+.drawer-overlay.on{display:block}
+.drawer{position:fixed;right:0;top:0;height:100vh;width:380px;background:#fff;box-shadow:-4px 0 20px rgba(0,0,0,.15);z-index:1501;padding:20px;overflow-y:auto;transform:translateX(100%);transition:transform .2s}
+.drawer.on{transform:translateX(0)}
+.drawer-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.drawer-sub{font-size:11px;color:#64748b;margin-bottom:14px}
+.form-group{margin-bottom:10px}
+.form-label{font-size:11px;font-weight:600;color:#374151;margin-bottom:3px;display:block}
+.form-control{width:100%;border:1px solid #e2e8f0;border-radius:4px;padding:6px 10px;font-size:11px}
+/* Annotation */
+.ann{background:#fef3c7;border:1px solid #fbbf24;border-radius:4px;padding:3px 7px;font-size:9px;color:#78350f;display:inline-block;margin-left:6px}
+</style>
+</head>
+<body>
+
+<!-- NAV BAR -->
+<div class="nav-bar">
+  <h1>🛡️ WF7 — Admin: Governance</h1>
+  <button class="nb on" onclick="show('s1')">S1: Homepage</button>
+  <button class="nb" onclick="show('s2')">S2: Audit Log</button>
+  <button class="nb" onclick="show('s3')">S3: Request History</button>
+  <button class="nb" onclick="show('s4')">S4: Data Log</button>
+  <button class="nb" onclick="show('s5')">S5: Reports</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S1: GOVERNANCE HOMEPAGE -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen on" id="s1">
+  <div class="slabel">Screen 1 — Governance Homepage</div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr">
+        <span class="rp">Admin</span>
+        <div class="nw">🔔<div class="nb2">3</div></div>
+        <div class="up"><div class="ua">AD</div> Admin User ▾</div>
+      </div>
+    </div>
+    <div class="ab">
+      <!-- Left Nav -->
+      <div class="ln">
+        <div class="lnt">Admin Menu</div>
+        <div class="tni"><div class="tio">📋</div><div class="tit"><div class="tit-t">Model Inventory</div></div></div>
+        <div class="tni"><div class="tio">⚙️</div><div class="tit"><div class="tit-t">KPI Config</div></div></div>
+        <div class="tni"><div class="tio">📥</div><div class="tit"><div class="tit-t">Data Ingestion</div></div></div>
+        <div class="tni"><div class="tio">🔐</div><div class="tit"><div class="tit-t">Access Control</div></div></div>
+        <div class="tni"><div class="tio">🕐</div><div class="tit"><div class="tit-t">Scheduler</div></div></div>
+        <div class="tni on"><div class="tio">🛡️</div><div class="tit"><div class="tit-t">Governance</div></div></div>
+        <div class="tni"><div class="tio">🗄️</div><div class="tit"><div class="tit-t">Data Center</div></div></div>
+      </div>
+      <!-- Main Content -->
+      <div class="mc">
+        <div class="bc"><a>Home</a> › Governance</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+          <div>
+            <div class="pgt">Governance</div>
+            <div class="pgs">Centralised oversight, audit, and compliance hub — all sections are read-only</div>
+          </div>
+          <button class="btn btn-sm">🔄 Refresh</button>
+        </div>
+
+        <!-- KPI row -->
+        <div class="kg">
+          <div class="kc s"><div class="kl">Events Today</div><div class="kv">1,284</div><div class="ks">Across all workflows</div></div>
+          <div class="kc p"><div class="kl">Open Requests</div><div class="kv">7</div><div class="ks">Pending action</div></div>
+          <div class="kc"><div class="kl">Datasets Created</div><div class="kv">142</div><div class="ks">All time</div></div>
+          <div class="kc w"><div class="kl">Reports Generated</div><div class="kv">38</div><div class="ks">This month</div></div>
+        </div>
+
+        <!-- Sub-section tiles -->
+        <div class="sg">
+          <!-- Audit Log -->
+          <div class="sc" onclick="show('s2')">
+            <div class="sch">
+              <div><div class="sct">Audit Log</div><div class="scs">Immutable log of all platform events</div></div>
+              <div class="sc-icon" style="background:#dbeafe">📜</div>
+            </div>
+            <div class="scbody">Tamper-evident record of every material platform event across all roles and workflows. Includes user actions, system events, model changes, and data operations. Read-only.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Events today</span><span class="sc-kpi-val">1,284</span></div>
+            <span class="sca">View Audit Log →</span>
+          </div>
+          <!-- Request History -->
+          <div class="sc" onclick="show('s3')">
+            <div class="sch">
+              <div><div class="sct">Request History</div><div class="scs">Data delete, approvals, model delete & archival</div></div>
+              <div class="sc-icon" style="background:#fef3c7">📨</div>
+            </div>
+            <div class="scbody">Consolidated read-only record of all data deletion requests, model deletion and archival approvals, and associated decision trail.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Open / pending</span><span class="sc-kpi-val">7</span></div>
+            <span class="sca">View Request History →</span>
+          </div>
+          <!-- Data Log -->
+          <div class="sc" onclick="show('s4')">
+            <div class="sch">
+              <div><div class="sct">Data Log</div><div class="scs">All datasets created for model use</div></div>
+              <div class="sc-icon" style="background:#dcfce7">🗂️</div>
+            </div>
+            <div class="scbody">Registry of all datasets created and ingested for model training, scoring, and monitoring. Includes dataset metadata, source, model association, and status.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Total datasets</span><span class="sc-kpi-val">142</span></div>
+            <span class="sca">View Data Log →</span>
+          </div>
+          <!-- Reports -->
+          <div class="sc" onclick="show('s5')">
+            <div class="sch">
+              <div><div class="sct">Reports</div><div class="scs">Review of all reports generated</div></div>
+              <div class="sc-icon" style="background:#f0fdf4">📊</div>
+            </div>
+            <div class="scbody">Complete history of all reports generated on the platform. View, filter, and re-download previously generated reports across all report types.</div>
+            <div class="sc-kpi"><span style="color:#64748b">Last generated</span><span class="sc-kpi-val">Today 09:14</span></div>
+            <span class="sca">View Reports →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S2: AUDIT LOG -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s2">
+  <div class="slabel">Screen 2 — Audit Log</div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni on"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div><div class="tit-s">All events</div></div></div>
+        <div class="tni" onclick="show('s3')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni" onclick="show('s4')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Data Log</div></div></div>
+        <div class="tni" onclick="show('s5')"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Audit Log</div>
+        <div class="pgt">Audit Log</div>
+        <div class="pgs">Immutable, tamper-evident record of all platform events — read-only to all roles</div>
+        <!-- Filter chips -->
+        <div class="chips">
+          <div class="chip">Date: Last 7 days <span onclick="this.parentElement.remove()">×</span></div>
+        </div>
+        <!-- Toolbar -->
+        <div class="tb">
+          <div class="tbl">
+            <div class="sb3"><input type="text" placeholder="Search actor, entity, event ID…"></div>
+            <div class="fc"><select><option>All Event Types</option><option>User Provisioned</option><option>Model Access Granted</option><option>Model Access Revoked</option><option>Data Deleted</option><option>Data Ingested</option><option>Model Registered</option><option>Model Archived</option><option>Model Deleted</option><option>Account Deactivated</option><option>Schedule Created</option><option>Report Generated</option><option>Dataset Created</option><option>Config Changed</option></select></div>
+            <div class="fc"><select><option>All Roles</option><option>Admin</option><option>User</option><option>External</option><option>System</option></select></div>
+            <div class="fc"><select><option>All Outcomes</option><option>Success</option><option>Failure</option></select></div>
+            <input type="date" class="fc" style="font-size:10px"> <span style="font-size:10px;color:#64748b">to</span> <input type="date" class="fc" style="font-size:10px">
+          </div>
+          <div class="tbr">
+            <button class="btn btn-sm">⬇ CSV</button>
+            <button class="btn btn-sm">⬇ PDF</button>
+          </div>
+        </div>
+        <!-- Table -->
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr>
+                <th style="width:28px"></th>
+                <th>Event ID</th><th>Timestamp ↓</th><th>Actor</th><th>Role</th>
+                <th>Event Type</th><th>Target Entity</th><th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="toggleExp('exp1')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009821</td>
+                <td>2026-05-11 14:32 IST</td>
+                <td>Sarah Chen</td><td><span class="badge b-blue">Admin</span></td>
+                <td>User Provisioned</td>
+                <td>User: Raj Mehta (USR-0291)</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp1"><td colspan="8" class="exp-cell">
+                <strong>IP:</strong> 10.44.12.31 &nbsp; <strong>Session:</strong> SES-48270<br>
+                <strong>Before State:</strong><div class="json-box">null</div>
+                <strong>After State:</strong><div class="json-box">{ "userID": "USR-0291", "name": "Raj Mehta", "role": "Platform User", "status": "Active", "createdAt": "2026-05-11T09:02:00Z" }</div>
+              </td></tr>
+              <tr onclick="toggleExp('exp2')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009820</td>
+                <td>2026-05-11 14:28 IST</td>
+                <td>James Park</td><td><span class="badge b-blue">Admin</span></td>
+                <td>Model Access Granted</td>
+                <td>Model: CR_CLF_001 (Priya Nair)</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp2"><td colspan="8" class="exp-cell">
+                <strong>IP:</strong> 10.44.12.55 &nbsp; <strong>Session:</strong> SES-48268<br>
+                <strong>Before State:</strong><div class="json-box">{ "modelID": "CR_CLF_001", "assignedUsers": ["USR-0188"] }</div>
+                <strong>After State:</strong><div class="json-box">{ "modelID": "CR_CLF_001", "assignedUsers": ["USR-0188", "USR-0291"] }</div>
+              </td></tr>
+              <tr onclick="toggleExp('exp3')" class="fail-row">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009819</td>
+                <td>2026-05-11 13:55 IST</td>
+                <td>System</td><td><span class="badge b-grey">System</span></td>
+                <td>Data Ingestion Failed</td>
+                <td>Model: MKT_REG_004</td>
+                <td><span class="badge b-red">Failure</span></td>
+              </tr>
+              <tr class="exp-row" id="exp3"><td colspan="8" class="exp-cell">
+                <strong>Failure Reason:</strong> Source data unavailable — ingestion job did not complete within the scheduled window.<br>
+                <strong>Session:</strong> SCHED-7741
+              </td></tr>
+              <tr onclick="toggleExp('exp4')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009818</td>
+                <td>2026-05-11 11:10 IST</td>
+                <td>Sarah Chen</td><td><span class="badge b-blue">Admin</span></td>
+                <td>Account Deactivated</td>
+                <td>User: [MASKED] (USR-0177)</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp4"><td colspan="8" class="exp-cell">
+                <strong>Note:</strong> Recipient details masked per privacy policy (sensitive event type: Account Deactivated).
+              </td></tr>
+              <tr onclick="toggleExp('exp5')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009817</td>
+                <td>2026-05-11 09:45 IST</td>
+                <td>System</td><td><span class="badge b-grey">System</span></td>
+                <td>Model Registered</td>
+                <td>Model: FRD_CLF_012</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp5"><td colspan="8" class="exp-cell">
+                <strong>Before State:</strong><div class="json-box">null</div>
+                <strong>After State:</strong><div class="json-box">{ "modelID": "FRD_CLF_012", "modelName": "Fraud Classifier v3", "domain": "Fraud", "status": "Active", "registeredBy": "ADM-003", "registeredAt": "2026-05-11T04:15:00Z" }</div>
+              </td></tr>
+              <tr onclick="toggleExp('exp6')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009816</td>
+                <td>2026-05-11 08:20 IST</td>
+                <td>Sarah Chen</td><td><span class="badge b-blue">Admin</span></td>
+                <td>Model Archived</td>
+                <td>Model: CR_CLF_001_v1</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp6"><td colspan="8" class="exp-cell">
+                <strong>Before State:</strong><div class="json-box">{ "modelID": "CR_CLF_001_v1", "status": "Deprecated" }</div>
+                <strong>After State:</strong><div class="json-box">{ "modelID": "CR_CLF_001_v1", "status": "Archived", "archivedAt": "2026-05-11T02:50:00Z", "archivedBy": "ADM-001" }</div>
+              </td></tr>
+              <tr onclick="toggleExp('exp7')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009815</td>
+                <td>2026-05-10 16:05 IST</td>
+                <td>James Park</td><td><span class="badge b-blue">Admin</span></td>
+                <td>Dataset Created</td>
+                <td>Dataset: DS-0142 (FRD_CLF_012)</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp7"><td colspan="8" class="exp-cell">
+                <strong>After State:</strong><div class="json-box">{ "datasetID": "DS-0142", "modelID": "FRD_CLF_012", "type": "Training", "records": 120000, "createdAt": "2026-05-10T10:35:00Z" }</div>
+              </td></tr>
+              <tr onclick="toggleExp('exp8')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">EVT-009814</td>
+                <td>2026-05-10 11:30 IST</td>
+                <td>Sarah Chen</td><td><span class="badge b-blue">Admin</span></td>
+                <td>Report Generated</td>
+                <td>Report: Full Audit Trail Export</td>
+                <td><span class="badge b-green">Success</span></td>
+              </tr>
+              <tr class="exp-row" id="exp8"><td colspan="8" class="exp-cell">
+                Parameters: Date Range 2026-04-01 to 2026-04-30. Output: audit_trail_apr2026.pdf. Deposited to repository.
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b">
+          <span>Showing 1–8 of 1,284 entries &nbsp;|&nbsp; Page size: <select style="font-size:10px;border:1px solid #e2e8f0;border-radius:3px"><option>25</option><option selected>50</option><option>100</option></select></span>
+          <div style="display:flex;gap:5px"><button class="btn btn-sm">‹ Prev</button><button class="btn btn-sm btn-p">Next ›</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S3: REQUEST HISTORY -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s3">
+  <div class="slabel">Screen 3 — Request History</div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div></div></div>
+        <div class="tni on"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni" onclick="show('s4')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Data Log</div></div></div>
+        <div class="tni" onclick="show('s5')"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Request History</div>
+        <div class="pgt">Request History</div>
+        <div class="pgs">Read-only record of all data deletion requests, model deletion and archival requests, and their approval decisions</div>
+        <div class="tb">
+          <div class="tbl">
+            <div class="sb3"><input type="text" placeholder="Search requester, target, model…"></div>
+            <div class="fc"><select><option>All Categories</option><option>Data Deletion</option><option>Model Deletion</option><option>Model Archival</option></select></div>
+            <div class="fc"><select><option>All Statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option><option>Withdrawn</option></select></div>
+            <input type="date" class="fc" style="font-size:10px"> <span style="font-size:10px;color:#64748b">to</span> <input type="date" class="fc" style="font-size:10px">
+          </div>
+          <div class="tbr"><button class="btn btn-sm">⬇ CSV</button><button class="btn btn-sm">⬇ PDF</button></div>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr><th>Req ID</th><th>Category</th><th>Requester</th><th>Request Date</th><th>Target</th><th>Justification</th><th>Status</th><th>Decision By</th><th>Decision Date</th><th>Audit Event</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0824</td>
+                <td><span class="badge b-red">Data Deletion</span></td>
+                <td>Ali Hassan</td>
+                <td>2026-05-10</td>
+                <td>Scoring data — CR_CLF_001 (Jan–Mar 2026)</td>
+                <td style="font-size:10px;color:#64748b">Retention window elapsed; GDPR Art. 17</td>
+                <td><span class="badge b-amber">Pending</span></td>
+                <td>—</td><td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0823</td>
+                <td><span class="badge b-red">Data Deletion</span></td>
+                <td>Ali Hassan</td>
+                <td>2026-05-08</td>
+                <td>Scoring data — MKT_REG_004 (Apr 2026)</td>
+                <td style="font-size:10px;color:#64748b">User right-to-erasure request received</td>
+                <td><span class="badge b-amber">Pending</span></td>
+                <td>—</td><td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0822</td>
+                <td><span class="badge b-purple">Model Archival</span></td>
+                <td>James Park</td>
+                <td>2026-05-08</td>
+                <td>Model: CR_CLF_001_v1</td>
+                <td style="font-size:10px;color:#64748b">Superseded by CR_CLF_001_v2; no active use</td>
+                <td><span class="badge b-green">Approved</span></td>
+                <td>Sarah Chen</td><td>2026-05-11</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009816 ↗</a></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0821</td>
+                <td><span class="badge b-red">Data Deletion</span></td>
+                <td>Priya Nair</td>
+                <td>2026-05-05</td>
+                <td>Training data — FRD_CLF_009 (DS-0138)</td>
+                <td style="font-size:10px;color:#64748b">Model decommissioned; data no longer needed</td>
+                <td><span class="badge b-green">Approved</span></td>
+                <td>Sarah Chen</td><td>2026-05-07</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009806 ↗</a></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0820</td>
+                <td><span class="badge b-red" style="background:#fce7f3;color:#9d174d">Model Deletion</span></td>
+                <td>Sarah Chen</td>
+                <td>2026-04-30</td>
+                <td>Model: MKT_REG_001_arch</td>
+                <td style="font-size:10px;color:#64748b">Hard-delete eligible; 7-year retention met</td>
+                <td><span class="badge b-green">Approved</span></td>
+                <td>Sarah Chen (dual-auth)</td><td>2026-05-02</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009791 ↗</a></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0819</td>
+                <td><span class="badge b-purple">Model Archival</span></td>
+                <td>James Park</td>
+                <td>2026-04-22</td>
+                <td>Model: FRD_CLF_009</td>
+                <td style="font-size:10px;color:#64748b">End-of-life; replaced by FRD_CLF_012</td>
+                <td><span class="badge b-green">Approved</span></td>
+                <td>Sarah Chen</td><td>2026-04-24</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009750 ↗</a></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-size:10px">REQ-0818</td>
+                <td><span class="badge b-red">Data Deletion</span></td>
+                <td>Mei Lin</td>
+                <td>2026-04-15</td>
+                <td>Outcome data — CR_CLF_002 (Q4 2025)</td>
+                <td style="font-size:10px;color:#64748b">Regulatory directive; data past retention window</td>
+                <td><span class="badge b-red">Rejected</span></td>
+                <td>Sarah Chen</td><td>2026-04-17</td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">EVT-009720 ↗</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b">
+          <span>Showing 1–7 of 41 entries &nbsp;|&nbsp; Page size: <select style="font-size:10px;border:1px solid #e2e8f0;border-radius:3px"><option>25</option><option selected>50</option></select></span>
+          <div style="display:flex;gap:5px"><button class="btn btn-sm">‹ Prev</button><button class="btn btn-sm btn-p">Next ›</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S4: DATA LOG -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s4">
+  <div class="slabel">Screen 4 — Data Log</div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div></div></div>
+        <div class="tni" onclick="show('s3')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni on"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Data Log</div><div class="tit-s">All datasets created</div></div></div>
+        <div class="tni" onclick="show('s5')"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Data Log</div>
+        <div class="pgt">Data Log</div>
+        <div class="pgs">Registry of all datasets created for model training, scoring, and monitoring — read-only</div>
+        <div class="tb">
+          <div class="tbl">
+            <div class="sb3"><input type="text" placeholder="Search dataset ID, model, source…"></div>
+            <div class="fc"><select><option>All Types</option><option>Training</option><option>Scoring</option><option>Outcome</option><option>Monitoring</option></select></div>
+            <div class="fc"><select><option>All Models</option><option>CR_CLF_001</option><option>CR_CLF_002</option><option>FRD_CLF_012</option><option>MKT_REG_004</option></select></div>
+            <div class="fc"><select><option>All Statuses</option><option>Active</option><option>Archived</option><option>Deleted</option></select></div>
+            <input type="date" class="fc" style="font-size:10px"> <span style="font-size:10px;color:#64748b">to</span> <input type="date" class="fc" style="font-size:10px">
+          </div>
+          <div class="tbr"><button class="btn btn-sm">⬇ CSV</button></div>
+        </div>
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr>
+                <th style="width:28px"></th>
+                <th>Dataset ID</th><th>Model</th><th>Dataset Type</th><th>Source</th><th>Records</th><th>Created By</th><th>Created At</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="toggleExp('dexp1')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">DS-0142</td>
+                <td><a style="color:#2563eb;cursor:pointer">FRD_CLF_012</a></td>
+                <td><span class="badge b-blue">Training</span></td>
+                <td>Core Banking DB</td>
+                <td>120,000</td>
+                <td>James Park</td>
+                <td>2026-05-10</td>
+                <td><span class="badge b-green">Active</span></td>
+              </tr>
+              <tr class="exp-row" id="dexp1"><td colspan="9" class="exp-cell">
+                <strong>Schema:</strong> transaction_id, amount, merchant_category, fraud_flag, timestamp &nbsp;|&nbsp; <strong>Ingestion Job:</strong> RUN-44819 &nbsp;|&nbsp; <strong>Validation:</strong> 0 schema errors &nbsp;|&nbsp; <strong>Audit Event:</strong> <a style="color:#2563eb;cursor:pointer">EVT-009815 ↗</a>
+              </td></tr>
+              <tr onclick="toggleExp('dexp2')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">DS-0141</td>
+                <td><a style="color:#2563eb;cursor:pointer">CR_CLF_001</a></td>
+                <td><span class="badge b-amber">Scoring</span></td>
+                <td>Loan Origination System</td>
+                <td>48,210</td>
+                <td>System</td>
+                <td>2026-05-11</td>
+                <td><span class="badge b-green">Active</span></td>
+              </tr>
+              <tr class="exp-row" id="dexp2"><td colspan="9" class="exp-cell">
+                <strong>Schema:</strong> applicant_id, credit_score, income_band, loan_amount, outcome &nbsp;|&nbsp; <strong>Ingestion Job:</strong> RUN-44819 &nbsp;|&nbsp; <strong>Validation:</strong> 0 schema errors
+              </td></tr>
+              <tr onclick="toggleExp('dexp3')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">DS-0140</td>
+                <td><a style="color:#2563eb;cursor:pointer">MKT_REG_004</a></td>
+                <td><span class="badge b-grey">Outcome</span></td>
+                <td>CRM Export</td>
+                <td>31,800</td>
+                <td>System</td>
+                <td>2026-05-09</td>
+                <td><span class="badge b-green">Active</span></td>
+              </tr>
+              <tr class="exp-row" id="dexp3"><td colspan="9" class="exp-cell">
+                <strong>Schema:</strong> customer_id, campaign_id, response_flag, channel, date &nbsp;|&nbsp; <strong>Ingestion Job:</strong> RUN-44815 &nbsp;|&nbsp; <strong>Validation:</strong> 3 rows skipped (malformed date field)
+              </td></tr>
+              <tr onclick="toggleExp('dexp4')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">DS-0139</td>
+                <td><a style="color:#2563eb;cursor:pointer">CR_CLF_002</a></td>
+                <td><span class="badge b-blue">Training</span></td>
+                <td>Data Warehouse</td>
+                <td>200,000</td>
+                <td>Priya Nair</td>
+                <td>2026-04-28</td>
+                <td><span class="badge b-green">Active</span></td>
+              </tr>
+              <tr class="exp-row" id="dexp4"><td colspan="9" class="exp-cell">
+                <strong>Schema:</strong> applicant_id, bureau_score, dti_ratio, employment_status, default_flag &nbsp;|&nbsp; <strong>Ingestion Job:</strong> RUN-44801 &nbsp;|&nbsp; <strong>Validation:</strong> 0 schema errors
+              </td></tr>
+              <tr onclick="toggleExp('dexp5')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">DS-0138</td>
+                <td><a style="color:#2563eb;cursor:pointer">FRD_CLF_009</a></td>
+                <td><span class="badge b-blue">Training</span></td>
+                <td>Core Banking DB</td>
+                <td>95,400</td>
+                <td>System</td>
+                <td>2026-02-14</td>
+                <td><span class="badge b-red">Deleted</span></td>
+              </tr>
+              <tr class="exp-row" id="dexp5"><td colspan="9" class="exp-cell">
+                <strong>Deleted:</strong> 2026-05-07 per REQ-0821 (Approved by Sarah Chen) &nbsp;|&nbsp; <strong>Audit Event:</strong> <a style="color:#2563eb;cursor:pointer">EVT-009806 ↗</a>
+              </td></tr>
+              <tr onclick="toggleExp('dexp6')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">DS-0137</td>
+                <td><a style="color:#2563eb;cursor:pointer">CR_CLF_001</a></td>
+                <td><span class="badge b-amber">Scoring</span></td>
+                <td>Loan Origination System</td>
+                <td>52,100</td>
+                <td>System</td>
+                <td>2026-04-11</td>
+                <td><span class="badge b-grey">Archived</span></td>
+              </tr>
+              <tr class="exp-row" id="dexp6"><td colspan="9" class="exp-cell">
+                <strong>Archived:</strong> 2026-05-01 per rolling retention policy (180 days). No deletion request active.
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b">
+          <span>Showing 1–6 of 142 datasets &nbsp;|&nbsp; Page size: <select style="font-size:10px;border:1px solid #e2e8f0;border-radius:3px"><option>25</option><option selected>50</option></select></span>
+          <div style="display:flex;gap:5px"><button class="btn btn-sm">‹ Prev</button><button class="btn btn-sm btn-p">Next ›</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- S5: REPORTS -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s5">
+  <div class="slabel">Screen 5 — Reports</div>
+  <div class="shell">
+    <div class="aph">
+      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
+      <div class="aphr"><span class="rp">Admin</span><div class="nw">🔔<div class="nb2">3</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
+    </div>
+    <div class="ab">
+      <div class="ln">
+        <div class="lnt">Governance</div>
+        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">Homepage</div></div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">📜</div><div class="tit"><div class="tit-t">Audit Log</div></div></div>
+        <div class="tni" onclick="show('s3')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Request History</div></div></div>
+        <div class="tni" onclick="show('s4')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Data Log</div></div></div>
+        <div class="tni on"><div class="tio">📊</div><div class="tit"><div class="tit-t">Reports</div><div class="tit-s">All generated reports</div></div></div>
+      </div>
+      <div class="mc">
+        <div class="bc"><a onclick="show('s1')">Governance</a> › Reports</div>
+        <div class="pgt">Reports</div>
+        <div class="pgs">Complete history of all reports generated on the platform — filter, view details, and re-download</div>
+
+        <!-- Toolbar -->
+        <div class="tb">
+          <div class="tbl">
+            <div class="sb3"><input type="text" placeholder="Search report name, generated by…"></div>
+            <div class="fc"><select><option>All Report Types</option><option>Full Audit Trail Export</option><option>Model Performance Summary</option><option>Data Quality Report</option><option>Dataset Inventory</option><option>Request History Export</option><option>Model Inventory Report</option></select></div>
+            <div class="fc"><select><option>All Formats</option><option>PDF</option><option>CSV</option></select></div>
+            <input type="date" class="fc" style="font-size:10px"> <span style="font-size:10px;color:#64748b">to</span> <input type="date" class="fc" style="font-size:10px">
+          </div>
+          <div class="tbr">
+            <button class="btn btn-sm">⬇ CSV</button>
+            <button class="btn btn-sm">⬇ PDF</button>
+          </div>
+        </div>
+
+        <!-- Report Run History Table -->
+        <div class="dtw">
+          <table class="dt">
+            <thead>
+              <tr>
+                <th style="width:28px"></th>
+                <th>Report ID</th><th>Report Name</th><th>Generated By</th><th>Parameters</th><th>Generated At</th><th>Format</th><th>Download</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="toggleExp('rpt1')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RPT-0038</td>
+                <td>Full Audit Trail Export</td>
+                <td>Sarah Chen</td>
+                <td style="font-size:10px;color:#64748b">Date: 2026-04-01 to 2026-04-30</td>
+                <td>2026-05-11 09:14</td>
+                <td><span class="badge b-red" style="background:#fee2e2;color:#991b1b">PDF</span></td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">⬇ audit_trail_apr2026.pdf</a></td>
+              </tr>
+              <tr class="exp-row" id="rpt1"><td colspan="8" class="exp-cell">
+                <strong>Scope:</strong> All workflows &nbsp;|&nbsp; <strong>Events included:</strong> 4,812 &nbsp;|&nbsp; <strong>Audit Event:</strong> <a style="color:#2563eb;cursor:pointer">EVT-009814 ↗</a>
+              </td></tr>
+              <tr onclick="toggleExp('rpt2')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RPT-0037</td>
+                <td>Dataset Inventory</td>
+                <td>James Park</td>
+                <td style="font-size:10px;color:#64748b">As-at: 2026-05-01 | All models</td>
+                <td>2026-05-08 14:30</td>
+                <td><span class="badge b-grey">CSV</span></td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">⬇ dataset_inventory_may2026.csv</a></td>
+              </tr>
+              <tr class="exp-row" id="rpt2"><td colspan="8" class="exp-cell">
+                <strong>Scope:</strong> All datasets across all models &nbsp;|&nbsp; <strong>Total rows:</strong> 142 &nbsp;|&nbsp; <strong>Audit Event:</strong> <a style="color:#2563eb;cursor:pointer">EVT-009805 ↗</a>
+              </td></tr>
+              <tr onclick="toggleExp('rpt3')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RPT-0036</td>
+                <td>Model Performance Summary</td>
+                <td>Sarah Chen</td>
+                <td style="font-size:10px;color:#64748b">Date: 2026-Q1 | Domain: Credit Risk</td>
+                <td>2026-04-03 10:00</td>
+                <td><span class="badge b-red" style="background:#fee2e2;color:#991b1b">PDF</span></td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">⬇ model_perf_Q1_credit.pdf</a></td>
+              </tr>
+              <tr class="exp-row" id="rpt3"><td colspan="8" class="exp-cell">
+                <strong>Scope:</strong> CR_CLF_001, CR_CLF_002 &nbsp;|&nbsp; <strong>Metrics:</strong> Drift, Bias, Performance &nbsp;|&nbsp; <strong>Audit Event:</strong> <a style="color:#2563eb;cursor:pointer">EVT-009680 ↗</a>
+              </td></tr>
+              <tr onclick="toggleExp('rpt4')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RPT-0035</td>
+                <td>Request History Export</td>
+                <td>James Park</td>
+                <td style="font-size:10px;color:#64748b">Date: 2026-01-01 to 2026-03-31 | All categories</td>
+                <td>2026-04-01 09:00</td>
+                <td><span class="badge b-grey">CSV</span></td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">⬇ request_history_Q1.csv</a></td>
+              </tr>
+              <tr class="exp-row" id="rpt4"><td colspan="8" class="exp-cell">
+                <strong>Scope:</strong> All request categories &nbsp;|&nbsp; <strong>Total requests:</strong> 34 &nbsp;|&nbsp; <strong>Audit Event:</strong> <a style="color:#2563eb;cursor:pointer">EVT-009621 ↗</a>
+              </td></tr>
+              <tr onclick="toggleExp('rpt5')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RPT-0034</td>
+                <td>Data Quality Report</td>
+                <td>Priya Nair</td>
+                <td style="font-size:10px;color:#64748b">Model: FRD_CLF_012 | Dataset: DS-0142</td>
+                <td>2026-05-10 17:45</td>
+                <td><span class="badge b-red" style="background:#fee2e2;color:#991b1b">PDF</span></td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">⬇ data_quality_FRD_CLF_012.pdf</a></td>
+              </tr>
+              <tr class="exp-row" id="rpt5"><td colspan="8" class="exp-cell">
+                <strong>Scope:</strong> DS-0142 &nbsp;|&nbsp; <strong>Findings:</strong> 0 schema errors, 99.98% completeness &nbsp;|&nbsp; <strong>Audit Event:</strong> <a style="color:#2563eb;cursor:pointer">EVT-009813 ↗</a>
+              </td></tr>
+              <tr onclick="toggleExp('rpt6')">
+                <td style="text-align:center;color:#2563eb;font-size:10px">▶</td>
+                <td style="font-family:monospace;font-size:10px">RPT-0033</td>
+                <td>Model Inventory Report</td>
+                <td>Sarah Chen</td>
+                <td style="font-size:10px;color:#64748b">As-at: 2026-05-01 | All domains | All statuses</td>
+                <td>2026-05-02 08:30</td>
+                <td><span class="badge b-grey">CSV</span></td>
+                <td><a style="color:#2563eb;cursor:pointer;font-size:10px">⬇ model_inventory_may2026.csv</a></td>
+              </tr>
+              <tr class="exp-row" id="rpt6"><td colspan="8" class="exp-cell">
+                <strong>Scope:</strong> All models across all domains &nbsp;|&nbsp; <strong>Total models:</strong> 24 &nbsp;|&nbsp; <strong>Audit Event:</strong> <a style="color:#2563eb;cursor:pointer">EVT-009792 ↗</a>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b">
+          <span>Showing 1–6 of 38 reports &nbsp;|&nbsp; Page size: <select style="font-size:10px;border:1px solid #e2e8f0;border-radius:3px"><option>25</option><option selected>50</option></select></span>
+          <div style="display:flex;gap:5px"><button class="btn btn-sm">‹ Prev</button><button class="btn btn-sm btn-p">Next ›</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Parameter Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="paramDrawer">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div>
+      <div class="drawer-title" id="drawerTitle">Report Name</div>
+      <div class="drawer-sub">Configure parameters and generate report</div>
+    </div>
+    <button class="btn btn-sm" onclick="closeDrawer()">✕</button>
+  </div>
+  <div id="drawerParams"></div>
+  <div style="margin-top:16px;display:flex;gap:8px">
+    <button class="btn btn-p" style="flex:1" onclick="closeDrawer()">▶ Generate Report</button>
+    <button class="btn" onclick="closeDrawer()">Cancel</button>
+  </div>
+</div>
+
+<script>
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const idx = {s1:0,s2:1,s3:2,s4:3,s5:4}[id];
+  document.querySelectorAll('.nb')[idx].classList.add('on');
+}
+function toggleExp(id){
+  const el = document.getElementById(id);
+  el.classList.toggle('on');
+  const row = el.previousElementSibling;
+  const arrow = row.querySelector('td');
+  if(el.classList.contains('on')){ arrow.textContent='▼'; }else{ arrow.textContent='▶'; }
+}
+function openDrawer(title, params){
+  document.getElementById('drawerTitle').textContent=title;
+  const paramList = params.split(',').map(p=>`
+    <div class="form-group">
+      <label class="form-label">${p.trim()}</label>
+      <input class="form-control" type="text" placeholder="Enter ${p.trim()}…">
+    </div>`).join('');
+  document.getElementById('drawerParams').innerHTML = paramList +
+    `<div class="form-group"><label class="form-label">Export Format</label>
+    <select class="form-control"><option>PDF</option><option>CSV</option></select></div>`;
+  document.getElementById('drawerOverlay').classList.add('on');
+  document.getElementById('paramDrawer').classList.add('on');
+}
+function closeDrawer(){
+  document.getElementById('drawerOverlay').classList.remove('on');
+  document.getElementById('paramDrawer').classList.remove('on');
+}
+</script>
+</body>
+</html>
