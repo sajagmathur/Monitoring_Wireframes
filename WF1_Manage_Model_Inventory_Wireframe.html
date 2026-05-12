@@ -345,11 +345,12 @@
     background: #fff;
     border: 1px dashed #cbd5e1;
     border-radius: 8px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     margin-bottom: 14px;
   }
   .data-table {
-    width: 100%;
+    min-width: 100%;
     border-collapse: collapse;
     font-size: 12px;
   }
@@ -841,6 +842,42 @@
     .data-table { font-size: 11px; }
   }
 
+  /* ===== Upload Dropdown ===== */
+  .upload-dropdown { position: relative; display: inline-block; }
+  .upload-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    min-width: 190px;
+    z-index: 200;
+    overflow: hidden;
+  }
+  .upload-menu.open { display: block; }
+  .upload-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1e293b;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    transition: background 0.15s;
+  }
+  .upload-menu-item:hover { background: #f1f5f9; }
+  .upload-menu-item + .upload-menu-item { border-top: 1px dashed #e2e8f0; }
+  .upload-menu-item .um-icon { font-size: 14px; }
+  .upload-menu-item .um-sub { font-size: 10px; color: #64748b; display: block; margin-top: 1px; font-weight: 400; }
+
     /* ===== ERP Workflow Status Tracker ===== */
     .erp-steps { display:flex; align-items:center; gap:2px; }
     .erp-step { display:flex; align-items:center; gap:2px; }
@@ -988,14 +1025,25 @@
             <div class="filter-chip active">🏷️ Domain: Credit ✕</div>
             <div class="filter-chip">📦 Product ▾</div>
             <div class="filter-chip">⚡ Frequency ▾</div>
-            <div class="filter-chip">⏱️ Due In: <span style="color:#dc2626;">●</span> All ▾</div>
+            <div class="filter-chip">⏱️ Due Date / Time ▾</div>
           </div>
           <div class="toolbar-right">
             <button class="btn" onclick="showScreen('config-cat', null)">⚙️ Category Labels</button>
             <button class="btn">📥 Download Template</button>
             <button class="btn">📤 Export Inventory</button>
-            <button class="btn" onclick="showScreen('bulk-upload', null)">📂 Bulk Upload</button>
-            <button class="btn-primary btn" onclick="showScreen('add-single', null)">＋ Add Single Model</button>
+            <div class="upload-dropdown">
+              <button class="btn-primary btn" onclick="toggleUploadMenu(event)">⬆ Upload / Add Model ▾</button>
+              <div class="upload-menu" id="upload-menu">
+                <button class="upload-menu-item" onclick="showScreen('add-single', null); closeUploadMenu()">
+                  <span class="um-icon">＋</span>
+                  <span><span>Add Single Model</span><span class="um-sub">Manual entry form</span></span>
+                </button>
+                <button class="upload-menu-item" onclick="showScreen('bulk-upload', null); closeUploadMenu()">
+                  <span class="um-icon">📂</span>
+                  <span><span>Bulk Upload</span><span class="um-sub">Upload Excel / CSV file</span></span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1013,7 +1061,8 @@
                 <th>Event Definition</th>
                 <th>Monitoring Start <span class="sort-arrow">▾</span></th>
                 <th>Frequency <span class="sort-arrow">▾</span></th>
-                <th>Due In <span class="sort-arrow">▾</span></th>
+                <th>Due Date <span class="sort-arrow">▾</span></th>
+                <th>Due Time / Duration <span class="sort-arrow">▾</span></th>
                 <th>Workflow Status</th>
                 <th>Add Data</th>
                 <th>Actions</th>
@@ -1028,7 +1077,8 @@
                 <td>Default 90+ DPD</td>
                 <td>2025-11-01</td>
                 <td>Monthly</td>
-                <td><span class="due-overdue">-3 days</span></td>
+                <td>08 May 2026</td>
+                <td><span class="due-overdue">-3 days / 30d</span></td>
                 <td>
                   <div class="erp-steps" title="KPI Review ✓ → Data Ingested ✓ → Monitoring Overdue!">
                     <div class="erp-step"><div class="erp-dot done" title="KPI Review Complete">✓</div></div>
@@ -1055,7 +1105,8 @@
                 <td>Loss given default</td>
                 <td>2025-12-15</td>
                 <td>Quarterly</td>
-                <td><span class="due-warning">7 days</span></td>
+                <td>18 May 2026</td>
+                <td><span class="due-overdue">7 days / 90d</span></td>
                 <td>
                   <div class="erp-steps" title="KPI Review ✓ → Data Ingested ✓ → Monitoring Active">
                     <div class="erp-step"><div class="erp-dot done" title="KPI Review Complete">✓</div></div>
@@ -1082,7 +1133,8 @@
                 <td>Default 60+ DPD</td>
                 <td>2026-01-10</td>
                 <td>Monthly</td>
-                <td><span class="due-default">22 days</span></td>
+                <td>02 Jun 2026</td>
+                <td><span class="due-default">22 days / 30d</span></td>
                 <td>
                   <div class="erp-steps" title="KPI Review pending → Data Ingestion pending → Monitoring pending">
                     <div class="erp-step"><div class="erp-dot active" title="KPI Review: In Progress">1</div></div>
@@ -1109,7 +1161,8 @@
                 <td>Fraudulent transaction</td>
                 <td>2025-09-01</td>
                 <td>Daily</td>
-                <td><span class="due-default">5 days</span></td>
+                <td>16 May 2026</td>
+                <td><span class="due-default">5 days / 1d</span></td>
                 <td>
                   <div class="erp-steps" title="KPI Review ✓ → Data Ingested ✓ → Monitoring Active">
                     <div class="erp-step"><div class="erp-dot done" title="KPI Review Complete">✓</div></div>
@@ -1136,7 +1189,8 @@
                 <td>Customer churn</td>
                 <td>2025-10-20</td>
                 <td>Weekly</td>
-                <td><span class="due-default">1 day</span></td>
+                <td>12 May 2026</td>
+                <td><span class="due-default">1 day / 7d</span></td>
                 <td>
                   <div class="erp-steps" title="KPI Review ✓ → Data Ingested ✓ → Monitoring Active">
                     <div class="erp-step"><div class="erp-dot done" title="KPI Review Complete">✓</div></div>
@@ -1163,7 +1217,8 @@
                 <td>Default 90+ DPD</td>
                 <td>2026-01-05</td>
                 <td>Monthly</td>
-                <td><span class="due-default">18 days</span></td>
+                <td>29 May 2026</td>
+                <td><span class="due-default">18 days / 30d</span></td>
                 <td>
                   <div class="erp-steps" title="KPI Review ✓ → Data Ingestion pending → Monitoring pending">
                     <div class="erp-step"><div class="erp-dot done" title="KPI Review Complete">✓</div></div>
@@ -1190,7 +1245,8 @@
                 <td>Application approval</td>
                 <td>2025-08-15</td>
                 <td>Monthly</td>
-                <td><span class="due-overdue">-12 days</span></td>
+                <td>29 Apr 2026</td>
+                <td><span class="due-overdue">-12 days / 30d</span></td>
                 <td>
                   <div class="erp-steps" title="KPI Review ✓ → Data Ingested ✓ → Monitoring OVERDUE">
                     <div class="erp-step"><div class="erp-dot done" title="KPI Review Complete">✓</div></div>
@@ -1232,7 +1288,7 @@
   </div>
 
   <div class="annotation">
-    <strong>📝 Note (WF2-LST-001 to 016):</strong> Active inventory list with all twelve mandatory display columns, global search, multi-column filter chips, sortable columns, pagination (default 25), and primary actions (Add Single, Bulk Upload, Download Template, Configure Categories, Export). Toggle in upper-left switches to Archived view. Due In is colour-coded: default neutral, amber when less than 10% of the monitoring frequency window remains (e.g. 7 of 90 days for quarterly = amber), red when overdue. The <strong>Add Data</strong> column shows context-sensitive action buttons: <strong style="color:#7c3aed">▶ Start KPI Review</strong> (purple) when the model requires a KPI Pack review before ingestion; <strong style="color:#0f766e">→ Continue with Data Ingestion</strong> (teal) when KPI Review is complete and data upload is next; or <strong style="color:#166534">✓ Data Added</strong> (green pill) once data has been successfully ingested. Click any row to open the View Details side panel.
+    <strong>📝 Note (WF2-LST-001 to 016):</strong> Active inventory list with all thirteen mandatory display columns, global search, multi-column filter chips, sortable columns, pagination (default 25), and primary actions (Add Single, Bulk Upload, Download Template, Configure Categories, Export). Toggle in upper-left switches to Archived view. <strong>Due Date</strong> shows the absolute calendar due date. <strong>Due Time / Duration</strong> shows time remaining relative to the monitoring period (e.g. <em>7 days / 90d</em>): default neutral, red when less than 10% of the frequency window remains (e.g. 7 of 90 days for quarterly = 7.7% → red), or when overdue. The <strong>Add Data</strong> column shows context-sensitive action buttons: <strong style="color:#7c3aed">▶ Start KPI Review</strong> (purple) when the model requires a KPI Pack review before ingestion; <strong style="color:#0f766e">→ Continue with Data Ingestion</strong> (teal) when KPI Review is complete and data upload is next; or <strong style="color:#166534">✓ Data Added</strong> (green pill) once data has been successfully ingested. Click any row to open the View Details side panel.
   </div>
 </div>
 
@@ -2325,6 +2381,15 @@
 </div>
 
 <script>
+  function toggleUploadMenu(e) {
+    e.stopPropagation();
+    document.getElementById('upload-menu').classList.toggle('open');
+  }
+  function closeUploadMenu() {
+    document.getElementById('upload-menu').classList.remove('open');
+  }
+  document.addEventListener('click', function() { closeUploadMenu(); });
+
   function showScreen(id, btn) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const target = document.getElementById(id);

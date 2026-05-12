@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Monitoring Platform — Data Center: Repository</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; color: #2c3e50; line-height: 1.5; }
+
+/* ===== TOP NAV ===== */
+.nav-bar { background: #1f2937; color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.nav-bar h1 { font-size: 12px; font-weight: 600; margin-right: 8px; white-space: nowrap; color: #fbbf24; }
+.nav-btn { background: #374151; color: #fff; border: 1px solid #4b5563; padding: 5px 9px; cursor: pointer; font-size: 11px; border-radius: 4px; transition: background 0.2s; white-space: nowrap; }
+.nav-btn:hover { background: #4b5563; }
+.nav-btn.active { background: #2563eb; border-color: #2563eb; }
+.nav-sep { color: #4b5563; font-size: 14px; padding: 0 2px; }
+
+/* ===== SCREEN ===== */
+.screen { display: none; min-height: calc(100vh - 46px); padding: 14px; }
+.screen.active { display: block; }
+.screen-label { background: #fbbf24; color: #78350f; padding: 5px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; display: inline-block; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ===== APP SHELL ===== */
+.app-shell { display: flex; flex-direction: column; min-height: calc(100vh - 80px); background: #fff; border: 2px dashed #94a3b8; border-radius: 8px; overflow: hidden; max-width: 1600px; margin: 0 auto; }
+.app-header { background: #1e3a8a; color: #fff; padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.app-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; }
+.app-brand-logo { width: 28px; height: 28px; background: #fff; color: #1e3a8a; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.app-header-right { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+.role-pill { background: #fbbf24; color: #78350f; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.user-pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; }
+.user-avatar { width: 22px; height: 22px; background: #fbbf24; color: #78350f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+.icon-btn { background: transparent; border: none; color: #fff; cursor: pointer; font-size: 14px; }
+
+/* ===== APP BODY ===== */
+.app-body { display: flex; flex: 1; }
+.left-nav { width: 215px; background: #f8fafc; border-right: 1px solid #e2e8f0; padding: 14px 10px; flex-shrink: 0; }
+.nav-section-title { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px; padding: 0 6px; }
+.tile-nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border: 1px dashed #cbd5e1; border-radius: 6px; margin-bottom: 6px; cursor: pointer; background: #fff; transition: all 0.2s; }
+.tile-nav-item:hover { border-color: #2563eb; border-style: solid; background: #eff6ff; }
+.tile-nav-item.active { background: #dbeafe; border-color: #2563eb; border-style: solid; }
+.tile-icon { width: 26px; height: 26px; background: #dbeafe; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.tile-text { flex: 1; min-width: 0; }
+.tile-title { font-size: 11px; font-weight: 600; color: #1e293b; }
+.tile-subtitle { font-size: 10px; color: #64748b; margin-top: 1px; }
+.tile-badge { background: #ef4444; color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 10px; }
+
+/* Sub-nav tree inside left nav */
+.subnav-tree { margin-top: 8px; padding: 8px 6px; background: #eff6ff; border: 1px dashed #93c5fd; border-radius: 6px; font-size: 11px; }
+.subnav-tree-title { font-size: 10px; font-weight: 700; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+.tree-node { padding: 3px 0 3px 10px; border-left: 2px dashed #93c5fd; margin-bottom: 2px; color: #1e293b; cursor: pointer; }
+.tree-node:hover { color: #2563eb; }
+.tree-node.active-node { color: #2563eb; font-weight: 600; border-left-color: #2563eb; border-left-style: solid; }
+.tree-node-l2 { padding-left: 18px; }
+.tree-node-l3 { padding-left: 26px; font-size: 10px; color: #475569; }
+.tree-node-l3:hover { color: #2563eb; }
+
+/* ===== MAIN CONTENT ===== */
+.main-content { flex: 1; padding: 18px; background: #f1f5f9; overflow-y: auto; min-width: 0; }
+.breadcrumb { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+.breadcrumb a { color: #2563eb; text-decoration: none; cursor: pointer; }
+.breadcrumb a:hover { text-decoration: underline; }
+.page-title { font-size: 19px; color: #1e293b; margin-bottom: 3px; font-weight: 700; }
+.page-subtitle { font-size: 12px; color: #64748b; margin-bottom: 16px; }
+
+/* ===== TOOLBAR ===== */
+.toolbar { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toolbar-left { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex: 1; }
+.toolbar-right { display: flex; gap: 8px; flex-wrap: wrap; }
+.search-box { position: relative; flex: 1; min-width: 180px; max-width: 300px; }
+.search-box input { width: 100%; padding: 7px 10px 7px 28px; border: 1px dashed #94a3b8; border-radius: 5px; font-size: 12px; background: #fff; }
+.search-box::before { content: '🔍'; position: absolute; left: 8px; top: 6px; font-size: 12px; opacity: 0.6; }
+.filter-chip { background: #fff; border: 1px dashed #94a3b8; padding: 5px 9px; border-radius: 5px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.filter-chip.active { background: #dbeafe; border-color: #2563eb; color: #1e3a8a; font-weight: 600; border-style: solid; }
+
+/* ===== BUTTONS ===== */
+.btn { background: #fff; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; color: #1e293b; display: inline-flex; align-items: center; gap: 5px; }
+.btn:hover { background: #f1f5f9; }
+.btn-primary { background: #2563eb; color: #fff; border-color: #2563eb; font-weight: 600; }
+.btn-primary:hover { background: #1e3a8a; }
+.btn-danger-outline { color: #dc2626; border-color: #fca5a5; background: #fff; }
+.btn-danger-outline:hover { background: #fef2f2; }
+.btn-danger { background: #dc2626; color: #fff; border-color: #dc2626; font-weight: 600; }
+.btn-ghost { background: transparent; border: 1px dashed #cbd5e1; color: #64748b; }
+.btn-sm { padding: 4px 8px; font-size: 11px; }
+
+/* ===== PILLS ===== */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.pill-uploaded { background: #dcfce7; color: #166534; }
+.pill-pending { background: #fef3c7; color: #78350f; }
+.pill-not-uploaded { background: #f1f5f9; color: #64748b; border: 1px dashed #cbd5e1; }
+.pill-deleted { background: #fee2e2; color: #991b1b; }
+.pill-active { background: #dcfce7; color: #166534; }
+.pill-agent { background: #e0e7ff; color: #3730a3; }
+.pill-user { background: #dbeafe; color: #1e3a8a; }
+
+/* ===== CARDS GRID (S01, S02) ===== */
+.domain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.domain-card { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s; border-left: 3px solid #2563eb; }
+.domain-card:hover { border-color: #2563eb; border-style: solid; border-left-style: solid; box-shadow: 0 2px 8px rgba(37,99,235,0.12); }
+.domain-card-icon { font-size: 24px; margin-bottom: 8px; }
+.domain-card-title { font-size: 14px; font-weight: 700; color: #1e3a8a; margin-bottom: 10px; }
+.domain-card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.meta-item { }
+.meta-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; }
+.meta-value { font-size: 12px; color: #1e293b; font-weight: 600; }
+.domain-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #e2e8f0; font-size: 11px; color: #64748b; }
+
+/* ===== DATA TABLE ===== */
+.data-table-wrap { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+.data-table-header { padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #1e293b; display: flex; justify-content: space-between; align-items: center; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th { background: #f8fafc; padding: 9px 12px; text-align: left; font-size: 11px; font-weight: 700; color: #475569; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+.data-table td { padding: 10px 12px; border-bottom: 1px dashed #e2e8f0; vertical-align: middle; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: #f8fafc; }
+.data-table .actions-cell { display: flex; gap: 6px; align-items: center; }
+.progress-bar-wrap { background: #e2e8f0; border-radius: 10px; height: 6px; width: 80px; display: inline-block; vertical-align: middle; margin-right: 5px; }
+.progress-bar-fill { background: #16a34a; height: 100%; border-radius: 10px; }
+
+/* ===== MODEL SUMMARY BANNER ===== */
+.model-banner { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.model-banner-id { background: #1e3a8a; color: #fff; border-radius: 6px; padding: 8px 14px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.model-banner-details { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.model-banner-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+
+/* ===== S04: COMPONENT LIST TABLE ===== */
+.component-list-wrap { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+.component-list-header { padding: 10px 16px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+.comp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.comp-table th { background: #f8fafc; padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 700; color: #475569; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; letter-spacing: 0.3px; }
+.comp-table td { padding: 11px 14px; border-bottom: 1px dashed #e2e8f0; vertical-align: middle; }
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-table tr:hover td { background: #f8fafc; }
+.comp-table .deleted-row td { background: #fef2f2; color: #991b1b; }
+.comp-table .deleted-row td .comp-name { text-decoration: line-through; color: #991b1b; }
+.comp-icon { font-size: 16px; margin-right: 6px; }
+.comp-name { font-weight: 600; color: #1e293b; font-size: 12px; }
+.comp-source { font-size: 10px; color: #64748b; margin-top: 2px; }
+.comp-actions { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.version-chip { font-size: 10px; color: #475569; background: #f1f5f9; border: 1px dashed #cbd5e1; padding: 2px 7px; border-radius: 4px; }
+.pending-badge { font-size: 10px; background: #fef3c7; color: #78350f; border: 1px solid #fcd34d; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+
+/* ===== COMPLETENESS BAR ===== */
+.completeness-footer { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+.completeness-label { font-size: 12px; font-weight: 600; color: #1e293b; white-space: nowrap; }
+.completeness-bar-outer { flex: 1; background: #e2e8f0; border-radius: 10px; height: 10px; }
+.completeness-bar-inner { height: 100%; border-radius: 10px; background: linear-gradient(90deg, #16a34a, #22c55e); }
+.completeness-pct { font-size: 12px; font-weight: 700; color: #16a34a; white-space: nowrap; }
+
+/* ===== COMPONENT VIEWER (S05-S11) ===== */
+.viewer-layout { display: flex; gap: 0; background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; overflow: hidden; min-height: 480px; }
+.version-sidebar { width: 230px; flex-shrink: 0; border-right: 1px dashed #cbd5e1; background: #f8fafc; }
+.version-sidebar-header { padding: 10px 12px; background: #1e3a8a; color: #fff; font-size: 11px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+.version-list { padding: 8px; }
+.version-item { padding: 8px 10px; border: 1px dashed #cbd5e1; border-radius: 6px; margin-bottom: 6px; cursor: pointer; background: #fff; transition: all 0.15s; }
+.version-item:hover { border-color: #2563eb; border-style: solid; }
+.version-item.active { background: #dbeafe; border-color: #2563eb; border-style: solid; }
+.version-item.deleted-v { background: #fef2f2; border-color: #fca5a5; }
+.version-num { font-size: 11px; font-weight: 700; color: #1e3a8a; }
+.version-num.deleted-v { text-decoration: line-through; color: #991b1b; }
+.version-meta { font-size: 10px; color: #64748b; margin-top: 2px; }
+.viewer-main { flex: 1; padding: 18px; min-width: 0; }
+.viewer-main-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.viewer-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+.viewer-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.viewer-content-box { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 14px; min-height: 280px; }
+.kv-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.kv-table tr { border-bottom: 1px dashed #e2e8f0; }
+.kv-table td:first-child { font-weight: 600; color: #475569; padding: 8px 12px 8px 0; width: 40%; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+.kv-table td:last-child { color: #1e293b; padding: 8px 0; }
+.viewer-meta-strip { display: flex; gap: 16px; flex-wrap: wrap; padding: 10px 14px; background: #eff6ff; border: 1px dashed #93c5fd; border-radius: 6px; margin-bottom: 12px; font-size: 11px; }
+.viewer-meta-item { }
+.viewer-meta-label { color: #64748b; text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px; }
+.viewer-meta-val { color: #1e3a8a; font-weight: 600; }
+.pending-delete-banner { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; color: #78350f; display: flex; align-items: center; gap: 8px; }
+.placeholder-chart { background: #e2e8f0; border: 1px dashed #94a3b8; border-radius: 6px; height: 120px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #94a3b8; font-style: italic; margin-bottom: 10px; }
+
+/* ===== TABS (S09) ===== */
+.tab-bar { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 14px; }
+.tab-item { padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; color: #64748b; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+.tab-item:hover { color: #1e3a8a; }
+.tab-item.active { color: #2563eb; border-bottom-color: #2563eb; }
+.tab-content { display: none; }
+.tab-content.active { display: flex; gap: 0; background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; overflow: hidden; min-height: 400px; }
+
+/* ===== AUDIT LOG TABLE ===== */
+.audit-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.audit-table th { background: #f8fafc; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #475569; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+.audit-table td { padding: 9px 10px; border-bottom: 1px dashed #e2e8f0; vertical-align: middle; }
+.audit-table tr:hover td { background: #f8fafc; }
+.audit-action-upload { color: #166534; font-weight: 600; }
+.audit-action-delete { color: #991b1b; font-weight: 600; }
+.audit-action-restore { color: #1e3a8a; font-weight: 600; }
+.audit-action-view { color: #64748b; }
+.audit-action-request { color: #78350f; font-weight: 600; }
+
+/* ===== ADDITIONAL DOCS UPLOAD DRAWER ===== */
+.upload-drawer { background: #fff; border: 1px dashed #2563eb; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+.upload-drawer-title { font-size: 12px; font-weight: 700; color: #1e3a8a; margin-bottom: 10px; }
+.dropzone { border: 2px dashed #93c5fd; border-radius: 8px; background: #eff6ff; padding: 24px; text-align: center; margin-bottom: 12px; }
+.dropzone-icon { font-size: 28px; margin-bottom: 6px; }
+.dropzone-text { font-size: 12px; color: #64748b; }
+.dropzone-text strong { color: #2563eb; cursor: pointer; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 11px; font-weight: 600; color: #475569; }
+.form-group input, .form-group select, .form-group textarea { padding: 7px 10px; border: 1px dashed #94a3b8; border-radius: 5px; font-size: 12px; font-family: inherit; background: #fff; }
+.form-group textarea { resize: vertical; min-height: 60px; }
+
+/* ===== DELETE MODAL ===== */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
+.modal-overlay.active { display: flex; }
+.modal-box { background: #fff; border-radius: 10px; width: 520px; max-width: 95vw; box-shadow: 0 8px 32px rgba(0,0,0,0.2); overflow: hidden; }
+.modal-header { background: #1e3a8a; color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { font-size: 14px; font-weight: 700; }
+.modal-close { background: none; border: none; color: #fff; cursor: pointer; font-size: 18px; }
+.modal-body { padding: 20px 18px; }
+.modal-info-box { background: #eff6ff; border: 1px dashed #93c5fd; border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #1e3a8a; margin-bottom: 12px; }
+.modal-warn-text { font-size: 11px; color: #78350f; background: #fef3c7; border: 1px dashed #fcd34d; border-radius: 6px; padding: 8px 12px; margin-bottom: 14px; }
+.modal-footer { padding: 12px 18px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px; }
+.char-counter { font-size: 10px; color: #94a3b8; text-align: right; margin-top: 3px; }
+.req-asterisk { color: #dc2626; }
+
+/* ===== ANNOTATION ===== */
+.ann { display: inline-block; background: #fef3c7; color: #78350f; border: 1px solid #fcd34d; border-radius: 3px; font-size: 9px; font-weight: 700; padding: 1px 5px; margin-left: 4px; font-style: normal; vertical-align: middle; cursor: help; }
+
+/* ===== INFO BANNERS ===== */
+.info-banner { background: #eff6ff; border: 1px dashed #93c5fd; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #1e3a8a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.warn-banner { background: #fef3c7; border: 1px dashed #fcd34d; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #78350f; margin-bottom: 12px; }
+
+/* Section group headers in comp list */
+.comp-group-row td { background: #f1f5f9; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; padding: 6px 14px; }
+</style>
+</head>
+<body>
+
+<!-- ===== TOP NAV ===== -->
+<div class="nav-bar">
+  <h1>📁 Data Center — Repository Wireframe</h1>
+  <span class="nav-sep">|</span>
+  <button class="nav-btn active" onclick="showScreen('s01',this)">S01: Domain List</button>
+  <button class="nav-btn" onclick="showScreen('s02',this)">S02: Technique List</button>
+  <button class="nav-btn" onclick="showScreen('s03',this)">S03: Model List</button>
+  <button class="nav-btn" onclick="showScreen('s04',this)">S04: Model Dashboard</button>
+  <span class="nav-sep">|</span>
+  <button class="nav-btn" onclick="showScreen('s05',this)">S05: Metadata</button>
+  <button class="nav-btn" onclick="showScreen('s06',this)">S06: KPI Config</button>
+  <button class="nav-btn" onclick="showScreen('s07',this)">S07: Data Insights</button>
+  <button class="nav-btn" onclick="showScreen('s08',this)">S08: Sample Analysis</button>
+  <button class="nav-btn" onclick="showScreen('s09',this)">S09: Drift Reports</button>
+  <button class="nav-btn" onclick="showScreen('s10',this)">S10: RCA</button>
+  <button class="nav-btn" onclick="showScreen('s11',this)">S11: Val. Report</button>
+  <span class="nav-sep">|</span>
+  <button class="nav-btn" onclick="showScreen('s12',this)">S12: Audit Log</button>
+  <button class="nav-btn" onclick="showScreen('s13',this)">S13: Add. Docs</button>
+  <button class="nav-btn" onclick="showScreen('s14',this)">S14: Delete Modal</button>
+</div>
+
+
+<!-- ================================================================ S01 ================================================================ -->
+<div id="s01" class="screen active">
+  <span class="screen-label">S01 — Repository Home: Domain List</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right">
+        <div class="role-pill">👤 USER</div>
+        <button class="icon-btn">🔔</button>
+        <div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div>
+        <button class="icon-btn">⏻</button>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">My Workspace</div>
+        <div class="tile-nav-item"><div class="tile-icon">📈</div><div class="tile-text"><div class="tile-title">Dashboard</div><div class="tile-subtitle">KPIs & health</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Model Inventory</div><div class="tile-subtitle">Browse models</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔬</div><div class="tile-text"><div class="tile-title">Model Monitoring</div><div class="tile-subtitle">Drift & performance</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">⚡</div><div class="tile-text"><div class="tile-title">Trigger Hit Report</div><div class="tile-subtitle">Alerts & breaches</div></div><span class="tile-badge">4</span></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div><div class="tile-subtitle">Data Center</div></div></div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb">Repository — Data Center</div>
+        <h2 class="page-title">Repository — Data Center</h2>
+        <p class="page-subtitle">Browse and manage model artefacts by Domain → Modelling Technique → Model. <span class="ann" title="REPO-S01-001">REPO-S01-001</span> Only domains containing models you have access to are shown.</p>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><input type="text" placeholder="Search domain, model name, model ID…"></div>
+            <div class="filter-chip">🏷️ Domain ▾</div>
+            <div class="filter-chip">📅 Last Updated ▾</div>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn">📥 Export</button>
+          </div>
+        </div>
+
+        <div class="domain-grid">
+          <div class="domain-card" onclick="showScreen('s02',null)">
+            <div class="domain-card-icon">💳</div>
+            <div class="domain-card-title">Credit Risk</div>
+            <div class="domain-card-meta">
+              <div class="meta-item"><div class="meta-label">Techniques</div><div class="meta-value">4</div></div>
+              <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">42</div></div>
+              <div class="meta-item"><div class="meta-label">Last Updated</div><div class="meta-value">09 May 2026</div></div>
+              <div class="meta-item"><div class="meta-label">Access Scope</div><div class="meta-value">Full</div></div>
+            </div>
+            <div class="domain-card-footer"><span>42 models registered</span><span>→ Open</span></div>
+          </div>
+          <div class="domain-card" onclick="showScreen('s02',null)">
+            <div class="domain-card-icon">🛡️</div>
+            <div class="domain-card-title">Fraud Detection</div>
+            <div class="domain-card-meta">
+              <div class="meta-item"><div class="meta-label">Techniques</div><div class="meta-value">3</div></div>
+              <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">18</div></div>
+              <div class="meta-item"><div class="meta-label">Last Updated</div><div class="meta-value">07 May 2026</div></div>
+              <div class="meta-item"><div class="meta-label">Access Scope</div><div class="meta-value">Full</div></div>
+            </div>
+            <div class="domain-card-footer"><span>18 models registered</span><span>→ Open</span></div>
+          </div>
+          <div class="domain-card" onclick="showScreen('s02',null)">
+            <div class="domain-card-icon">📊</div>
+            <div class="domain-card-title">Market Risk</div>
+            <div class="domain-card-meta">
+              <div class="meta-item"><div class="meta-label">Techniques</div><div class="meta-value">2</div></div>
+              <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">11</div></div>
+              <div class="meta-item"><div class="meta-label">Last Updated</div><div class="meta-value">02 May 2026</div></div>
+              <div class="meta-item"><div class="meta-label">Access Scope</div><div class="meta-value">Read-only</div></div>
+            </div>
+            <div class="domain-card-footer"><span>11 models registered</span><span>→ Open</span></div>
+          </div>
+          <div class="domain-card" onclick="showScreen('s02',null)">
+            <div class="domain-card-icon">🏦</div>
+            <div class="domain-card-title">Liquidity Risk</div>
+            <div class="domain-card-meta">
+              <div class="meta-item"><div class="meta-label">Techniques</div><div class="meta-value">2</div></div>
+              <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">7</div></div>
+              <div class="meta-item"><div class="meta-label">Last Updated</div><div class="meta-value">28 Apr 2026</div></div>
+              <div class="meta-item"><div class="meta-label">Access Scope</div><div class="meta-value">Full</div></div>
+            </div>
+            <div class="domain-card-footer"><span>7 models registered</span><span>→ Open</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ S02 ================================================================ -->
+<div id="s02" class="screen">
+  <span class="screen-label">S02 — Modelling Technique List</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right">
+        <div class="role-pill">👤 USER</div>
+        <button class="icon-btn">🔔</button>
+        <div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div>
+        <button class="icon-btn">⏻</button>
+      </div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">My Workspace</div>
+        <div class="tile-nav-item"><div class="tile-icon">📈</div><div class="tile-text"><div class="tile-title">Dashboard</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Model Inventory</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔬</div><div class="tile-text"><div class="tile-title">Model Monitoring</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">⚡</div><div class="tile-text"><div class="tile-title">Trigger Hit Report</div></div><span class="tile-badge">4</span></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div><div class="tile-subtitle">Data Center</div></div></div>
+        <div class="subnav-tree">
+          <div class="subnav-tree-title">📁 Browsing</div>
+          <div class="tree-node active-node">💳 Credit Risk</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; Credit Risk</div>
+        <h2 class="page-title">Credit Risk</h2>
+        <p class="page-subtitle">Select a Modelling Technique to view all registered models within it.</p>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><input type="text" placeholder="Search technique or model…"></div>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn" onclick="showScreen('s01',null)">← Back to Domains</button>
+          </div>
+        </div>
+
+        <div class="domain-grid">
+          <div class="domain-card" onclick="showScreen('s03',null)" style="border-left-color:#7c3aed">
+            <div class="domain-card-icon">🔢</div>
+            <div class="domain-card-title">Classification</div>
+            <div class="domain-card-meta">
+              <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">24</div></div>
+              <div class="meta-item"><div class="meta-label">Data Types</div><div class="meta-value">Account / Summary</div></div>
+              <div class="meta-item"><div class="meta-label">Last Updated</div><div class="meta-value">09 May 2026</div></div>
+              <div class="meta-item"><div class="meta-label">KPI Pack</div><div class="meta-value">3 packs</div></div>
+            </div>
+            <div class="domain-card-footer"><span>24 models</span><span>→ Open</span></div>
+          </div>
+          <div class="domain-card" onclick="showScreen('s03',null)" style="border-left-color:#0891b2">
+            <div class="domain-card-icon">📉</div>
+            <div class="domain-card-title">Regression / Continuous</div>
+            <div class="domain-card-meta">
+              <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">9</div></div>
+              <div class="meta-item"><div class="meta-label">Data Types</div><div class="meta-value">Account level</div></div>
+              <div class="meta-item"><div class="meta-label">Last Updated</div><div class="meta-value">04 May 2026</div></div>
+              <div class="meta-item"><div class="meta-label">KPI Pack</div><div class="meta-value">1 pack</div></div>
+            </div>
+            <div class="domain-card-footer"><span>9 models</span><span>→ Open</span></div>
+          </div>
+          <div class="domain-card" onclick="showScreen('s03',null)" style="border-left-color:#d97706">
+            <div class="domain-card-icon">⏱️</div>
+            <div class="domain-card-title">Survival / Time-to-Event</div>
+            <div class="domain-card-meta">
+              <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">5</div></div>
+              <div class="meta-item"><div class="meta-label">Data Types</div><div class="meta-value">Account level</div></div>
+              <div class="meta-item"><div class="meta-label">Last Updated</div><div class="meta-value">01 May 2026</div></div>
+              <div class="meta-item"><div class="meta-label">KPI Pack</div><div class="meta-value">1 pack</div></div>
+            </div>
+            <div class="domain-card-footer"><span>5 models</span><span>→ Open</span></div>
+          </div>
+          <div class="domain-card" onclick="showScreen('s03',null)" style="border-left-color:#16a34a">
+            <div class="domain-card-icon">📏</div>
+            <div class="domain-card-title">Scorecard / Points System</div>
+            <div class="domain-card-meta">
+              <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">4</div></div>
+              <div class="meta-item"><div class="meta-label">Data Types</div><div class="meta-value">Summary level</div></div>
+              <div class="meta-item"><div class="meta-label">Last Updated</div><div class="meta-value">28 Apr 2026</div></div>
+              <div class="meta-item"><div class="meta-label">KPI Pack</div><div class="meta-value">1 pack</div></div>
+            </div>
+            <div class="domain-card-footer"><span>4 models</span><span>→ Open</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================ S03 ================================================================ -->
+<div id="s03" class="screen">
+  <span class="screen-label">S03 — Model List</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right"><div class="role-pill">👤 USER</div><button class="icon-btn">🔔</button><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div><button class="icon-btn">⏻</button></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">My Workspace</div>
+        <div class="tile-nav-item"><div class="tile-icon">📈</div><div class="tile-text"><div class="tile-title">Dashboard</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Model Inventory</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔬</div><div class="tile-text"><div class="tile-title">Model Monitoring</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">⚡</div><div class="tile-text"><div class="tile-title">Trigger Hit Report</div></div><span class="tile-badge">4</span></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div><div class="tile-subtitle">Data Center</div></div></div>
+        <div class="subnav-tree">
+          <div class="subnav-tree-title">📁 Browsing</div>
+          <div class="tree-node">💳 Credit Risk</div>
+          <div class="tree-node tree-node-l2 active-node">🔢 Classification</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; <a onclick="showScreen('s02',null)">Credit Risk</a> &nbsp;›&nbsp; Classification</div>
+        <h2 class="page-title">Classification — Model List</h2>
+        <p class="page-subtitle">24 models registered under Credit Risk / Classification. Click <strong>Open Repository</strong> to view a model's artefacts. <span class="ann" title="REPO-S03-001">REPO-S03-001</span></p>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><input type="text" placeholder="Search model ID or name…"></div>
+            <div class="filter-chip active">Status: Active ✕</div>
+            <div class="filter-chip">Owner ▾</div>
+            <div class="filter-chip">Sort: Last Updated ▾</div>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn" onclick="showScreen('s02',null)">← Back</button>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <div class="data-table-header"><span>Models (24)</span><span style="font-size:11px;color:#64748b;">Showing 1–8 of 24</span></div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Model ID</th><th>Model Name</th><th>Owner</th><th>Reg. Date</th><th>Last Updated</th><th>Status</th><th>Upload Progress</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>CR-CLF-001</strong></td>
+                <td>PD Model — Retail Banking</td>
+                <td>J. Smith</td>
+                <td>12 Jan 2025</td>
+                <td>09 May 2026</td>
+                <td><span class="pill pill-active">● Active</span></td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:82%"></div></div>
+                    <span style="font-size:11px;color:#16a34a;font-weight:600;">9/11</span>
+                  </div>
+                </td>
+                <td><div class="actions-cell"><button class="btn btn-primary btn-sm" onclick="showScreen('s04',null)">Open Repository</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>CR-CLF-002</strong></td>
+                <td>LGD Model — Corporate</td>
+                <td>R. Patel</td>
+                <td>03 Mar 2025</td>
+                <td>05 May 2026</td>
+                <td><span class="pill pill-active">● Active</span></td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%"></div></div>
+                    <span style="font-size:11px;color:#16a34a;font-weight:600;">11/11</span>
+                  </div>
+                </td>
+                <td><div class="actions-cell"><button class="btn btn-primary btn-sm" onclick="showScreen('s04',null)">Open Repository</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>CR-CLF-003</strong></td>
+                <td>EAD Model — SME Lending</td>
+                <td>J. Smith</td>
+                <td>17 Apr 2025</td>
+                <td>28 Apr 2026</td>
+                <td><span class="pill pill-active">● Active</span></td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:45%;background:linear-gradient(90deg,#d97706,#f59e0b)"></div></div>
+                    <span style="font-size:11px;color:#d97706;font-weight:600;">5/11</span>
+                  </div>
+                </td>
+                <td><div class="actions-cell"><button class="btn btn-primary btn-sm" onclick="showScreen('s04',null)">Open Repository</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>CR-CLF-004</strong></td>
+                <td>Behavioural Score — Cards</td>
+                <td>A. Chen</td>
+                <td>22 Jun 2025</td>
+                <td>01 May 2026</td>
+                <td><span class="pill pill-active">● Active</span></td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:73%"></div></div>
+                    <span style="font-size:11px;color:#16a34a;font-weight:600;">8/11</span>
+                  </div>
+                </td>
+                <td><div class="actions-cell"><button class="btn btn-primary btn-sm" onclick="showScreen('s04',null)">Open Repository</button></div></td>
+              </tr>
+              <tr>
+                <td><strong>CR-CLF-005</strong></td>
+                <td>Application Score — Mortgage</td>
+                <td>M. Johnson</td>
+                <td>08 Sep 2025</td>
+                <td>09 May 2026</td>
+                <td><span class="pill pill-active">● Active</span></td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%"></div></div>
+                    <span style="font-size:11px;color:#16a34a;font-weight:600;">11/11</span>
+                  </div>
+                </td>
+                <td><div class="actions-cell"><button class="btn btn-primary btn-sm" onclick="showScreen('s04',null)">Open Repository</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:11px;color:#64748b;text-align:right;">Page 1 of 3 &nbsp;|&nbsp; ← Prev &nbsp; Next →</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================ S04 ================================================================ -->
+<div id="s04" class="screen">
+  <span class="screen-label">S04 — Model Repository Dashboard</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right"><div class="role-pill">👤 USER</div><button class="icon-btn">🔔</button><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div><button class="icon-btn">⏻</button></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">My Workspace</div>
+        <div class="tile-nav-item"><div class="tile-icon">📈</div><div class="tile-text"><div class="tile-title">Dashboard</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Model Inventory</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">🔬</div><div class="tile-text"><div class="tile-title">Model Monitoring</div></div></div>
+        <div class="tile-nav-item"><div class="tile-icon">⚡</div><div class="tile-text"><div class="tile-title">Trigger Hit Report</div></div><span class="tile-badge">4</span></div>
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div><div class="tile-subtitle">Data Center</div></div></div>
+        <div class="subnav-tree">
+          <div class="subnav-tree-title">📁 Browsing</div>
+          <div class="tree-node">💳 Credit Risk</div>
+          <div class="tree-node tree-node-l2">🔢 Classification</div>
+          <div class="tree-node tree-node-l2 active-node">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s05',null)">📋 Metadata</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s06',null)">⚙️ KPI Config</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s07',null)">📊 Data Insights</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s08',null)">🔬 Sample Analysis</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s09',null)">📉 Drift Reports</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s10',null)">🔍 RCA</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s11',null)">📄 Val. Report</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s12',null)">🗂️ Audit Log</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s13',null)">📎 Add. Docs</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; <a onclick="showScreen('s02',null)">Credit Risk</a> &nbsp;›&nbsp; <a onclick="showScreen('s03',null)">Classification</a> &nbsp;›&nbsp; CR-CLF-001</div>
+
+        <!-- Model Banner -->
+        <div class="model-banner">
+          <div class="model-banner-id">CR-CLF-001</div>
+          <div class="model-banner-details">
+            <div><div class="meta-label">Model Name</div><div class="meta-value" style="font-size:13px;">PD Model — Retail Banking</div></div>
+            <div><div class="meta-label">Domain</div><div class="meta-value">Credit Risk</div></div>
+            <div><div class="meta-label">Technique</div><div class="meta-value">Classification</div></div>
+            <div><div class="meta-label">Owner</div><div class="meta-value">Jane Smith</div></div>
+            <div><div class="meta-label">Registered</div><div class="meta-value">12 Jan 2025</div></div>
+            <div><div class="meta-label">Last Activity</div><div class="meta-value">09 May 2026</div></div>
+          </div>
+          <div class="model-banner-right">
+            <span class="pill pill-active">● Active</span>
+            <button class="btn btn-sm">📥 Export All</button>
+          </div>
+        </div>
+
+        <!-- Completeness bar -->
+        <div class="completeness-footer">
+          <span class="completeness-label">Repository Completeness</span>
+          <div class="completeness-bar-outer"><div class="completeness-bar-inner" style="width:69%"></div></div>
+          <span class="completeness-pct">9 of 13 uploaded</span>
+          <span style="font-size:11px;color:#64748b;">4 components pending upload</span>
+        </div>
+
+        <!-- Component List — clean table layout -->
+        <div class="component-list-wrap">
+          <div class="component-list-header">
+            <span style="font-size:13px;font-weight:700;color:#1e293b;">Repository Components <span class="ann" title="REPO-S04-001">REPO-S04-001</span></span>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:11px;color:#64748b;">Source:&nbsp;</span>
+              <span class="pill pill-user" style="font-size:10px;">👤 User Upload</span>
+              <span class="pill pill-agent" style="font-size:10px;">🤖 Agent Generated</span>
+            </div>
+          </div>
+          <table class="comp-table">
+            <thead>
+              <tr>
+                <th style="width:32%">Component</th>
+                <th style="width:12%">Source</th>
+                <th style="width:14%">Status</th>
+                <th style="width:18%">Latest Version</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Group: Core -->
+              <tr class="comp-group-row"><td colspan="5">📌 Core Model Artefacts</td></tr>
+              <tr>
+                <td><span class="comp-icon">📋</span><span class="comp-name">1. Model Metadata</span></td>
+                <td><span class="pill pill-user">👤 User</span></td>
+                <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
+                <td><span class="version-chip">v3</span> <span style="font-size:10px;color:#64748b;">09 May 2026, 14:32</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s05',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">⚙️</span><span class="comp-name">2. KPI Configuration</span></td>
+                <td><span class="pill pill-user">👤 User</span></td>
+                <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
+                <td><span class="version-chip">v2</span> <span style="font-size:10px;color:#64748b;">02 May 2026, 10:15</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s06',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">📊</span><span class="comp-name">3. Reference — Data Insights Numbers</span></td>
+                <td><span class="pill pill-user">👤 User</span></td>
+                <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
+                <td><span class="version-chip">v1</span> <span style="font-size:10px;color:#64748b;">15 Jan 2026, 09:00</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s07',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">📦</span><span class="comp-name">4. Baseline Data</span></td>
+                <td><span class="pill pill-user">👤 User</span></td>
+                <td><span class="pill pill-not-uploaded">○ Not Uploaded</span></td>
+                <td><span style="font-size:11px;color:#94a3b8;">Not yet ingested</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm" disabled style="opacity:0.4;cursor:not-allowed;">View</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">📊</span><span class="comp-name">5. Reference Data</span></td>
+                <td><span class="pill pill-agent">🤖 System</span></td>
+                <td><span class="pill pill-not-uploaded">○ Not Ingested</span></td>
+                <td><span style="font-size:11px;color:#94a3b8;">Populated via ingestion pipeline</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm" disabled style="opacity:0.4;cursor:not-allowed;">View</button>
+                </div></td>
+              </tr>
+
+              <!-- Group: Validation -->
+              <tr class="comp-group-row"><td colspan="5">🔬 Validation Artefacts</td></tr>
+              <tr>
+                <td><span class="comp-icon">🔬</span><span class="comp-name">6. Validation — Sample Analysis</span></td>
+                <td><span class="pill pill-user">👤 User</span></td>
+                <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
+                <td><span class="version-chip">v2</span> <span style="font-size:10px;color:#64748b;">20 Apr 2026, 11:45</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s08',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">📉</span><span class="comp-name">7. Validation — Data Drift</span></td>
+                <td><span class="pill pill-agent">🤖 Agent</span></td>
+                <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
+                <td><span class="version-chip">v4</span> <span style="font-size:10px;color:#64748b;">09 May 2026, 06:00</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s09',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">🔄</span><span class="comp-name">8. Validation — Concept Drift</span></td>
+                <td><span class="pill pill-agent">🤖 Agent</span></td>
+                <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
+                <td><span class="version-chip">v4</span> <span style="font-size:10px;color:#64748b;">09 May 2026, 06:00</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s09',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">📈</span><span class="comp-name">9. Validation — Performance Drift</span></td>
+                <td><span class="pill pill-agent">🤖 Agent</span></td>
+                <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
+                <td><span class="version-chip">v4</span> <span style="font-size:10px;color:#64748b;">09 May 2026, 06:00</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s09',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">🔍</span><span class="comp-name">10. Validation — RCA</span></td>
+                <td><span class="pill pill-agent">🤖 Agent</span></td>
+                <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
+                <td><span class="version-chip">v2</span> <span style="font-size:10px;color:#64748b;">28 Apr 2026, 14:00</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s10',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">📄</span><span class="comp-name">11. Validation — Report</span></td>
+                <td><span class="pill pill-agent">🤖 Agent</span></td>
+                <td><span class="pill pill-not-uploaded">○ Not Uploaded</span></td>
+                <td><span style="font-size:11px;color:#94a3b8;">Pending agent run</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm" disabled style="opacity:0.4;cursor:not-allowed;">View</button>
+                </div></td>
+              </tr>
+
+              <!-- Group: Governance -->
+              <tr class="comp-group-row"><td colspan="5">🛡️ Governance &amp; Support</td></tr>
+              <tr>
+                <td><span class="comp-icon">🗂️</span><span class="comp-name">12. Audit Log</span></td>
+                <td><span class="pill pill-agent">🤖 System</span></td>
+                <td><span class="pill pill-uploaded">✓ Active</span></td>
+                <td><span style="font-size:10px;color:#64748b;">Auto-maintained · 47 entries</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s12',null)">View</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">📎</span><span class="comp-name">13. Additional Documents</span></td>
+                <td><span class="pill pill-user">👤 User</span></td>
+                <td><span class="pill pill-not-uploaded">○ None Uploaded</span></td>
+                <td><span style="font-size:11px;color:#94a3b8;">No files yet</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s13',null)">Manage</button>
+                </div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================ S05 METADATA ================================================================ -->
+<div id="s05" class="screen">
+  <span class="screen-label">S05 — Model Metadata</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right"><div class="role-pill">👤 USER</div><button class="icon-btn">🔔</button><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div><button class="icon-btn">⏻</button></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="nav-section-title">My Workspace</div>
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div><div class="tile-subtitle">Data Center</div></div></div>
+        <div class="subnav-tree">
+          <div class="tree-node">💳 Credit Risk</div>
+          <div class="tree-node tree-node-l2">🔢 Classification</div>
+          <div class="tree-node tree-node-l2" onclick="showScreen('s04',null)">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3 active-node" onclick="showScreen('s05',null)">📋 Metadata ◀</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s06',null)">⚙️ KPI Config</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s07',null)">📊 Data Insights</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s08',null)">🔬 Sample Analysis</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s09',null)">📉 Drift Reports</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s10',null)">🔍 RCA</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s11',null)">📄 Val. Report</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s12',null)">🗂️ Audit Log</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s13',null)">📎 Add. Docs</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; <a onclick="showScreen('s02',null)">Credit Risk</a> &nbsp;›&nbsp; <a onclick="showScreen('s03',null)">Classification</a> &nbsp;›&nbsp; <a onclick="showScreen('s04',null)">CR-CLF-001</a> &nbsp;›&nbsp; Model Metadata</div>
+        <h2 class="page-title">Model Metadata <span class="ann" title="REPO-S05-001">REPO-S05-001</span></h2>
+        <p class="page-subtitle">Component 1 of 13 — Source: User Upload</p>
+
+        <div class="pending-delete-banner">⚠️ <strong>Pending delete request</strong> on v1 — Requested by J. Smith · 02 May 2026 · Reason: "Superseded by v3" — Awaiting Admin approval. <span class="ann" title="REPO-S05-002">REPO-S05-002</span></div>
+
+        <div class="viewer-layout">
+          <!-- Version Sidebar -->
+          <div class="version-sidebar">
+            <div class="version-sidebar-header">
+              <span>📋 Versions (3)</span>
+              
+            </div>
+            <div class="version-list">
+              <div class="version-item active">
+                <div class="version-num">v3 — Current</div>
+                <div class="version-meta">J. Smith · 09 May 2026, 14:32</div>
+                <div class="version-meta">Size: 48 KB · PDF</div>
+              </div>
+              <div class="version-item">
+                <div class="version-num">v2</div>
+                <div class="version-meta">J. Smith · 02 Mar 2026, 10:15</div>
+                <div class="version-meta">Size: 45 KB · PDF</div>
+              </div>
+              <div class="version-item deleted-v">
+                <div class="version-num deleted-v">v1 — Delete Requested</div>
+                <div class="version-meta">J. Smith · 12 Jan 2025, 09:00</div>
+                <div class="version-meta">Pending Admin approval</div>
+              </div>
+            </div>
+          </div>
+          <!-- Main Viewer -->
+          <div class="viewer-main">
+            <div class="viewer-main-header">
+              <div>
+                <div class="viewer-title">📋 Model Metadata — v3</div>
+                <div style="font-size:11px;color:#64748b;margin-top:2px;">Uploaded by Jane Smith · 09 May 2026, 14:32 · PDF · 48 KB</div>
+              </div>
+              <div class="viewer-actions">
+                <button class="btn btn-sm">📥 Download PDF</button>
+                <button class="btn btn-sm">📥 Download Excel</button>
+                <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+              </div>
+            </div>
+            <div class="viewer-meta-strip">
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Model ID</div><div class="viewer-meta-val">CR-CLF-001</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Version</div><div class="viewer-meta-val">v3 (Current)</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Upload Date</div><div class="viewer-meta-val">09 May 2026</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">File Type</div><div class="viewer-meta-val">PDF</div></div>
+            </div>
+            <div class="viewer-content-box">
+              <table class="kv-table">
+                <tr><td>Model ID</td><td>CR-CLF-001</td></tr>
+                <tr><td>Model Name</td><td>PD Model — Retail Banking</td></tr>
+                <tr><td>Domain</td><td>Credit Risk</td></tr>
+                <tr><td>Modelling Technique</td><td>Classification</td></tr>
+                <tr><td>Data Type</td><td>Account Level</td></tr>
+                <tr><td>Data Structure</td><td>Cross-Sectional</td></tr>
+                <tr><td>Risk Tier</td><td>Tier 1 — High Risk</td></tr>
+                <tr><td>Model Owner</td><td>Jane Smith</td></tr>
+                <tr><td>Model Developer</td><td>R. Patel, A. Chen</td></tr>
+                <tr><td>Monitoring Start Date</td><td>01 Feb 2025</td></tr>
+                <tr><td>Monitoring Frequency</td><td>Monthly</td></tr>
+                <tr><td>Upstream Models</td><td>None</td></tr>
+                <tr><td>Downstream Models</td><td>CR-CLF-009, CR-CLF-014</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ S06 KPI CONFIG ================================================================ -->
+<div id="s06" class="screen">
+  <span class="screen-label">S06 — KPI Configuration</span>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
+      <div class="app-header-right"><div class="role-pill">👤 USER</div><button class="icon-btn">🔔</button><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div><button class="icon-btn">⏻</button></div>
+    </div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div></div></div>
+        <div class="subnav-tree">
+          <div class="tree-node">💳 Credit Risk</div><div class="tree-node tree-node-l2" onclick="showScreen('s04',null)">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s05',null)">📋 Metadata</div>
+          <div class="tree-node tree-node-l3 active-node">⚙️ KPI Config ◀</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s07',null)">📊 Data Insights</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s08',null)">🔬 Sample Analysis</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s09',null)">📉 Drift Reports</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s10',null)">🔍 RCA</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s11',null)">📄 Val. Report</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s12',null)">🗂️ Audit Log</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s13',null)">📎 Add. Docs</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; Credit Risk &nbsp;›&nbsp; <a onclick="showScreen('s04',null)">CR-CLF-001</a> &nbsp;›&nbsp; KPI Configuration</div>
+        <h2 class="page-title">KPI Configuration</h2>
+        <p class="page-subtitle">Component 2 of 13 — Source: User Upload · Read-only view of stored KPI Pack snapshot.</p>
+        <div class="viewer-layout">
+          <div class="version-sidebar">
+            <div class="version-sidebar-header"><span>⚙️ Versions (2)</span></div>
+            <div class="version-list">
+              <div class="version-item active"><div class="version-num">v2 — Current</div><div class="version-meta">R. Patel · 02 May 2026, 10:15</div><div class="version-meta">XLSX · 112 KB</div></div>
+              <div class="version-item"><div class="version-num">v1</div><div class="version-meta">J. Smith · 15 Feb 2025, 09:30</div><div class="version-meta">XLSX · 98 KB</div></div>
+            </div>
+          </div>
+          <div class="viewer-main">
+            <div class="viewer-main-header">
+              <div><div class="viewer-title">⚙️ KPI Configuration — v2</div><div style="font-size:11px;color:#64748b;margin-top:2px;">Uploaded by R. Patel · 02 May 2026 · XLSX · 112 KB</div></div>
+              <div class="viewer-actions"><button class="btn btn-sm">📥 Download</button><button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button></div>
+            </div>
+            <div class="viewer-content-box">
+              <table class="data-table" style="font-size:11px;">
+                <thead><tr><th>KPI Type</th><th>Metric Name</th><th>Applicable</th><th>Warning Threshold</th><th>Breach Threshold</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Data Drift</td><td>PSI — Score Band</td><td>✓</td><td>0.10</td><td>0.25</td><td><span class="pill pill-uploaded">Set</span></td></tr>
+                  <tr><td>Data Drift</td><td>PSI — Feature Variables</td><td>✓</td><td>0.10</td><td>0.25</td><td><span class="pill pill-uploaded">Set</span></td></tr>
+                  <tr><td>Performance</td><td>Gini Coefficient</td><td>✓</td><td>-0.05 Δ</td><td>-0.10 Δ</td><td><span class="pill pill-uploaded">Set</span></td></tr>
+                  <tr><td>Performance</td><td>AUROC</td><td>✓</td><td>-0.03 Δ</td><td>-0.07 Δ</td><td><span class="pill pill-uploaded">Set</span></td></tr>
+                  <tr><td>Concept Drift</td><td>PSI — Default Rate</td><td>✓</td><td>—</td><td>0.20 Δ</td><td><span class="pill pill-pending">Delta Only</span></td></tr>
+                  <tr><td>Concept Drift</td><td>Actual vs Predicted DR</td><td>✓</td><td>—</td><td>+15% Δ</td><td><span class="pill pill-pending">Delta Only</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================ S07 DATA INSIGHTS ================================================================ -->
+<div id="s07" class="screen">
+  <span class="screen-label">S07 — Reference: Data Insights Numbers</span>
+  <div class="app-shell">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div></div></div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div></div></div>
+        <div class="subnav-tree">
+          <div class="tree-node">💳 Credit Risk</div><div class="tree-node tree-node-l2" onclick="showScreen('s04',null)">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s05',null)">📋 Metadata</div><div class="tree-node tree-node-l3" onclick="showScreen('s06',null)">⚙️ KPI Config</div>
+          <div class="tree-node tree-node-l3 active-node">📊 Data Insights ◀</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s08',null)">🔬 Sample Analysis</div><div class="tree-node tree-node-l3" onclick="showScreen('s09',null)">📉 Drift Reports</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s10',null)">🔍 RCA</div><div class="tree-node tree-node-l3" onclick="showScreen('s11',null)">📄 Val. Report</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s12',null)">🗂️ Audit Log</div><div class="tree-node tree-node-l3" onclick="showScreen('s13',null)">📎 Add. Docs</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; Credit Risk &nbsp;›&nbsp; <a onclick="showScreen('s04',null)">CR-CLF-001</a> &nbsp;›&nbsp; Reference — Data Insights</div>
+        <h2 class="page-title">Reference — Data Insights Numbers</h2>
+        <p class="page-subtitle">Component 3 of 13 — Source: User Upload · Reference statistics from training/development data.</p>
+        <div class="viewer-layout">
+          <div class="version-sidebar">
+            <div class="version-sidebar-header"><span>📊 Versions (1)</span></div>
+            <div class="version-list">
+              <div class="version-item active"><div class="version-num">v1 — Current</div><div class="version-meta">J. Smith · 15 Jan 2026, 09:00</div><div class="version-meta">CSV · 2.3 MB</div></div>
+            </div>
+          </div>
+          <div class="viewer-main">
+            <div class="viewer-main-header">
+              <div><div class="viewer-title">📊 Data Insights Numbers — v1</div><div style="font-size:11px;color:#64748b;margin-top:2px;">Uploaded by J. Smith · 15 Jan 2026 · CSV · 2.3 MB</div></div>
+              <div class="viewer-actions"><button class="btn btn-sm">📥 Download CSV</button><button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button></div>
+            </div>
+            <div class="viewer-meta-strip">
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Reference Period</div><div class="viewer-meta-val">Jan 2023 – Dec 2024</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Sample Size</div><div class="viewer-meta-val">22,582</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Default Rate</div><div class="viewer-meta-val">21.8%</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">File Type</div><div class="viewer-meta-val">CSV</div></div>
+            </div>
+            <div class="viewer-content-box">
+              <table class="data-table" style="font-size:11px;">
+                <thead><tr><th>Variable</th><th>Type</th><th>Mean</th><th>Median</th><th>Std Dev</th><th>Min</th><th>Max</th><th>Missing %</th></tr></thead>
+                <tbody>
+                  <tr><td>person_age</td><td>Numeric</td><td>27.7</td><td>26</td><td>6.35</td><td>20</td><td>144</td><td>0.0%</td></tr>
+                  <tr><td>person_income</td><td>Numeric</td><td>66,075</td><td>55,000</td><td>61,983</td><td>4,000</td><td>6,000,000</td><td>0.0%</td></tr>
+                  <tr><td>loan_amnt</td><td>Numeric</td><td>9,589</td><td>8,000</td><td>6,321</td><td>500</td><td>35,000</td><td>0.0%</td></tr>
+                  <tr><td>loan_int_rate</td><td>Numeric</td><td>11.01%</td><td>10.99%</td><td>3.24%</td><td>5.42%</td><td>23.22%</td><td>9.5%</td></tr>
+                  <tr><td>loan_percent_income</td><td>Numeric</td><td>0.17</td><td>0.15</td><td>0.11</td><td>0.0</td><td>0.83</td><td>0.0%</td></tr>
+                  <tr><td>person_home_ownership</td><td>Categorical</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>0.0%</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ S08 SAMPLE ANALYSIS ================================================================ -->
+<div id="s08" class="screen">
+  <span class="screen-label">S08 — Validation: Sample Analysis</span>
+  <div class="app-shell">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div></div></div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div></div></div>
+        <div class="subnav-tree">
+          <div class="tree-node">💳 Credit Risk</div><div class="tree-node tree-node-l2" onclick="showScreen('s04',null)">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s05',null)">📋 Metadata</div><div class="tree-node tree-node-l3" onclick="showScreen('s06',null)">⚙️ KPI Config</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s07',null)">📊 Data Insights</div>
+          <div class="tree-node tree-node-l3 active-node">🔬 Sample Analysis ◀</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s09',null)">📉 Drift Reports</div><div class="tree-node tree-node-l3" onclick="showScreen('s10',null)">🔍 RCA</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s11',null)">📄 Val. Report</div><div class="tree-node tree-node-l3" onclick="showScreen('s12',null)">🗂️ Audit Log</div><div class="tree-node tree-node-l3" onclick="showScreen('s13',null)">📎 Add. Docs</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; Credit Risk &nbsp;›&nbsp; <a onclick="showScreen('s04',null)">CR-CLF-001</a> &nbsp;›&nbsp; Validation — Sample Analysis</div>
+        <h2 class="page-title">Validation — Sample Analysis</h2>
+        <p class="page-subtitle">Component 4 of 13 — Source: User Upload · Out-of-time or out-of-sample validation results.</p>
+        <div class="viewer-layout">
+          <div class="version-sidebar">
+            <div class="version-sidebar-header"><span>🔬 Versions (2)</span></div>
+            <div class="version-list">
+              <div class="version-item active"><div class="version-num">v2 — Current</div><div class="version-meta">J. Smith · 20 Apr 2026, 11:45</div><div class="version-meta">PDF · 3.8 MB</div></div>
+              <div class="version-item"><div class="version-num">v1</div><div class="version-meta">J. Smith · 10 Feb 2025, 14:00</div><div class="version-meta">PDF · 3.2 MB</div></div>
+            </div>
+          </div>
+          <div class="viewer-main">
+            <div class="viewer-main-header">
+              <div><div class="viewer-title">🔬 Sample Analysis — v2</div><div style="font-size:11px;color:#64748b;margin-top:2px;">Uploaded by J. Smith · 20 Apr 2026 · PDF · 3.8 MB</div></div>
+              <div class="viewer-actions"><button class="btn btn-sm">📥 Download PDF</button><button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button></div>
+            </div>
+            <div class="viewer-meta-strip">
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Run Date</div><div class="viewer-meta-val">18 Apr 2026</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Analyst</div><div class="viewer-meta-val">J. Smith</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Sample Size</div><div class="viewer-meta-val">4,512</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Validation Type</div><div class="viewer-meta-val">Out-of-Time</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Overall Status</div><div class="viewer-meta-val"><span class="pill pill-uploaded">✓ Pass</span></div></div>
+            </div>
+            <div class="viewer-content-box">
+              <div class="placeholder-chart">[PDF Document Preview — Page 1 of 24: Sample Analysis Report]</div>
+              <table class="data-table" style="font-size:11px;">
+                <thead><tr><th>Metric</th><th>Development</th><th>OOT Validation</th><th>Delta</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Gini Coefficient</td><td>0.680</td><td>0.652</td><td>-0.028</td><td><span class="pill pill-uploaded">✓ Pass</span></td></tr>
+                  <tr><td>AUROC</td><td>0.840</td><td>0.826</td><td>-0.014</td><td><span class="pill pill-uploaded">✓ Pass</span></td></tr>
+                  <tr><td>KS Statistic</td><td>0.412</td><td>0.398</td><td>-0.014</td><td><span class="pill pill-uploaded">✓ Pass</span></td></tr>
+                  <tr><td>Brier Score</td><td>0.102</td><td>0.109</td><td>+0.007</td><td><span class="pill pill-pending">⚠ Watch</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================ S09 DRIFT REPORTS ================================================================ -->
+<div id="s09" class="screen">
+  <span class="screen-label">S09 — Validation: Drift Reports (3 independent components)</span>
+  <div class="app-shell">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div></div></div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div></div></div>
+        <div class="subnav-tree">
+          <div class="tree-node">💳 Credit Risk</div><div class="tree-node tree-node-l2" onclick="showScreen('s04',null)">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s05',null)">📋 Metadata</div><div class="tree-node tree-node-l3" onclick="showScreen('s06',null)">⚙️ KPI Config</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s07',null)">📊 Data Insights</div><div class="tree-node tree-node-l3" onclick="showScreen('s08',null)">🔬 Sample Analysis</div>
+          <div class="tree-node tree-node-l3 active-node">📉 Drift Reports ◀</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s10',null)">🔍 RCA</div><div class="tree-node tree-node-l3" onclick="showScreen('s11',null)">📄 Val. Report</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s12',null)">🗂️ Audit Log</div><div class="tree-node tree-node-l3" onclick="showScreen('s13',null)">📎 Add. Docs</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; Credit Risk &nbsp;›&nbsp; <a onclick="showScreen('s04',null)">CR-CLF-001</a> &nbsp;›&nbsp; Validation — Drift Reports</div>
+        <h2 class="page-title">Validation — Drift Reports</h2>
+        <p class="page-subtitle">Components 7, 8 &amp; 9 of 13 — Source: Agent Generated · Each drift type is stored and versioned independently. <span class="ann" title="REPO-S09-001">REPO-S09-001</span></p>
+
+        <div class="info-banner">ℹ️ Each tab below represents an <strong>independent component</strong> with its own version history, status, and delete controls. Deleting a version in one tab does not affect the other drift types.</div>
+
+        <!-- Tab bar -->
+        <div class="tab-bar">
+          <div class="tab-item active" onclick="switchTab('drift-data',this)">📉 Data Drift &nbsp;<span class="pill pill-uploaded" style="font-size:9px;">v4</span></div>
+          <div class="tab-item" onclick="switchTab('drift-concept',this)">🔄 Concept Drift &nbsp;<span class="pill pill-uploaded" style="font-size:9px;">v4</span></div>
+          <div class="tab-item" onclick="switchTab('drift-perf',this)">📈 Performance Drift &nbsp;<span class="pill pill-uploaded" style="font-size:9px;">v4</span></div>
+        </div>
+
+        <!-- DATA DRIFT TAB -->
+        <div id="drift-data" class="tab-content active">
+          <div class="version-sidebar">
+            <div class="version-sidebar-header"><span>📉 Data Drift Versions (4)</span></div>
+            <div class="version-list">
+              <div class="version-item active"><div class="version-num">v4 — Current</div><div class="version-meta">Agent Run · 09 May 2026, 06:00</div><div class="version-meta">Auto-generated · JSON+PDF</div></div>
+              <div class="version-item"><div class="version-num">v3</div><div class="version-meta">Agent Run · 09 Apr 2026, 06:00</div></div>
+              <div class="version-item"><div class="version-num">v2</div><div class="version-meta">Agent Run · 09 Mar 2026, 06:00</div></div>
+              <div class="version-item"><div class="version-num">v1</div><div class="version-meta">Agent Run · 09 Feb 2026, 06:00</div></div>
+            </div>
+          </div>
+          <div class="viewer-main">
+            <div class="viewer-main-header">
+              <div><div class="viewer-title">📉 Data Drift Report — v4 (May 2026)</div><div style="font-size:11px;color:#64748b;margin-top:2px;">Agent Run · 09 May 2026, 06:00 UTC · Vintage: Apr 2026</div></div>
+              <div class="viewer-actions"><button class="btn btn-sm">📥 Download</button><button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button></div>
+            </div>
+            <div class="viewer-meta-strip">
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Run Date</div><div class="viewer-meta-val">09 May 2026</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Vintage</div><div class="viewer-meta-val">Apr 2026</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Overall Status</div><div class="viewer-meta-val"><span class="pill pill-uploaded">✓ No Breach</span></div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Triggered</div><div class="viewer-meta-val">0 of 8 metrics</div></div>
+            </div>
+            <div class="viewer-content-box">
+              <div class="placeholder-chart">[Data Drift Chart — PSI Trend across Vintages: Feb–May 2026]</div>
+              <table class="data-table" style="font-size:11px;">
+                <thead><tr><th>Feature</th><th>PSI Score</th><th>Warning (0.10)</th><th>Breach (0.25)</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Score Band Distribution</td><td>0.04</td><td>—</td><td>—</td><td><span class="pill pill-uploaded">✓ OK</span></td></tr>
+                  <tr><td>person_income</td><td>0.07</td><td>—</td><td>—</td><td><span class="pill pill-uploaded">✓ OK</span></td></tr>
+                  <tr><td>loan_amnt</td><td>0.09</td><td>⚠ Near Warning</td><td>—</td><td><span class="pill pill-pending">⚠ Watch</span></td></tr>
+                  <tr><td>loan_int_rate</td><td>0.03</td><td>—</td><td>—</td><td><span class="pill pill-uploaded">✓ OK</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONCEPT DRIFT TAB -->
+        <div id="drift-concept" class="tab-content">
+          <div class="version-sidebar">
+            <div class="version-sidebar-header"><span>🔄 Concept Drift Versions (4)</span></div>
+            <div class="version-list">
+              <div class="version-item active"><div class="version-num">v4 — Current</div><div class="version-meta">Agent Run · 09 May 2026, 06:00</div><div class="version-meta">Auto-generated · JSON+PDF</div></div>
+              <div class="version-item"><div class="version-num">v3</div><div class="version-meta">Agent Run · 09 Apr 2026, 06:00</div></div>
+              <div class="version-item"><div class="version-num">v2</div><div class="version-meta">Agent Run · 09 Mar 2026, 06:00</div></div>
+              <div class="version-item"><div class="version-num">v1</div><div class="version-meta">Agent Run · 09 Feb 2026, 06:00</div></div>
+            </div>
+          </div>
+          <div class="viewer-main">
+            <div class="viewer-main-header">
+              <div><div class="viewer-title">🔄 Concept Drift Report — v4 (May 2026)</div><div style="font-size:11px;color:#64748b;margin-top:2px;">Agent Run · 09 May 2026, 06:00 UTC · Vintage: Apr 2026</div></div>
+              <div class="viewer-actions"><button class="btn btn-sm">📥 Download</button><button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button></div>
+            </div>
+            <div class="viewer-meta-strip">
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Run Date</div><div class="viewer-meta-val">09 May 2026</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Vintage</div><div class="viewer-meta-val">Apr 2026</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Overall Status</div><div class="viewer-meta-val"><span class="pill pill-pending">⚠ Warning</span></div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Triggered</div><div class="viewer-meta-val">1 of 2 metrics</div></div>
+            </div>
+            <div class="viewer-content-box">
+              <div class="placeholder-chart">[Concept Drift Chart — Actual vs Predicted Default Rate Trend]</div>
+              <table class="data-table" style="font-size:11px;">
+                <thead><tr><th>Metric</th><th>Reference DR</th><th>Current DR</th><th>Delta</th><th>Breach (Δ0.20)</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>PSI — Default Rate</td><td>21.8%</td><td>24.1%</td><td>+2.3%</td><td>—</td><td><span class="pill pill-uploaded">✓ OK</span></td></tr>
+                  <tr><td>Actual vs Predicted DR</td><td>21.8%</td><td>26.5%</td><td>+4.7%</td><td>+15% Δ Warn</td><td><span class="pill pill-pending">⚠ Warning</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PERFORMANCE DRIFT TAB -->
+        <div id="drift-perf" class="tab-content">
+          <div class="version-sidebar">
+            <div class="version-sidebar-header"><span>📈 Performance Versions (4)</span></div>
+            <div class="version-list">
+              <div class="version-item active"><div class="version-num">v4 — Current</div><div class="version-meta">Agent Run · 09 May 2026, 06:00</div><div class="version-meta">Auto-generated · JSON+PDF</div></div>
+              <div class="version-item"><div class="version-num">v3</div><div class="version-meta">Agent Run · 09 Apr 2026, 06:00</div></div>
+              <div class="version-item"><div class="version-num">v2</div><div class="version-meta">Agent Run · 09 Mar 2026, 06:00</div></div>
+              <div class="version-item"><div class="version-num">v1</div><div class="version-meta">Agent Run · 09 Feb 2026, 06:00</div></div>
+            </div>
+          </div>
+          <div class="viewer-main">
+            <div class="viewer-main-header">
+              <div><div class="viewer-title">📈 Performance Drift Report — v4 (May 2026)</div><div style="font-size:11px;color:#64748b;margin-top:2px;">Agent Run · 09 May 2026, 06:00 UTC · Vintage: Apr 2026</div></div>
+              <div class="viewer-actions"><button class="btn btn-sm">📥 Download</button><button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button></div>
+            </div>
+            <div class="viewer-meta-strip">
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Run Date</div><div class="viewer-meta-val">09 May 2026</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Vintage</div><div class="viewer-meta-val">Apr 2026</div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Overall Status</div><div class="viewer-meta-val"><span class="pill pill-uploaded">✓ No Breach</span></div></div>
+              <div class="viewer-meta-item"><div class="viewer-meta-label">Triggered</div><div class="viewer-meta-val">0 of 4 metrics</div></div>
+            </div>
+            <div class="viewer-content-box">
+              <div class="placeholder-chart">[Performance Drift Chart — Gini / AUROC Trend: Feb–May 2026]</div>
+              <table class="data-table" style="font-size:11px;">
+                <thead><tr><th>Metric</th><th>Dev Baseline</th><th>Current</th><th>Delta</th><th>Warn (Δ-0.05)</th><th>Breach (Δ-0.10)</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Gini Coefficient</td><td>0.680</td><td>0.661</td><td>-0.019</td><td>—</td><td>—</td><td><span class="pill pill-uploaded">✓ OK</span></td></tr>
+                  <tr><td>AUROC</td><td>0.840</td><td>0.831</td><td>-0.009</td><td>—</td><td>—</td><td><span class="pill pill-uploaded">✓ OK</span></td></tr>
+                  <tr><td>KS Statistic</td><td>0.412</td><td>0.401</td><td>-0.011</td><td>—</td><td>—</td><td><span class="pill pill-uploaded">✓ OK</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================ S10 RCA ================================================================ -->
+<div id="s10" class="screen">
+  <span class="screen-label">S10 — Validation: RCA</span>
+  <div class="app-shell">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div></div></div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div></div></div>
+        <div class="subnav-tree">
+          <div class="tree-node">💳 Credit Risk</div><div class="tree-node tree-node-l2" onclick="showScreen('s04',null)">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s05',null)">📋 Metadata</div><div class="tree-node tree-node-l3" onclick="showScreen('s06',null)">⚙️ KPI Config</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s07',null)">📊 Data Insights</div><div class="tree-node tree-node-l3" onclick="showScreen('s08',null)">🔬 Sample Analysis</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s09',null)">📉 Drift Reports</div>
+          <div class="tree-node tree-node-l3 active-node">🔍 RCA ◀</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s11',null)">📄 Val. Report</div><div class="tree-node tree-node-l3" onclick="showScreen('s12',null)">🗂️ Audit Log</div><div class="tree-node tree-node-l3" onclick="showScreen('s13',null)">📎 Add. Docs</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; Credit Risk &nbsp;›&nbsp; <a onclick="showScreen('s04',null)">CR-CLF-001</a> &nbsp;›&nbsp; Validation — RCA</div>
+        <h2 class="page-title">Validation — Root Cause Analysis (RCA)</h2>
+        <p class="page-subtitle">Component 8 of 13 — Source: Agent Generated · RCA is triggered when a monitoring breach is detected.</p>
+        <div class="viewer-layout">
+          <div class="version-sidebar">
+            <div class="version-sidebar-header"><span>🔍 RCA Versions (2)</span></div>
+            <div class="version-list">
+              <div class="version-item active"><div class="version-num">v2 — Current</div><div class="version-meta">Agent · 28 Apr 2026, 14:00</div><div class="version-meta">Triggered by: Concept Drift v3</div></div>
+              <div class="version-item"><div class="version-num">v1</div><div class="version-meta">Agent · 12 Nov 2025, 09:30</div><div class="version-meta">Triggered by: Perf Drift v1</div></div>
+            </div>
+          </div>
+          <div class="viewer-main">
+            <div class="viewer-main-header">
+              <div><div class="viewer-title">🔍 RCA Report — v2</div><div style="font-size:11px;color:#64748b;margin-top:2px;">Agent Generated · 28 Apr 2026, 14:00 · Triggered by Concept Drift breach</div></div>
+              <div class="viewer-actions"><span class="pill pill-pending" style="font-size:11px;">⚠ Pending Review</span><button class="btn btn-sm">📥 Download</button><button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button></div>
+            </div>
+            <div class="viewer-content-box" style="padding:16px;">
+              <div style="margin-bottom:14px;"><div style="font-size:12px;font-weight:700;color:#1e3a8a;margin-bottom:6px;">Root Cause Summary</div><div style="font-size:12px;color:#1e293b;background:#eff6ff;padding:10px;border-radius:6px;border:1px dashed #93c5fd;">Concept drift detected in Actual vs Predicted Default Rate (Apr 2026 vintage). Primary driver identified as a macroeconomic shift in household income and credit utilisation rates across Retail Banking segment Q1 2026.</div></div>
+              <div style="margin-bottom:14px;"><div style="font-size:12px;font-weight:700;color:#1e3a8a;margin-bottom:6px;">Contributing Factors</div>
+                <div style="font-size:12px;color:#1e293b;padding:8px 0;border-bottom:1px dashed #e2e8f0;">1. Interest rate environment — Average loan interest rate increased 1.8pp Q1 2026 vs reference period</div>
+                <div style="font-size:12px;color:#1e293b;padding:8px 0;border-bottom:1px dashed #e2e8f0;">2. Income distribution shift — person_income PSI = 0.07, approaching warning threshold</div>
+                <div style="font-size:12px;color:#1e293b;padding:8px 0;">3. Default rate uplift — 4.7% absolute increase Actual DR vs model expectation</div>
+              </div>
+              <div><div style="font-size:12px;font-weight:700;color:#1e3a8a;margin-bottom:6px;">Recommended Actions</div>
+                <div style="font-size:12px;color:#1e293b;padding:8px 0;border-bottom:1px dashed #e2e8f0;">① Review model recalibration against Q1 2026 data before next monitoring cycle</div>
+                <div style="font-size:12px;color:#1e293b;padding:8px 0;border-bottom:1px dashed #e2e8f0;">② Escalate to Model Risk Committee if May 2026 Concept Drift also breaches</div>
+                <div style="font-size:12px;color:#1e293b;padding:8px 0;">③ Analyst review of loan_amnt distribution — approaching warning PSI</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ S11 VALIDATION REPORT ================================================================ -->
+<div id="s11" class="screen">
+  <span class="screen-label">S11 — Validation: Final Report</span>
+  <div class="app-shell">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div></div></div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div></div></div>
+        <div class="subnav-tree">
+          <div class="tree-node">💳 Credit Risk</div><div class="tree-node tree-node-l2" onclick="showScreen('s04',null)">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s05',null)">📋 Metadata</div><div class="tree-node tree-node-l3" onclick="showScreen('s06',null)">⚙️ KPI Config</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s07',null)">📊 Data Insights</div><div class="tree-node tree-node-l3" onclick="showScreen('s08',null)">🔬 Sample Analysis</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s09',null)">📉 Drift Reports</div><div class="tree-node tree-node-l3" onclick="showScreen('s10',null)">🔍 RCA</div>
+          <div class="tree-node tree-node-l3 active-node">📄 Val. Report ◀</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s12',null)">🗂️ Audit Log</div><div class="tree-node tree-node-l3" onclick="showScreen('s13',null)">📎 Add. Docs</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; Credit Risk &nbsp;›&nbsp; <a onclick="showScreen('s04',null)">CR-CLF-001</a> &nbsp;›&nbsp; Validation — Report</div>
+        <h2 class="page-title">Validation — Final Report</h2>
+        <p class="page-subtitle">Component 9 of 13 — Source: Agent Generated · Consolidated validation report for the monitoring period.</p>
+        <div class="warn-banner">⏳ <strong>Not yet generated.</strong> This component is pending the next scheduled agent run (due 10 May 2026). No action required from the user. <span class="ann" title="REPO-S11-001">REPO-S11-001</span></div>
+        <div class="viewer-layout" style="opacity:0.5;pointer-events:none;">
+          <div class="version-sidebar">
+            <div class="version-sidebar-header"><span>📄 Versions (0)</span></div>
+            <div class="version-list" style="padding:12px;font-size:11px;color:#94a3b8;text-align:center;">No reports generated yet.</div>
+          </div>
+          <div class="viewer-main" style="display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;color:#94a3b8;font-size:13px;padding:40px;">📄<br><br>Validation Report will appear here after the next agent run.<br><br><span style="font-size:11px;">Next scheduled run: 10 May 2026, 06:00 UTC</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================ S12 AUDIT LOG ================================================================ -->
+<div id="s12" class="screen">
+  <span class="screen-label">S12 — Audit Log</span>
+  <div class="app-shell">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div></div></div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div></div></div>
+        <div class="subnav-tree">
+          <div class="tree-node">💳 Credit Risk</div><div class="tree-node tree-node-l2" onclick="showScreen('s04',null)">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s05',null)">📋 Metadata</div><div class="tree-node tree-node-l3" onclick="showScreen('s06',null)">⚙️ KPI Config</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s07',null)">📊 Data Insights</div><div class="tree-node tree-node-l3" onclick="showScreen('s08',null)">🔬 Sample Analysis</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s09',null)">📉 Drift Reports</div><div class="tree-node tree-node-l3" onclick="showScreen('s10',null)">🔍 RCA</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s11',null)">📄 Val. Report</div>
+          <div class="tree-node tree-node-l3 active-node">🗂️ Audit Log ◀</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s13',null)">📎 Add. Docs</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; Credit Risk &nbsp;›&nbsp; <a onclick="showScreen('s04',null)">CR-CLF-001</a> &nbsp;›&nbsp; Audit Log</div>
+        <h2 class="page-title">Audit Log <span class="ann" title="REPO-S12-001">REPO-S12-001</span></h2>
+        <p class="page-subtitle">Component 10 of 13 — System Maintained · Immutable, append-only log of all repository actions. Cannot be deleted.</p>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><input type="text" placeholder="Search user, component, action…"></div>
+            <div class="filter-chip">📅 Date Range ▾</div>
+            <div class="filter-chip">⚡ Action Type ▾</div>
+            <div class="filter-chip">👤 User ▾</div>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn">📥 Export CSV</button>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <div class="data-table-header"><span>Audit Entries (47)</span><span style="font-size:11px;color:#64748b;">Showing 1–10 of 47 · 50 per page</span></div>
+          <table class="audit-table">
+            <thead><tr><th>Timestamp (UTC)</th><th>User</th><th>Role</th><th>Action</th><th>Component</th><th>Version</th><th>Details</th></tr></thead>
+            <tbody>
+              <tr><td>09 May 2026, 14:32</td><td>Jane Smith</td><td><span class="pill pill-user">User</span></td><td class="audit-action-upload">↑ Uploaded</td><td>Model Metadata</td><td>v3</td><td>metadata_v3_final.pdf · 48 KB</td></tr>
+              <tr><td>09 May 2026, 06:00</td><td>System Agent</td><td><span class="pill pill-agent">Agent</span></td><td class="audit-action-upload">↑ Generated</td><td>Data Drift</td><td>v4</td><td>Scheduled run · Apr 2026 vintage</td></tr>
+              <tr><td>09 May 2026, 06:00</td><td>System Agent</td><td><span class="pill pill-agent">Agent</span></td><td class="audit-action-upload">↑ Generated</td><td>Concept Drift</td><td>v4</td><td>Scheduled run · Warning triggered</td></tr>
+              <tr><td>09 May 2026, 06:00</td><td>System Agent</td><td><span class="pill pill-agent">Agent</span></td><td class="audit-action-upload">↑ Generated</td><td>Performance Drift</td><td>v4</td><td>Scheduled run · No breach</td></tr>
+              <tr><td>02 May 2026, 10:15</td><td>R. Patel</td><td><span class="pill pill-user">User</span></td><td class="audit-action-upload">↑ Uploaded</td><td>KPI Configuration</td><td>v2</td><td>kpi_config_v2.xlsx · 112 KB</td></tr>
+              <tr><td>02 May 2026, 09:40</td><td>Jane Smith</td><td><span class="pill pill-user">User</span></td><td class="audit-action-request">⚑ Delete Requested</td><td>Model Metadata</td><td>v1</td><td>Reason: Superseded by v3</td></tr>
+              <tr><td>28 Apr 2026, 14:00</td><td>System Agent</td><td><span class="pill pill-agent">Agent</span></td><td class="audit-action-upload">↑ Generated</td><td>RCA</td><td>v2</td><td>Triggered by Concept Drift breach</td></tr>
+              <tr><td>20 Apr 2026, 11:45</td><td>Jane Smith</td><td><span class="pill pill-user">User</span></td><td class="audit-action-upload">↑ Uploaded</td><td>Sample Analysis</td><td>v2</td><td>sample_analysis_oot_v2.pdf · 3.8 MB</td></tr>
+              <tr><td>15 Jan 2026, 09:00</td><td>Jane Smith</td><td><span class="pill pill-user">User</span></td><td class="audit-action-upload">↑ Uploaded</td><td>Data Insights Numbers</td><td>v1</td><td>dev_data_insights_2023_2024.csv · 2.3 MB</td></tr>
+              <tr><td>12 Jan 2025, 09:05</td><td>Jane Smith</td><td><span class="pill pill-user">User</span></td><td class="audit-action-upload">↑ Uploaded</td><td>Model Metadata</td><td>v1</td><td>metadata_v1_initial.pdf · 41 KB</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:11px;color:#64748b;text-align:right;">Page 1 of 5 &nbsp;|&nbsp; ← Prev &nbsp; Next →</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ S13 ADDITIONAL DOCS ================================================================ -->
+<div id="s13" class="screen">
+  <span class="screen-label">S13 — Additional Documents</span>
+  <div class="app-shell">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div><div class="user-pill"><div class="user-avatar">JS</div><span>Jane Smith</span></div></div></div>
+    <div class="app-body">
+      <div class="left-nav">
+        <div class="tile-nav-item active"><div class="tile-icon">📁</div><div class="tile-text"><div class="tile-title">Repository</div></div></div>
+        <div class="subnav-tree">
+          <div class="tree-node">💳 Credit Risk</div><div class="tree-node tree-node-l2" onclick="showScreen('s04',null)">📄 CR-CLF-001</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s05',null)">📋 Metadata</div><div class="tree-node tree-node-l3" onclick="showScreen('s06',null)">⚙️ KPI Config</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s07',null)">📊 Data Insights</div><div class="tree-node tree-node-l3" onclick="showScreen('s08',null)">🔬 Sample Analysis</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s09',null)">📉 Drift Reports</div><div class="tree-node tree-node-l3" onclick="showScreen('s10',null)">🔍 RCA</div>
+          <div class="tree-node tree-node-l3" onclick="showScreen('s11',null)">📄 Val. Report</div><div class="tree-node tree-node-l3" onclick="showScreen('s12',null)">🗂️ Audit Log</div>
+          <div class="tree-node tree-node-l3 active-node">📎 Add. Docs ◀</div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="breadcrumb"><a onclick="showScreen('s01',null)">Repository</a> &nbsp;›&nbsp; Credit Risk &nbsp;›&nbsp; <a onclick="showScreen('s04',null)">CR-CLF-001</a> &nbsp;›&nbsp; Additional Documents</div>
+        <h2 class="page-title">Additional Documents</h2>
+        <p class="page-subtitle">Component 11 of 13 — Source: User Upload · Free-form document library. Upload any supporting files relevant to this model. <span class="ann" title="REPO-S13-001">REPO-S13-001</span></p>
+
+
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><input type="text" placeholder="Search file name or description…"></div>
+            <div class="filter-chip">📄 File Type ▾</div>
+            <div class="filter-chip">🏷️ Document Type ▾</div>
+            <div class="filter-chip">Sort: Date ▾</div>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <div class="data-table-header"><span>Documents (3)</span></div>
+          <table class="data-table">
+            <thead><tr><th>File Name</th><th>Type</th><th>Doc Type</th><th>Uploaded By</th><th>Upload Date</th><th>Size</th><th>Tags</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>📄 MRC_Submission_Q4_2025.pdf</td>
+                <td><span class="pill pill-not-uploaded" style="font-size:10px;">PDF</span></td>
+                <td>Regulatory Filing</td>
+                <td>Jane Smith</td>
+                <td>10 Jan 2026</td>
+                <td>2.1 MB</td>
+                <td><span style="font-size:10px;background:#f1f5f9;padding:2px 6px;border-radius:4px;">Q4-2025</span></td>
+                <td><div class="actions-cell"><button class="btn btn-sm">View</button><button class="btn btn-sm">📥</button><button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button></div></td>
+              </tr>
+              <tr>
+                <td>📊 Recalibration_Notes_Mar2026.xlsx</td>
+                <td><span class="pill pill-not-uploaded" style="font-size:10px;">XLSX</span></td>
+                <td>Model Documentation</td>
+                <td>R. Patel</td>
+                <td>15 Mar 2026</td>
+                <td>890 KB</td>
+                <td><span style="font-size:10px;background:#f1f5f9;padding:2px 6px;border-radius:4px;">recalibration</span></td>
+                <td><div class="actions-cell"><button class="btn btn-sm">View</button><button class="btn btn-sm">📥</button><button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button></div></td>
+              </tr>
+              <tr style="background:#fef2f2;">
+                <td style="text-decoration:line-through;color:#991b1b;">📝 Draft_Correspondence_v1.docx</td>
+                <td><span class="pill pill-not-uploaded" style="font-size:10px;">DOCX</span></td>
+                <td>Correspondence</td>
+                <td>Jane Smith</td>
+                <td>01 Feb 2026</td>
+                <td>145 KB</td>
+                <td><span class="pill pill-deleted" style="font-size:10px;">Deleted</span></td>
+                <td><div class="actions-cell"><span style="font-size:11px;color:#991b1b;">Soft Deleted · Admin only: Restore</span></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================ S14 DELETE MODAL ================================================================ -->
+<div id="s14" class="screen">
+  <span class="screen-label">S14 — Delete Request Modal (Both States)</span>
+  <div class="app-shell" style="min-height:400px;">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div></div></div>
+    <div class="main-content" style="padding:30px;">
+      <h2 class="page-title">S14 — Delete Request Modal</h2>
+      <p class="page-subtitle" style="margin-bottom:24px;">This modal is triggered from any component screen. Two states shown side-by-side below: <strong>User Request</strong> (left) and <strong>Admin Review</strong> (right).</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1100px;">
+
+        <!-- USER STATE -->
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#1e3a8a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">State 1 — User: Request Deletion</div>
+          <div class="modal-box" style="position:relative;box-shadow:0 4px 16px rgba(0,0,0,0.15);">
+            <div class="modal-header"><h3>Request Component Deletion</h3><button class="modal-close">✕</button></div>
+            <div class="modal-body">
+              <div class="modal-info-box">📦 You are requesting deletion of:<br><strong>Model Metadata — Version 1</strong><br><span style="font-size:11px;color:#64748b;">Model: CR-CLF-001 — PD Model · Retail Banking</span></div>
+              <div class="modal-warn-text">⚠️ This request will be sent to the Admin for review. The component will remain visible and accessible until the Admin approves the deletion. You will be notified by email of the outcome. <span class="ann" title="REPO-S14-001">REPO-S14-001</span></div>
+              <div class="form-group">
+                <label>Reason for deletion <span class="req-asterisk">*</span></label>
+                <textarea style="padding:8px;border:1px dashed #94a3b8;border-radius:5px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;" placeholder="Provide a clear reason for requesting deletion of this component version…">Superseded by v3 — this initial version contains outdated model ownership details.</textarea>
+                <div class="char-counter">42 / 500 characters</div>
+              </div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-ghost">Cancel</button><button class="btn btn-primary">⚑ Submit Request</button></div>
+          </div>
+        </div>
+
+        <!-- ADMIN STATE -->
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">State 2 — Admin: Review &amp; Approve</div>
+          <div class="modal-box" style="position:relative;box-shadow:0 4px 16px rgba(0,0,0,0.15);">
+            <div class="modal-header" style="background:#7f1d1d;"><h3>Review Deletion Request</h3><button class="modal-close">✕</button></div>
+            <div class="modal-body">
+              <div class="modal-info-box" style="background:#fff7ed;border-color:#fed7aa;color:#92400e;">📦 Deletion requested for:<br><strong>Model Metadata — Version 1</strong><br><span style="font-size:11px;color:#78350f;">Model: CR-CLF-001 — PD Model · Retail Banking</span></div>
+              <table class="kv-table" style="margin-bottom:12px;">
+                <tr><td>Requested By</td><td><strong>Jane Smith</strong> (User)</td></tr>
+                <tr><td>Request Date</td><td>02 May 2026, 09:40 UTC</td></tr>
+                <tr><td>Reason Provided</td><td><em>"Superseded by v3 — this initial version contains outdated model ownership details."</em></td></tr>
+                <tr><td>Current Version Status</td><td>Superseded (v3 is current)</td></tr>
+              </table>
+              <div class="modal-warn-text" style="background:#fef2f2;border-color:#fca5a5;color:#991b1b;">🗑️ Approving will <strong>soft delete</strong> this version. It will be hidden from the User but remains recoverable by Admin. An audit log entry will be created automatically. <span class="ann" title="REPO-S14-002">REPO-S14-002</span></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-ghost">Reject Request</button><button class="btn btn-danger">🗑️ Approve &amp; Soft Delete</button></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ FLOATING DELETE MODAL (reusable) ================================================================ -->
+<div class="modal-overlay" id="delModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="modal-box">
+    <div class="modal-header"><h3>Request Component Deletion</h3><button class="modal-close" onclick="document.getElementById('delModal').classList.remove('active')">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-info-box">📦 You are requesting deletion of:<br><strong>Model Metadata — Version 1</strong><br><span style="font-size:11px;color:#64748b;">Model: CR-CLF-001 — PD Model · Retail Banking</span></div>
+      <div class="modal-warn-text">⚠️ This request will be sent to the Admin for review. The component will remain visible until approved.</div>
+      <div class="form-group">
+        <label>Reason for deletion <span class="req-asterisk">*</span></label>
+        <textarea style="padding:8px;border:1px dashed #94a3b8;border-radius:5px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;width:100%;" placeholder="Provide a clear reason…"></textarea>
+        <div class="char-counter">0 / 500 characters</div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="document.getElementById('delModal').classList.remove('active')">Cancel</button><button class="btn btn-primary">⚑ Submit Request</button></div>
+  </div>
+</div>
+
+<!-- ================================================================ JAVASCRIPT ================================================================ -->
+<script>
+function showScreen(id, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function switchTab(tabId, btn) {
+  // Deactivate all tabs and contents in parent
+  var parent = btn.closest('.main-content');
+  parent.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  var el = document.getElementById(tabId);
+  if (el) el.classList.add('active');
+}
+</script>
+</body>
+</html>

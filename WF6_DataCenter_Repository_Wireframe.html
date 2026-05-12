@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -255,6 +255,8 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
   <button class="nav-btn" onclick="showScreen('s12',this)">S12: Audit Log</button>
   <button class="nav-btn" onclick="showScreen('s13',this)">S13: Add. Docs</button>
   <button class="nav-btn" onclick="showScreen('s14',this)">S14: Delete Modal</button>
+  <button class="nav-btn" onclick="showScreen('s15',this)">S15: Ref Data View</button>
+  <button class="nav-btn" onclick="showScreen('s16',this)">S16: Val Data View</button>
 </div>
 
 
@@ -627,37 +629,49 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
         <!-- Completeness bar -->
         <div class="completeness-footer">
           <span class="completeness-label">Repository Completeness</span>
-          <div class="completeness-bar-outer"><div class="completeness-bar-inner" style="width:69%"></div></div>
-          <span class="completeness-pct">9 of 13 uploaded</span>
-          <span style="font-size:11px;color:#64748b;">4 components pending upload</span>
+          <div class="completeness-bar-outer"><div class="completeness-bar-inner" style="width:85%"></div></div>
+          <span class="completeness-pct">11 of 13 uploaded</span>
+          <span style="font-size:11px;color:#64748b;">2 components pending upload</span>
         </div>
 
         <!-- Component List — clean table layout -->
         <div class="component-list-wrap">
           <div class="component-list-header">
             <span style="font-size:13px;font-weight:700;color:#1e293b;">Repository Components <span class="ann" title="REPO-S04-001">REPO-S04-001</span></span>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <span style="font-size:11px;color:#64748b;">Source:&nbsp;</span>
-              <span class="pill pill-user" style="font-size:10px;">👤 User Upload</span>
-              <span class="pill pill-agent" style="font-size:10px;">🤖 Agent Generated</span>
-            </div>
+
           </div>
           <table class="comp-table">
             <thead>
               <tr>
-                <th style="width:32%">Component</th>
-                <th style="width:12%">Source</th>
-                <th style="width:14%">Status</th>
-                <th style="width:18%">Latest Version</th>
+                <th style="width:44%">Component</th>
+                <th style="width:16%">Status</th>
+                <th style="width:22%">Latest Version</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <!-- Group: Core -->
-              <tr class="comp-group-row"><td colspan="5">📌 Core Model Artefacts</td></tr>
+              <tr class="comp-group-row"><td colspan="4">📌 Core Model Artefacts</td></tr>
               <tr>
-                <td><span class="comp-icon">📋</span><span class="comp-name">1. Model Metadata</span></td>
-                <td><span class="pill pill-user">👤 User</span></td>
+                <td><span class="comp-icon"></span><span class="comp-name">1. Reference Data</span></td>
+                <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
+                <td><span class="version-chip">v1</span> <span style="font-size:10px;color:#64748b;">15 Jan 2026, 09:00</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s15',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">📊</span><span class="comp-name">2. Validation Data</span></td>
+                <td><span class="pill pill-uploaded">✓ Ingested</span></td>
+                <td><span class="version-chip">v1</span> <span style="font-size:10px;color:#64748b;">20 Jan 2026, 10:30</span></td>
+                <td><div class="comp-actions">
+                  <button class="btn btn-sm btn-primary" onclick="showScreen('s16',null)">View</button>
+                  <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+                </div></td>
+              </tr>
+              <tr>
+                <td><span class="comp-icon">📋</span><span class="comp-name">3. Model Metadata</span></td>
                 <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
                 <td><span class="version-chip">v3</span> <span style="font-size:10px;color:#64748b;">09 May 2026, 14:32</span></td>
                 <td><div class="comp-actions">
@@ -666,8 +680,7 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
                 </div></td>
               </tr>
               <tr>
-                <td><span class="comp-icon">⚙️</span><span class="comp-name">2. KPI Configuration</span></td>
-                <td><span class="pill pill-user">👤 User</span></td>
+                <td><span class="comp-icon">⚙️</span><span class="comp-name">4. KPI Configuration</span></td>
                 <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
                 <td><span class="version-chip">v2</span> <span style="font-size:10px;color:#64748b;">02 May 2026, 10:15</span></td>
                 <td><div class="comp-actions">
@@ -676,8 +689,7 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
                 </div></td>
               </tr>
               <tr>
-                <td><span class="comp-icon">📊</span><span class="comp-name">3. Reference — Data Insights Numbers</span></td>
-                <td><span class="pill pill-user">👤 User</span></td>
+                <td><span class="comp-icon">📊</span><span class="comp-name">5. Reference — Data Insights Numbers</span></td>
                 <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
                 <td><span class="version-chip">v1</span> <span style="font-size:10px;color:#64748b;">15 Jan 2026, 09:00</span></td>
                 <td><div class="comp-actions">
@@ -685,30 +697,11 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
                   <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
                 </div></td>
               </tr>
-              <tr>
-                <td><span class="comp-icon">📦</span><span class="comp-name">4. Baseline Data</span></td>
-                <td><span class="pill pill-user">👤 User</span></td>
-                <td><span class="pill pill-not-uploaded">○ Not Uploaded</span></td>
-                <td><span style="font-size:11px;color:#94a3b8;">Not yet ingested</span></td>
-                <td><div class="comp-actions">
-                  <button class="btn btn-sm" disabled style="opacity:0.4;cursor:not-allowed;">View</button>
-                </div></td>
-              </tr>
-              <tr>
-                <td><span class="comp-icon">📊</span><span class="comp-name">5. Reference Data</span></td>
-                <td><span class="pill pill-agent">🤖 System</span></td>
-                <td><span class="pill pill-not-uploaded">○ Not Ingested</span></td>
-                <td><span style="font-size:11px;color:#94a3b8;">Populated via ingestion pipeline</span></td>
-                <td><div class="comp-actions">
-                  <button class="btn btn-sm" disabled style="opacity:0.4;cursor:not-allowed;">View</button>
-                </div></td>
-              </tr>
 
               <!-- Group: Validation -->
-              <tr class="comp-group-row"><td colspan="5">🔬 Validation Artefacts</td></tr>
+              <tr class="comp-group-row"><td colspan="4">🔬 Validation Artefacts</td></tr>
               <tr>
                 <td><span class="comp-icon">🔬</span><span class="comp-name">6. Validation — Sample Analysis</span></td>
-                <td><span class="pill pill-user">👤 User</span></td>
                 <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
                 <td><span class="version-chip">v2</span> <span style="font-size:10px;color:#64748b;">20 Apr 2026, 11:45</span></td>
                 <td><div class="comp-actions">
@@ -718,7 +711,6 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
               </tr>
               <tr>
                 <td><span class="comp-icon">📉</span><span class="comp-name">7. Validation — Data Drift</span></td>
-                <td><span class="pill pill-agent">🤖 Agent</span></td>
                 <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
                 <td><span class="version-chip">v4</span> <span style="font-size:10px;color:#64748b;">09 May 2026, 06:00</span></td>
                 <td><div class="comp-actions">
@@ -728,7 +720,6 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
               </tr>
               <tr>
                 <td><span class="comp-icon">🔄</span><span class="comp-name">8. Validation — Concept Drift</span></td>
-                <td><span class="pill pill-agent">🤖 Agent</span></td>
                 <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
                 <td><span class="version-chip">v4</span> <span style="font-size:10px;color:#64748b;">09 May 2026, 06:00</span></td>
                 <td><div class="comp-actions">
@@ -738,7 +729,6 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
               </tr>
               <tr>
                 <td><span class="comp-icon">📈</span><span class="comp-name">9. Validation — Performance Drift</span></td>
-                <td><span class="pill pill-agent">🤖 Agent</span></td>
                 <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
                 <td><span class="version-chip">v4</span> <span style="font-size:10px;color:#64748b;">09 May 2026, 06:00</span></td>
                 <td><div class="comp-actions">
@@ -748,7 +738,6 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
               </tr>
               <tr>
                 <td><span class="comp-icon">🔍</span><span class="comp-name">10. Validation — RCA</span></td>
-                <td><span class="pill pill-agent">🤖 Agent</span></td>
                 <td><span class="pill pill-uploaded">✓ Uploaded</span></td>
                 <td><span class="version-chip">v2</span> <span style="font-size:10px;color:#64748b;">28 Apr 2026, 14:00</span></td>
                 <td><div class="comp-actions">
@@ -758,7 +747,6 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
               </tr>
               <tr>
                 <td><span class="comp-icon">📄</span><span class="comp-name">11. Validation — Report</span></td>
-                <td><span class="pill pill-agent">🤖 Agent</span></td>
                 <td><span class="pill pill-not-uploaded">○ Not Uploaded</span></td>
                 <td><span style="font-size:11px;color:#94a3b8;">Pending agent run</span></td>
                 <td><div class="comp-actions">
@@ -767,10 +755,9 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
               </tr>
 
               <!-- Group: Governance -->
-              <tr class="comp-group-row"><td colspan="5">🛡️ Governance &amp; Support</td></tr>
+              <tr class="comp-group-row"><td colspan="4">🛡️ Governance &amp; Support</td></tr>
               <tr>
                 <td><span class="comp-icon">🗂️</span><span class="comp-name">12. Audit Log</span></td>
-                <td><span class="pill pill-agent">🤖 System</span></td>
                 <td><span class="pill pill-uploaded">✓ Active</span></td>
                 <td><span style="font-size:10px;color:#64748b;">Auto-maintained · 47 entries</span></td>
                 <td><div class="comp-actions">
@@ -779,7 +766,6 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
               </tr>
               <tr>
                 <td><span class="comp-icon">📎</span><span class="comp-name">13. Additional Documents</span></td>
-                <td><span class="pill pill-user">👤 User</span></td>
                 <td><span class="pill pill-not-uploaded">○ None Uploaded</span></td>
                 <td><span style="font-size:11px;color:#94a3b8;">No files yet</span></td>
                 <td><div class="comp-actions">
@@ -1504,6 +1490,122 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef1f5; 
   </div>
 </div>
 
+
+<!-- ================================================================ S15 REFERENCE DATA VIEW ================================================================ -->
+<div id="s15" class="screen">
+  <span class="screen-label">S15 — Reference Data Viewer</span>
+  <div class="app-shell" style="min-height:600px;">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div></div></div>
+    <div class="main-content" style="padding:24px 30px;">
+      <div class="breadcrumb-row" style="font-size:12px;color:#64748b;margin-bottom:12px;"><a onclick="showScreen('s04',null)" style="cursor:pointer;color:#2563eb;">Model Dashboard</a> › <a onclick="showScreen('s04',null)" style="cursor:pointer;color:#2563eb;">DataCenter Repository</a> › Reference Data</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <h2 class="page-title" style="margin:0;">Reference Data</h2>
+        <span class="pill pill-uploaded" style="font-size:11px;">✓ Uploaded</span>
+        <span class="version-chip">v1</span>
+      </div>
+      <p class="page-subtitle" style="margin-bottom:20px;">Component 1 of 13 — Source: WF3 Ingestion Pipeline · Ingested 15 Jan 2026, 09:00</p>
+
+      <div style="display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 18px;min-width:140px;">
+          <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Rows</div>
+          <div style="font-size:22px;font-weight:700;color:#1e293b;">32,456</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 18px;min-width:140px;">
+          <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Columns</div>
+          <div style="font-size:22px;font-weight:700;color:#1e293b;">21</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 18px;min-width:140px;">
+          <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Version</div>
+          <div style="font-size:22px;font-weight:700;color:#1e293b;">v1</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 18px;min-width:180px;">
+          <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Ingested On</div>
+          <div style="font-size:14px;font-weight:700;color:#1e293b;">15 Jan 2026, 09:00</div>
+        </div>
+      </div>
+
+      <!-- Data Preview Table -->
+      <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:8px;">Data Preview <span style="font-size:11px;font-weight:400;color:#64748b;">(first 5 rows)</span></div>
+      <div class="dtw">
+        <table class="dt" style="font-size:11px;">
+          <thead>
+            <tr><th>#</th><th>loan_amnt</th><th>int_rate</th><th>annual_inc</th><th>dti</th><th>loan_status</th><th>grade</th><th>home_ownership</th><th>purpose</th><th style="color:#94a3b8;">…+12 more</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>12000</td><td>13.49%</td><td>55000</td><td>18.34</td><td><span class="badge b-blue">Fully Paid</span></td><td>B</td><td>RENT</td><td>debt_consolidation</td><td style="color:#94a3b8;">…</td></tr>
+            <tr><td>2</td><td>8500</td><td>10.65%</td><td>72000</td><td>12.11</td><td><span class="badge b-green">Fully Paid</span></td><td>A</td><td>OWN</td><td>home_improvement</td><td style="color:#94a3b8;">…</td></tr>
+            <tr><td>3</td><td>25000</td><td>19.42%</td><td>38000</td><td>34.52</td><td><span class="badge b-red">Charged Off</span></td><td>E</td><td>RENT</td><td>small_business</td><td style="color:#94a3b8;">…</td></tr>
+            <tr><td>4</td><td>15000</td><td>14.80%</td><td>61000</td><td>21.07</td><td><span class="badge b-blue">Fully Paid</span></td><td>C</td><td>MORTGAGE</td><td>car</td><td style="color:#94a3b8;">…</td></tr>
+            <tr><td>5</td><td>5000</td><td>9.17%</td><td>48000</td><td>9.78</td><td><span class="badge b-blue">Fully Paid</span></td><td>A</td><td>RENT</td><td>vacation</td><td style="color:#94a3b8;">…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:8px;">
+        <button class="btn btn-sm btn-primary">⬇ Download CSV</button>
+        <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+        <button class="btn btn-sm" onclick="showScreen('s04',null)">← Back to Repository</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ S16 VALIDATION DATA VIEW ================================================================ -->
+<div id="s16" class="screen">
+  <span class="screen-label">S16 — Validation Data Viewer</span>
+  <div class="app-shell" style="min-height:600px;">
+    <div class="app-header"><div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div><div class="app-header-right"><div class="role-pill">👤 USER</div></div></div>
+    <div class="main-content" style="padding:24px 30px;">
+      <div class="breadcrumb-row" style="font-size:12px;color:#64748b;margin-bottom:12px;"><a onclick="showScreen('s04',null)" style="cursor:pointer;color:#2563eb;">Model Dashboard</a> › <a onclick="showScreen('s04',null)" style="cursor:pointer;color:#2563eb;">DataCenter Repository</a> › Validation Data</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <h2 class="page-title" style="margin:0;">Validation Data</h2>
+        <span class="pill pill-uploaded" style="font-size:11px;">✓ Ingested</span>
+        <span class="version-chip">v1</span>
+      </div>
+      <p class="page-subtitle" style="margin-bottom:20px;">Component 2 of 13 — Source: Ingestion Pipeline · Ingested 20 Jan 2026, 10:30</p>
+
+      <div style="display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 18px;min-width:140px;">
+          <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Rows</div>
+          <div style="font-size:22px;font-weight:700;color:#1e293b;">8,120</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 18px;min-width:140px;">
+          <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Columns</div>
+          <div style="font-size:22px;font-weight:700;color:#1e293b;">21</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 18px;min-width:140px;">
+          <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Version</div>
+          <div style="font-size:22px;font-weight:700;color:#1e293b;">v1</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 18px;min-width:180px;">
+          <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Ingested On</div>
+          <div style="font-size:14px;font-weight:700;color:#1e293b;">20 Jan 2026, 10:30</div>
+        </div>
+      </div>
+
+      <!-- Data Preview Table -->
+      <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:8px;">Data Preview <span style="font-size:11px;font-weight:400;color:#64748b;">(first 5 rows)</span></div>
+      <div class="dtw">
+        <table class="dt" style="font-size:11px;">
+          <thead>
+            <tr><th>#</th><th>loan_amnt</th><th>int_rate</th><th>annual_inc</th><th>dti</th><th>loan_status</th><th>grade</th><th>home_ownership</th><th>purpose</th><th style="color:#94a3b8;">…+12 more</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>9000</td><td>11.72%</td><td>62000</td><td>15.20</td><td><span class="badge b-blue">Fully Paid</span></td><td>B</td><td>MORTGAGE</td><td>debt_consolidation</td><td style="color:#94a3b8;">…</td></tr>
+            <tr><td>2</td><td>18000</td><td>16.55%</td><td>45000</td><td>28.40</td><td><span class="badge b-red">Charged Off</span></td><td>D</td><td>RENT</td><td>credit_card</td><td style="color:#94a3b8;">…</td></tr>
+            <tr><td>3</td><td>7000</td><td>8.90%</td><td>80000</td><td>8.55</td><td><span class="badge b-green">Fully Paid</span></td><td>A</td><td>OWN</td><td>home_improvement</td><td style="color:#94a3b8;">…</td></tr>
+            <tr><td>4</td><td>30000</td><td>22.10%</td><td>34000</td><td>40.11</td><td><span class="badge b-red">Charged Off</span></td><td>F</td><td>RENT</td><td>small_business</td><td style="color:#94a3b8;">…</td></tr>
+            <tr><td>5</td><td>11000</td><td>12.35%</td><td>56000</td><td>19.88</td><td><span class="badge b-blue">Fully Paid</span></td><td>C</td><td>MORTGAGE</td><td>car</td><td style="color:#94a3b8;">…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:8px;">
+        <button class="btn btn-sm btn-primary">⬇ Download CSV</button>
+        <button class="btn btn-sm btn-danger-outline" onclick="document.getElementById('delModal').classList.add('active')">Request Delete</button>
+        <button class="btn btn-sm" onclick="showScreen('s04',null)">← Back to Repository</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- ================================================================ FLOATING DELETE MODAL (reusable) ================================================================ -->
 <div class="modal-overlay" id="delModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="modal-box">

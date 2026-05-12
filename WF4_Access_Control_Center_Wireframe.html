@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -194,12 +194,9 @@ textarea.form-control{resize:vertical;min-height:60px}
 <div class="nav-bar">
   <h1>🔐 WF4 — Admin: Access Control Center</h1>
   <button class="nb on" onclick="show('s1')">S1: ACC Homepage</button>
-  <button class="nb" onclick="show('s2')">S2: Ext. Request Queue</button>
+  <button class="nb" onclick="show('s2')">S2: Configure Roles</button>
   <button class="nb" onclick="show('s3')">S3: Ext. Request Detail</button>
-  <button class="nb" onclick="show('s4')">S4: Provision User</button>
-  <button class="nb" onclick="show('s5')">S5: Provision Admin</button>
-  <button class="nb" onclick="show('s6')">S6: Provision External</button>
-  <button class="nb" onclick="show('s7')">S7: Model Access Req.</button>
+  <button class="nb" onclick="show('s7')">S7: Access Requests</button>
   <button class="nb" onclick="show('s8')">S8: Data Deletion Req.</button>
   <button class="nb" onclick="show('s9')">S9: Manage Model Access</button>
   <button class="nb" onclick="show('s10')">S10: User Directory</button>
@@ -258,41 +255,37 @@ textarea.form-control{resize:vertical;min-height:60px}
         <!-- Quick Actions — WF4-HOME-007 -->
         <div style="background:#fff;border:1px dashed #cbd5e1;border-radius:7px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px">Quick Actions:</span>
-          <button class="btn btn-sm btn-p" onclick="show('s4')">+ Provision New User</button>
-          <button class="btn btn-sm" style="background:#7c3aed;color:#fff;border-color:#7c3aed" onclick="show('s5')">+ Provision New Admin</button>
-          <button class="btn btn-sm" style="background:#0891b2;color:#fff;border-color:#0891b2" onclick="show('s6')">+ Provision New External</button>
-          <span class="ann">WF4-HOME-007 — accessible directly from homepage</span>
+          <span class="ann">WF4-HOME-007</span>
         </div>
 
         <!-- 4 Sub-section Tiles — WF4-HOME-001/002 -->
         <div class="sg">
           <!-- Configure Roles -->
           <div class="sc" onclick="show('s2')">
-            <div class="sc-badge">5 pending</div>
             <div class="sch">
-              <div><div class="sct">Configure Roles</div><div class="scs">Provisioning & access request approvals</div></div>
+              <div><div class="sct">Configure Roles</div><div class="scs">User &amp; External role assignment</div></div>
               <div class="sc-icon" style="background:#dbeafe">👥</div>
             </div>
-            <div class="scbody">Review and approve External access requests submitted via WF1. Provision new User, Admin (dual-auth required), and External accounts. <span class="ann">WF4-HOME-005</span></div>
+            <div class="scbody">Add and remove User and External roles. Assign and revoke platform access. View and modify existing role assignments. <span class="ann">WF4-HOME-005</span></div>
             <div class="sc-kpi">
-              <span style="color:#64748b">Pending items</span>
-              <span class="sc-kpi-val">5</span>
+              <span style="color:#64748b">Active accounts</span>
+              <span class="sc-kpi-val">24</span>
             </div>
             <span class="sca">Open Configure Roles →</span>
           </div>
-          <!-- Requests -->
-          <div class="sc" onclick="show('s7')">
-            <div class="sc-badge">4 pending</div>
+          <!-- Data Delete Requests -->
+          <div class="sc" onclick="show('s8')">
+            <div class="sc-badge">2 pending</div>
             <div class="sch">
-              <div><div class="sct">Requests</div><div class="scs">Model access & data deletion requests</div></div>
-              <div class="sc-icon" style="background:#fef3c7">📨</div>
+              <div><div class="sct">Data Delete Requests</div><div class="scs">Data deletion requests</div></div>
+              <div class="sc-icon" style="background:#fef3c7">🗑️</div>
             </div>
-            <div class="scbody">Process model access requests from Users and Externals. Review and action data deletion requests raised by Users (Admin executes all deletions). <span class="ann">WF4-HOME-004</span></div>
+            <div class="scbody">Review and action data deletion requests raised by Users. Admin executes all approved deletions from the platform. <span class="ann">WF4-HOME-004</span></div>
             <div class="sc-kpi">
-              <span style="color:#64748b">Pending items (2 access + 2 deletion)</span>
-              <span class="sc-kpi-val">4</span>
+              <span style="color:#64748b">Pending deletion requests</span>
+              <span class="sc-kpi-val">2</span>
             </div>
-            <span class="sca">Open Requests →</span>
+            <span class="sca">Open Data Delete Requests →</span>
           </div>
           <!-- Manage Model Access -->
           <div class="sc" onclick="show('s9')">
@@ -307,19 +300,7 @@ textarea.form-control{resize:vertical;min-height:60px}
             </div>
             <span class="sca">Open Manage Model Access →</span>
           </div>
-          <!-- User Deactivation & Role Revocation -->
-          <div class="sc" onclick="show('s10')">
-            <div class="sch">
-              <div><div class="sct">User Deactivation &amp; Role Revocation</div><div class="scs">Account lifecycle &amp; deactivation</div></div>
-              <div class="sc-icon" style="background:#fee2e2">🚫</div>
-            </div>
-            <div class="scbody">Deactivate User and External accounts, revoke roles, reassign model ownership. All sessions invalidated server-side on confirmation. <span class="ann">WF4-DEA-001</span></div>
-            <div class="sc-kpi">
-              <span style="color:#64748b">Deactivated accounts</span>
-              <span class="sc-kpi-val">8</span>
-            </div>
-            <span class="sca">Open User Directory →</span>
-          </div>
+
         </div>
       </div>
     </div>
@@ -330,7 +311,7 @@ textarea.form-control{resize:vertical;min-height:60px}
 <!-- S2: EXTERNAL ACCESS REQUEST QUEUE -->
 <!-- ══════════════════════════════════════════════════════════════ -->
 <div class="screen" id="s2">
-  <div class="slabel">Screen 2 — Configure Roles: External Access Request Queue <span class="ann">WF4-EXT-001 to 013</span></div>
+  <div class="slabel">Screen 2 — Configure Roles: Role Management <span class="ann">WF4-ROL-001 to 010</span></div>
   <div class="shell">
     <div class="aph">
       <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
@@ -340,98 +321,115 @@ textarea.form-control{resize:vertical;min-height:60px}
       <div class="ln">
         <div class="lnt">Access Control</div>
         <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni on"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div><div class="tit-s">Ext. Requests</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
+        <div class="tni on"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div><div class="tit-s">Role Management</div></div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">🗑️</div><div class="tit"><div class="tit-t">Data Delete Requests</div></div><div class="tni-badge">2</div></div>
         <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
         <div class="tni" onclick="show('s10')"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
       </div>
       <div class="mc">
-        <div class="bc"><a onclick="show('s1')">ACC</a> › Configure Roles › External Requests</div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
-          <div>
-            <div class="pgt">External Access Request Queue</div>
-            <div class="pgs">Review and action access requests submitted by External stakeholders via WF1</div>
+        <div class="bc"><a onclick="show('s1')">ACC</a> › Configure Roles</div>
+        <div class="pgt">Configure Roles</div>
+        <div class="pgs">Add and remove User and External roles; assign and revoke platform access</div>
+        <div class="tabs" style="margin-bottom:10px">
+          <div class="tab on" onclick="showConfTab('users',event)">Users <span class="tab-badge">18</span></div>
+          <div class="tab" onclick="showConfTab('externals',event)">Externals <span class="tab-badge">6</span></div>
+          <div class="tab" onclick="showConfTab('deactivated',event)">Deactivated <span class="tab-badge">8</span></div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="conf-tab-users">
+          <div class="tb">
+            <div class="tbl">
+              <div class="sb3"><input type="text" placeholder="Search name or email…"></div>
+              <div class="fc"><select><option>All Roles</option><option>Admin</option><option>User</option></select></div>
+              <div class="fc"><select><option>All Departments</option><option>Risk Management</option><option>Audit &amp; Compliance</option><option>Technology</option><option>Finance</option></select></div>
+              <div class="fc"><select><option>Sort: Name A–Z</option><option>Last Active ↓</option><option>Role ↑</option></select></div>
+            </div>
+            <div style="margin-left:auto;padding-bottom:6px">
+              <button class="btn btn-sm btn-p">＋ Add User</button>
+            </div>
           </div>
-          <div style="display:flex;gap:7px">
-            <button class="btn btn-sm" onclick="show('s4')">+ Provision User</button>
-            <button class="btn btn-sm" style="background:#7c3aed;color:#fff;border-color:#7c3aed" onclick="show('s5')">+ Provision Admin</button>
-            <button class="btn btn-sm" style="background:#0891b2;color:#fff;border-color:#0891b2" onclick="show('s6')">+ Provision External</button>
+          <div class="dtw">
+            <table class="dt">
+              <thead>
+                <tr><th>Name</th><th>Corporate Email / ID</th><th>Department</th><th>Role</th><th>Assigned Models</th><th>Last Active</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Jane Smith</td><td style="font-size:10px">jane.smith@corp.com</td><td>Risk Management</td><td><span class="badge b-blue">User</span></td><td>3</td><td>2026-05-11</td><td><button class="btn btn-xs btn-p">Edit Role</button><button class="btn btn-xs btn-danger" style="margin-left:4px">Remove</button></td></tr>
+                <tr><td>Ali Hassan</td><td style="font-size:10px">ali.hassan@corp.com / USR-0201</td><td>Risk Management</td><td><span class="badge b-blue">User</span></td><td>2</td><td>2026-05-10</td><td><button class="btn btn-xs btn-p">Edit Role</button><button class="btn btn-xs btn-danger" style="margin-left:4px">Remove</button></td></tr>
+                <tr><td>Priya Nair</td><td style="font-size:10px">priya.nair@corp.com / USR-0188</td><td>Audit &amp; Compliance</td><td><span class="badge b-blue">User</span></td><td>2</td><td>2026-05-11</td><td><button class="btn btn-xs btn-p">Edit Role</button><button class="btn btn-xs btn-danger" style="margin-left:4px">Remove</button></td></tr>
+                <tr><td>Raj Mehta</td><td style="font-size:10px">raj.mehta@corp.com / USR-0291</td><td>Finance</td><td><span class="badge b-blue">User</span></td><td>1</td><td>2026-05-09</td><td><button class="btn btn-xs btn-p">Edit Role</button><button class="btn btn-xs btn-danger" style="margin-left:4px">Remove</button></td></tr>
+                <tr><td>Sarah Chen</td><td style="font-size:10px">sarah.chen@corp.com</td><td>Technology</td><td><span class="badge b-red">Admin</span></td><td>—</td><td>2026-05-11</td><td><button class="btn btn-xs btn-p">Edit Role</button><button class="btn btn-xs btn-danger" style="margin-left:4px" disabled title="Cannot remove sole active Admin">Remove</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <span>Showing 1–5 of 18 active users</span>
+            <div style="display:flex;gap:5px"><button class="btn btn-sm">‹ Prev</button><button class="btn btn-sm btn-p">Next ›</button></div>
           </div>
         </div>
-        <!-- Tabs — WF4-EXT-001 -->
-        <div class="tabs">
-          <div class="tab on">Pending <span class="tab-badge">4</span></div>
-          <div class="tab">Approved</div>
-          <div class="tab">Rejected</div>
-          <div class="tab">All</div>
-          <div style="margin-left:auto;display:flex;gap:8px;padding-bottom:6px">
-            <span class="ann">WF4-ADM-003 — also shows pending Admin provisioning (dual-auth)</span>
+
+        <!-- Externals Tab -->
+        <div id="conf-tab-externals" style="display:none">
+          <div class="tb">
+            <div class="tbl">
+              <div class="sb3"><input type="text" placeholder="Search name, email, or Ext ID…"></div>
+              <div class="fc"><select><option>All Stakeholder Types</option><option>Auditor</option><option>Consultant</option><option>Regulator</option><option>External Reviewer</option></select></div>
+              <div class="fc"><select><option>All Statuses</option><option>Active</option><option>Expiring Soon</option></select></div>
+              <div class="fc"><select><option>Sort: Expiry Soonest</option><option>Name A–Z</option><option>Last Active ↓</option></select></div>
+            </div>
+            <div style="margin-left:auto;padding-bottom:6px">
+              <button class="btn btn-sm btn-p">＋ Add External</button>
+            </div>
+          </div>
+          <div class="dtw">
+            <table class="dt">
+              <thead>
+                <tr><th>Name</th><th>Email / Ext ID</th><th>Stakeholder Type</th><th>Assigned Models</th><th>Access Expiry</th><th>Last Active</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Anita Rao</td><td style="font-size:10px">anita.rao@corp.com / EXT-0047</td><td><span class="badge b-purple">Auditor</span></td><td>CR_CLF_001</td><td style="color:#d97706;font-weight:600">2026-06-30</td><td>2026-05-10</td><td><button class="btn btn-xs btn-p">View Profile</button><button class="btn btn-xs btn-danger" style="margin-left:4px">Revoke</button></td></tr>
+                <tr><td>David Lim</td><td style="font-size:10px">david.lim@corp.com / EXT-0052</td><td><span class="badge b-teal">Consultant</span></td><td>FRD_CLF_012</td><td>2026-07-15</td><td>2026-05-08</td><td><button class="btn btn-xs btn-p">View Profile</button><button class="btn btn-xs btn-danger" style="margin-left:4px">Revoke</button></td></tr>
+                <tr><td>Mei Lin</td><td style="font-size:10px">mei.lin@corp.com / EXT-0031</td><td><span class="badge b-blue">Regulator</span></td><td>All Active</td><td style="color:#16a34a;font-weight:600">Permanent</td><td>2026-05-09</td><td><button class="btn btn-xs btn-p">View Profile</button><button class="btn btn-xs btn-danger" style="margin-left:4px">Revoke</button></td></tr>
+                <tr><td>Carlos Rivera</td><td style="font-size:10px">carlos.rivera@corp.com / EXT-0063</td><td><span class="badge b-purple">Auditor</span></td><td>CR_CLF_001, MKT_REG_004</td><td style="color:#ef4444;font-weight:600">2026-05-31</td><td>2026-05-05</td><td><button class="btn btn-xs btn-p">View Profile</button><button class="btn btn-xs btn-danger" style="margin-left:4px">Revoke</button></td></tr>
+                <tr><td>Fatima Malik</td><td style="font-size:10px">fatima.malik@corp.com / EXT-0071</td><td><span class="badge b-teal">Consultant</span></td><td>MKT_REG_004</td><td>2026-06-15</td><td>2026-05-03</td><td><button class="btn btn-xs btn-p">View Profile</button><button class="btn btn-xs btn-danger" style="margin-left:4px">Revoke</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <span>Showing 1–5 of 6 active externals</span>
+            <div style="display:flex;gap:5px"><button class="btn btn-sm">‹ Prev</button><button class="btn btn-sm btn-p">Next ›</button></div>
           </div>
         </div>
-        <!-- Toolbar — WF4-EXT-003 -->
-        <div class="tb">
-          <div class="tbl">
-            <div class="sb3"><input type="text" placeholder="Search name or email…"></div>
-            <div class="fc"><select><option>All Stakeholder Types</option><option>Auditor</option><option>Governance Reviewer</option><option>Business Stakeholder</option><option>External Reviewer</option></select></div>
-            <div class="fc"><select><option>All Date Ranges</option><option>Last 7 days</option><option>Last 30 days</option><option>Last 90 days</option></select></div>
-            <div class="fc"><select><option>Sort: Submission Date ↓</option><option>Days Pending ↓</option><option>Name A–Z</option></select></div>
+
+        <!-- Deactivated Tab -->
+        <div id="conf-tab-deactivated" style="display:none">
+          <div class="tb">
+            <div class="tbl">
+              <div class="sb3"><input type="text" placeholder="Search name or email…"></div>
+              <div class="fc"><select><option>All Types</option><option>User</option><option>External</option><option>Admin</option></select></div>
+              <div class="fc"><select><option>All Reasons</option><option>Resigned</option><option>Access Expiry</option><option>Prolonged Inactivity</option><option>Engagement Ended</option><option>Role Change</option></select></div>
+              <div class="fc"><select><option>Sort: Deactivated ↓</option><option>Name A–Z</option></select></div>
+            </div>
           </div>
-        </div>
-        <!-- Table — WF4-EXT-002 -->
-        <div class="dtw">
-          <table class="dt">
-            <thead>
-              <tr><th>Requester Name</th><th>Corporate Email / ID</th><th>Department / BU</th><th>Stakeholder Type</th><th>Submitted</th><th>Days Pending</th><th>Status</th><th>Actions</th></tr>
-            </thead>
-            <tbody>
-              <!-- Duplicate warning row — WF4-EXT-012 -->
-              <tr class="dup-row" onclick="show('s3')">
-                <td>Anita Rao</td>
-                <td style="font-size:10px">anita.rao@corp.com</td>
-                <td>Audit & Compliance</td>
-                <td><span class="badge b-purple">Auditor</span></td>
-                <td>2026-05-10</td>
-                <td style="color:#d97706;font-weight:700">2</td>
-                <td><span class="badge b-amber">Pending</span></td>
-                <td><button class="btn btn-xs btn-p" onclick="event.stopPropagation();show('s3')">Review</button> <span style="font-size:9px;color:#d97706">⚠ Duplicate</span></td>
-              </tr>
-              <tr onclick="show('s3')">
-                <td>David Lim</td>
-                <td style="font-size:10px">david.lim@corp.com</td>
-                <td>Risk Management</td>
-                <td><span class="badge b-orange">Governance Reviewer</span></td>
-                <td>2026-05-09</td>
-                <td style="color:#d97706;font-weight:700">3</td>
-                <td><span class="badge b-amber">Pending</span></td>
-                <td><button class="btn btn-xs btn-p" onclick="event.stopPropagation();show('s3')">Review</button></td>
-              </tr>
-              <tr onclick="show('s3')">
-                <td>Mei Lin</td>
-                <td style="font-size:10px">mei.lin@external-org.com</td>
-                <td>External Organisation</td>
-                <td><span class="badge b-teal">External Reviewer</span></td>
-                <td>2026-05-08</td>
-                <td>4</td>
-                <td><span class="badge b-amber">Pending</span></td>
-                <td><button class="btn btn-xs btn-p" onclick="event.stopPropagation();show('s3')">Review</button></td>
-              </tr>
-              <!-- Pending Admin provisioning — dual-auth — WF4-HOME-005 -->
-              <tr class="warn-row">
-                <td>Tom Bradley <span class="ann">Admin Provisioning — Awaiting 2nd Admin</span></td>
-                <td style="font-size:10px">tom.bradley@corp.com</td>
-                <td>Technology</td>
-                <td><span class="badge b-purple">New Admin (Dual-Auth)</span></td>
-                <td>2026-05-07</td>
-                <td style="color:#dc2626;font-weight:700">5</td>
-                <td><span class="badge b-amber">Pending 2nd Approval</span></td>
-                <td><button class="btn btn-xs btn-p" onclick="show('s5')">Approve/Reject</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pager">
-          <span>Showing 1–4 of 4 pending items</span>
-          <div style="display:flex;gap:5px"><button class="btn btn-sm">‹ Prev</button><button class="btn btn-sm btn-p">Next ›</button></div>
+          <div class="dtw">
+            <table class="dt">
+              <thead>
+                <tr><th>Name</th><th>Email / ID</th><th>Department</th><th>Role</th><th>Reason</th><th>Deactivated On</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Tom Bradley</td><td style="font-size:10px">tom.bradley@corp.com</td><td>Technology</td><td><span class="badge b-blue">User</span></td><td>Resigned</td><td>2026-03-15</td><td><button class="btn btn-xs btn-p">Restore</button></td></tr>
+                <tr><td>Lisa Chen</td><td style="font-size:10px">lisa.chen@corp.com / USR-0145</td><td>Risk Management</td><td><span class="badge b-blue">User</span></td><td>Access Expiry</td><td>2026-04-02</td><td><button class="btn btn-xs btn-p">Restore</button></td></tr>
+                <tr><td>Marco Ricci</td><td style="font-size:10px">marco.ricci@corp.com / USR-0132</td><td>Audit &amp; Compliance</td><td><span class="badge b-blue">User</span></td><td>Prolonged Inactivity</td><td>2026-04-18</td><td><button class="btn btn-xs btn-p">Restore</button></td></tr>
+                <tr><td>James Park</td><td style="font-size:10px">james.park@corp.com</td><td>Technology</td><td><span class="badge b-red">Admin</span></td><td>Role Change</td><td>2026-02-28</td><td><button class="btn btn-xs" disabled title="Another Admin must restore">Restore</button></td></tr>
+                <tr><td>Sofia Andrade</td><td style="font-size:10px">sofia.andrade@corp.com / EXT-0039</td><td>—</td><td><span class="badge b-teal">External</span></td><td>Engagement Ended</td><td>2026-03-22</td><td><button class="btn btn-xs btn-p">Restore</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <span>Showing 1–5 of 8 deactivated accounts</span>
+            <div style="display:flex;gap:5px"><button class="btn btn-sm">‹ Prev</button><button class="btn btn-sm btn-p">Next ›</button></div>
+          </div>
         </div>
       </div>
     </div>
@@ -452,8 +450,9 @@ textarea.form-control{resize:vertical;min-height:60px}
       <div class="ln">
         <div class="lnt">Access Control</div>
         <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni on"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
+        <div class="tni on"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Access Requests</div></div><div class="tni-badge">2</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">🗑️</div><div class="tit"><div class="tit-t">Data Delete Requests</div></div><div class="tni-badge">2</div></div>
         <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
         <div class="tni" onclick="show('s10')"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
       </div>
@@ -551,290 +550,6 @@ textarea.form-control{resize:vertical;min-height:60px}
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════ -->
-<!-- S4: PROVISION NEW USER -->
-<!-- ══════════════════════════════════════════════════════════════ -->
-<div class="screen" id="s4">
-  <div class="slabel">Screen 4 — Configure Roles: Provision New User <span class="ann">WF4-USR-001 to 009</span></div>
-  <div class="shell">
-    <div class="aph">
-      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
-      <div class="aphr"><span class="rp">Admin</span><div class="nw" onclick="show('s13')">🔔<div class="nb2">5</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
-    </div>
-    <div class="ab">
-      <div class="ln">
-        <div class="lnt">Access Control</div>
-        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni on"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
-        <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
-        <div class="tni" onclick="show('s10')"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
-      </div>
-      <div class="mc">
-        <div class="bc"><a onclick="show('s1')">ACC</a> › <a onclick="show('s2')">Configure Roles</a> › Provision New User</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:12px">
-          <div><div class="pgt">Provision New User</div><div class="pgs">Create a new platform User account with model access scope</div></div>
-          <button class="btn btn-sm" onclick="show('s2')">← Back</button>
-        </div>
-
-        <!-- Progress steps — WF4-USR-007 -->
-        <div class="progress-steps" style="margin-bottom:16px">
-          <div class="step active"><div class="step-num">1</div><div class="step-label">Identity</div></div>
-          <div class="step-line"></div>
-          <div class="step"><div class="step-num">2</div><div class="step-label">Model Scope</div></div>
-          <div class="step-line"></div>
-          <div class="step"><div class="step-num">3</div><div class="step-label">Review &amp; Submit</div></div>
-        </div>
-
-        <!-- Identity fields — WF4-USR-002 -->
-        <div class="form-section">
-          <div class="form-section-title">Step 1: Identity Details</div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Full Name <span class="req">*</span></label>
-              <input type="text" class="form-control" placeholder="e.g. Priya Nair">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Corporate Email / ID <span class="req">*</span></label>
-              <input type="text" class="form-control" placeholder="priya.nair@corp.com">
-              <div class="form-hint">Validated against corporate domain. Checked for uniqueness across active and deactivated accounts. <span class="req-id">WF4-USR-003</span></div>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Department / BU <span class="req">*</span></label>
-              <select class="form-control"><option value="">Select department…</option><option>Credit Risk</option><option>Fraud</option><option>Marketing Analytics</option><option>Operations</option></select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Job Title</label>
-              <input type="text" class="form-control" placeholder="e.g. Model Risk Analyst">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Manager / Sponsor</label>
-              <input type="text" class="form-control" placeholder="Manager's name or email">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Role</label>
-              <input type="text" class="form-control" value="User" disabled style="background:#f1f5f9;color:#64748b">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Access Expiry Date <span style="color:#64748b;font-weight:400">(optional)</span> <span class="req-id">WF4-USR-006</span></label>
-            <input type="date" class="form-control" style="max-width:200px">
-            <div class="form-hint">If set, expiry warnings sent 7 days before and on day of expiry.</div>
-          </div>
-        </div>
-
-        <!-- Model scope — WF4-USR-004 -->
-        <div class="form-section">
-          <div class="form-section-title">Step 2: Model Access Scope <span class="req-id">WF4-USR-004</span></div>
-          <div class="tb" style="margin-bottom:8px">
-            <div class="tbl">
-              <div class="sb3"><input type="text" placeholder="Search Model ID, Name, Category, Domain…"></div>
-              <div class="fc"><select><option>All Categories</option><option>Credit Risk</option><option>Fraud Detection</option><option>Marketing</option></select></div>
-              <div class="fc"><select><option>All Domains</option><option>Retail Banking</option><option>Corporate</option></select></div>
-            </div>
-          </div>
-          <div class="chips">
-            <div class="chip">CR_CLF_001 — Credit Classifier v2 <span>×</span></div>
-            <div class="chip">FRD_CLF_012 — Fraud Classifier v3 <span>×</span></div>
-          </div>
-          <div class="dtw" style="max-height:160px;overflow-y:auto">
-            <table class="dt">
-              <thead><tr><th style="width:28px"><input type="checkbox"></th><th>Model ID</th><th>Model Name</th><th>Category</th><th>Domain</th><th>Status</th></tr></thead>
-              <tbody>
-                <tr><td><input type="checkbox" checked></td><td>CR_CLF_001</td><td>Credit Classifier v2</td><td>Credit Risk</td><td>Retail Banking</td><td><span class="badge b-green">Active</span></td></tr>
-                <tr><td><input type="checkbox" checked></td><td>FRD_CLF_012</td><td>Fraud Classifier v3</td><td>Fraud Detection</td><td>Retail Banking</td><td><span class="badge b-green">Active</span></td></tr>
-                <tr><td><input type="checkbox"></td><td>MKT_REG_004</td><td>Marketing Propensity v1</td><td>Marketing</td><td>Retail Banking</td><td><span class="badge b-green">Active</span></td></tr>
-                <tr><td><input type="checkbox"></td><td>CR_CLF_002</td><td>Credit Classifier v3</td><td>Credit Risk</td><td>Corporate</td><td><span class="badge b-green">Active</span></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-p">Review &amp; Submit →</button>
-          <button class="btn">Save as Draft <span class="req-id">WF4-USR-009</span></button>
-          <button class="btn" onclick="show('s2')">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- S5: PROVISION NEW ADMIN (DUAL-AUTH) -->
-<!-- ══════════════════════════════════════════════════════════════ -->
-<div class="screen" id="s5">
-  <div class="slabel">Screen 5 — Configure Roles: Provision New Admin (Dual-Admin Authorisation) <span class="ann">WF4-ADM-001 to 008</span></div>
-  <div class="shell">
-    <div class="aph">
-      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
-      <div class="aphr"><span class="rp">Admin</span><div class="nw" onclick="show('s13')">🔔<div class="nb2">5</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
-    </div>
-    <div class="ab">
-      <div class="ln">
-        <div class="lnt">Access Control</div>
-        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni on"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
-        <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
-        <div class="tni" onclick="show('s10')"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
-      </div>
-      <div class="mc">
-        <div class="bc"><a onclick="show('s1')">ACC</a> › <a onclick="show('s2')">Configure Roles</a> › Provision New Admin</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:12px">
-          <div><div class="pgt">Provision New Admin</div><div class="pgs">Requires dual-Admin authorisation — a second Admin must approve before the account is activated</div></div>
-          <button class="btn btn-sm" onclick="show('s2')">← Back</button>
-        </div>
-
-        <div class="alert alert-warn">🔒 <div><strong>Dual-Admin Authorisation Required:</strong> Submitting this form places the request in 'Pending Second Approval' state. All other active Admins (excluding you) will be notified to action it. Timeout: 5 business days. <span class="req-id">WF4-ADM-003, WF4-ADM-008</span></div></div>
-
-        <div class="form-section" style="border-color:#7c3aed">
-          <div class="form-section-title" style="color:#7c3aed">⚠ Admin Account — Elevated Privilege <span class="req-id">WF4-ADM-001</span></div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Full Name <span class="req">*</span></label>
-              <input type="text" class="form-control" placeholder="e.g. Tom Bradley">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Corporate Email / ID <span class="req">*</span></label>
-              <input type="text" class="form-control" placeholder="tom.bradley@corp.com">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Department / BU <span class="req">*</span></label>
-              <select class="form-control"><option>Technology</option><option>Risk</option><option>Operations</option></select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Job Title</label>
-              <input type="text" class="form-control" placeholder="e.g. Platform Administrator">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Role</label>
-            <input type="text" class="form-control" value="Admin (Full Platform Access — no model scope restriction)" disabled style="background:#f1f5f9;color:#64748b">
-            <div class="form-hint">Admins have full platform access. Model access scope does not apply. <span class="req-id">WF4-ADM-002</span></div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Second Approver Requirement <span class="req-id">WF4-ADM-005</span></label>
-            <select class="form-control">
-              <option>Any active Admin (other than submitter)</option>
-              <option>Designated Super-Admin only</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Pending approval view (second admin) -->
-        <div class="detail-panel" style="border-color:#f59e0b;background:#fffbeb">
-          <div class="detail-title">⏳ Pending Second Approval — Tom Bradley (ADM-PEND-004)</div>
-          <dl class="dl">
-            <dt>Submitted by</dt><dd>Sarah Chen (Admin)</dd>
-            <dt>Submitted</dt><dd>2026-05-07 10:15 IST</dd>
-            <dt>Days Pending</dt><dd style="color:#dc2626;font-weight:700">5 — expires today</dd>
-            <dt>Status</dt><dd><span class="badge b-amber">Pending 2nd Approval</span></dd>
-          </dl>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-p">✔ Approve (as 2nd Admin)</button>
-            <button class="btn btn-danger">✖ Reject</button>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-p" style="background:#7c3aed;border-color:#7c3aed">Submit for 2nd Admin Approval</button>
-          <button class="btn" onclick="show('s2')">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- S6: PROVISION NEW EXTERNAL -->
-<!-- ══════════════════════════════════════════════════════════════ -->
-<div class="screen" id="s6">
-  <div class="slabel">Screen 6 — Configure Roles: Provision New External <span class="ann">WF4-EXP-001 to 006</span></div>
-  <div class="shell">
-    <div class="aph">
-      <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
-      <div class="aphr"><span class="rp">Admin</span><div class="nw" onclick="show('s13')">🔔<div class="nb2">5</div></div><div class="up"><div class="ua">AD</div> Admin User ▾</div></div>
-    </div>
-    <div class="ab">
-      <div class="ln">
-        <div class="lnt">Access Control</div>
-        <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni on"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
-        <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
-        <div class="tni" onclick="show('s10')"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
-      </div>
-      <div class="mc">
-        <div class="bc"><a onclick="show('s1')">ACC</a> › <a onclick="show('s2')">Configure Roles</a> › Provision New External</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:12px">
-          <div><div class="pgt">Provision New External</div><div class="pgs">Directly onboard an External stakeholder with read-only platform access</div></div>
-          <button class="btn btn-sm" onclick="show('s2')">← Back</button>
-        </div>
-        <div class="form-section">
-          <div class="form-section-title">External Account Details</div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Full Name <span class="req">*</span></label>
-              <input type="text" class="form-control" placeholder="e.g. Anita Rao">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Corporate or External Email / ID <span class="req">*</span></label>
-              <input type="text" class="form-control" placeholder="anita.rao@external-org.com">
-              <div class="form-hint">External (non-corporate) domains accepted. Domain validation is advisory only (warning, not blocking). <span class="req-id">WF4-EXP-003</span></div>
-            </div>
-          </div>
-          <!-- Non-corporate email warning -->
-          <div class="alert alert-warn" style="margin-bottom:8px">⚠ <div>Non-corporate email domain detected. Email delivery to this address may have a higher bounce rate. An MX record check will be performed. <span class="req-id">OPN-W4-012</span></div></div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Organisation / Department <span class="req">*</span></label>
-              <input type="text" class="form-control" placeholder="e.g. External Audit Firm Ltd">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Stakeholder Type <span class="req">*</span></label>
-              <select class="form-control"><option value="">Select…</option><option>Auditor</option><option>Governance Reviewer</option><option>Business Stakeholder</option><option>External Reviewer</option></select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Role</label>
-            <input class="form-control" value="External (View-only — no edit, request, delete, or approval rights)" disabled style="background:#f1f5f9;color:#64748b">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Access Expiry Date <span style="color:#d97706;font-weight:400">(recommended)</span> <span class="req-id">WF4-EXP-002</span></label>
-            <input type="date" class="form-control" style="max-width:200px">
-          </div>
-        </div>
-        <div class="form-section">
-          <div class="form-section-title">Model Access Scope (View-only) <span class="req-id">WF4-EXP-004</span></div>
-          <div class="chips">
-            <div class="chip">CR_CLF_001 — Credit Classifier v2 <span>×</span></div>
-          </div>
-          <div class="dtw" style="max-height:120px;overflow-y:auto">
-            <table class="dt">
-              <thead><tr><th style="width:28px"><input type="checkbox"></th><th>Model ID</th><th>Model Name</th><th>Category</th><th>Status</th></tr></thead>
-              <tbody>
-                <tr><td><input type="checkbox" checked></td><td>CR_CLF_001</td><td>Credit Classifier v2</td><td>Credit Risk</td><td><span class="badge b-green">Active</span></td></tr>
-                <tr><td><input type="checkbox"></td><td>FRD_CLF_012</td><td>Fraud Classifier v3</td><td>Fraud Detection</td><td><span class="badge b-green">Active</span></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-p" style="background:#0891b2;border-color:#0891b2">Provision External Account</button>
-          <button class="btn" onclick="show('s2')">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════════ -->
 <!-- S7: MODEL ACCESS REQUEST QUEUE -->
 <!-- ══════════════════════════════════════════════════════════════ -->
 <div class="screen" id="s7">
@@ -848,18 +563,18 @@ textarea.form-control{resize:vertical;min-height:60px}
       <div class="ln">
         <div class="lnt">Access Control</div>
         <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni on"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div><div class="tit-s">Model Access &amp; Data Deletion</div></div><div class="tni-badge">4</div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div></div>
+        <div class="tni on"><div class="tio">📨</div><div class="tit"><div class="tit-t">Access Requests</div><div class="tit-s">Model Access &amp; Requests</div></div><div class="tni-badge">2</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">🗑️</div><div class="tit"><div class="tit-t">Data Delete Requests</div></div><div class="tni-badge">2</div></div>
         <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
         <div class="tni" onclick="show('s10')"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
       </div>
       <div class="mc">
-        <div class="bc"><a onclick="show('s1')">ACC</a> › Requests</div>
-        <div class="pgt">Requests</div>
-        <div class="pgs">Model access requests and data deletion requests from Users and Externals</div>
+        <div class="bc"><a onclick="show('s1')">ACC</a> › Access Requests</div>
+        <div class="pgt">Access Requests</div>
+        <div class="pgs">Model access requests from Users and Externals</div>
         <div class="tabs">
           <div class="tab on">Model Access Requests <span class="tab-badge">2</span></div>
-          <div class="tab" onclick="show('s8')">Data Deletion Requests <span class="tab-badge">2</span></div>
         </div>
         <div class="tb">
           <div class="tbl">
@@ -940,7 +655,7 @@ textarea.form-control{resize:vertical;min-height:60px}
 <!-- S8: DATA DELETION REQUEST QUEUE -->
 <!-- ══════════════════════════════════════════════════════════════ -->
 <div class="screen" id="s8">
-  <div class="slabel">Screen 8 — Requests: Data Deletion Request Queue &amp; Detail <span class="ann">WF4-DDR-001 to 010</span></div>
+  <div class="slabel">Screen 8 — Data Delete Requests <span class="ann">WF4-DDR-001 to 010</span></div>
   <div class="shell">
     <div class="aph">
       <div class="apb"><div class="apl">🏦</div> Model Monitoring Platform</div>
@@ -950,17 +665,17 @@ textarea.form-control{resize:vertical;min-height:60px}
       <div class="ln">
         <div class="lnt">Access Control</div>
         <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni on"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Access Requests</div></div><div class="tni-badge">2</div></div>
+        <div class="tni on"><div class="tio">🗑️</div><div class="tit"><div class="tit-t">Data Delete Requests</div></div><div class="tni-badge">2</div></div>
         <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
         <div class="tni" onclick="show('s10')"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
       </div>
       <div class="mc">
-        <div class="bc"><a onclick="show('s1')">ACC</a> › Requests</div>
-        <div class="pgt">Requests</div>
+        <div class="bc"><a onclick="show('s1')">ACC</a> › Data Delete Requests</div>
+        <div class="pgt">Data Delete Requests</div>
         <div class="pgs">Users raise data deletion requests; Admin is sole executor of all deletions</div>
         <div class="tabs">
-          <div class="tab" onclick="show('s7')">Model Access Requests <span class="tab-badge">2</span></div>
           <div class="tab on">Data Deletion Requests <span class="tab-badge">2</span></div>
         </div>
 
@@ -1063,8 +778,9 @@ textarea.form-control{resize:vertical;min-height:60px}
       <div class="ln">
         <div class="lnt">Access Control</div>
         <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Access Requests</div></div><div class="tni-badge">2</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">🗑️</div><div class="tit"><div class="tit-t">Data Delete Requests</div></div><div class="tni-badge">2</div></div>
         <div class="tni on"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
         <div class="tni" onclick="show('s10')"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
       </div>
@@ -1072,6 +788,10 @@ textarea.form-control{resize:vertical;min-height:60px}
         <div class="bc"><a onclick="show('s1')">ACC</a> › Manage Model Access</div>
         <div class="pgt">Manage Model Access</div>
         <div class="pgs">Model-centric view of all User and External assignments. Assign, remove, and manage access by model.</div>
+        <div class="tabs" style="margin-bottom:10px">
+          <div class="tab on">Model Assignment</div>
+          <div class="tab" onclick="show('s7')">Access Requests <span class="tab-badge">2</span></div>
+        </div>
 
         <!-- Model list — WF4-MMA-001, 002, 009 -->
         <div class="tb">
@@ -1244,8 +964,9 @@ textarea.form-control{resize:vertical;min-height:60px}
       <div class="ln">
         <div class="lnt">Access Control</div>
         <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Access Requests</div></div><div class="tni-badge">2</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">🗑️</div><div class="tit"><div class="tit-t">Data Delete Requests</div></div><div class="tni-badge">2</div></div>
         <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
         <div class="tni on"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
       </div>
@@ -1254,7 +975,6 @@ textarea.form-control{resize:vertical;min-height:60px}
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
           <div><div class="pgt">User Directory</div><div class="pgs">All platform accounts — Admin, User, and External</div></div>
           <div style="display:flex;gap:7px">
-            <button class="btn btn-sm" onclick="show('s4')">+ Provision User</button>
             <button class="btn btn-sm btn-p">⬇ Export Excel</button>
           </div>
         </div>
@@ -1356,8 +1076,9 @@ textarea.form-control{resize:vertical;min-height:60px}
       <div class="ln">
         <div class="lnt">Access Control</div>
         <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Access Requests</div></div><div class="tni-badge">2</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">🗑️</div><div class="tit"><div class="tit-t">Data Delete Requests</div></div><div class="tni-badge">2</div></div>
         <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
         <div class="tni on"><div class="tio">🚫</div><div class="tit"><div class="tit-t">User Directory</div></div></div>
       </div>
@@ -1491,8 +1212,9 @@ textarea.form-control{resize:vertical;min-height:60px}
       <div class="ln">
         <div class="lnt">Access Control</div>
         <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Access Requests</div></div><div class="tni-badge">2</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">🗑️</div><div class="tit"><div class="tit-t">Data Delete Requests</div></div><div class="tni-badge">2</div></div>
         <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
         <div class="tni on"><div class="tio">🔔</div><div class="tit"><div class="tit-t">Notifications</div></div></div>
       </div>
@@ -1545,16 +1267,7 @@ textarea.form-control{resize:vertical;min-height:60px}
             </div>
             <div class="notif-time">14:07 today</div>
           </div>
-          <!-- Pending Admin provisioning timeout warning — WF4-ADM-008 -->
-          <div class="notif-item unread">
-            <div class="notif-dot"></div>
-            <div class="notif-icon" style="background:#fee2e2">⏳</div>
-            <div class="notif-body">
-              <div class="notif-title">Admin Provisioning Request Expiring — Tom Bradley</div>
-              <div class="notif-sub">ADM-PEND-004 expires today (5 business day timeout). Second Admin approval required. <span class="req-id">WF4-ADM-008</span></div>
-            </div>
-            <div class="notif-time">09:00 today</div>
-          </div>
+
           <!-- Read notification -->
           <div class="notif-item">
             <div class="notif-dot read"></div>
@@ -1596,8 +1309,9 @@ textarea.form-control{resize:vertical;min-height:60px}
       <div class="ln">
         <div class="lnt">Access Control</div>
         <div class="tni" onclick="show('s1')"><div class="tio">🏠</div><div class="tit"><div class="tit-t">ACC Homepage</div></div></div>
-        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div><div class="tni-badge">5</div></div>
-        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Requests</div></div><div class="tni-badge">4</div></div>
+        <div class="tni" onclick="show('s2')"><div class="tio">👥</div><div class="tit"><div class="tit-t">Configure Roles</div></div></div>
+        <div class="tni" onclick="show('s7')"><div class="tio">📨</div><div class="tit"><div class="tit-t">Access Requests</div></div><div class="tni-badge">2</div></div>
+        <div class="tni" onclick="show('s8')"><div class="tio">🗑️</div><div class="tit"><div class="tit-t">Data Delete Requests</div></div><div class="tni-badge">2</div></div>
         <div class="tni" onclick="show('s9')"><div class="tio">🗂️</div><div class="tit"><div class="tit-t">Manage Model Access</div></div></div>
         <div class="tni on"><div class="tio">⏰</div><div class="tit"><div class="tit-t">Expiry Renewal</div></div></div>
       </div>
@@ -1668,6 +1382,15 @@ textarea.form-control{resize:vertical;min-height:60px}
 </div>
 
 <script>
+function showConfTab(tab, ev) {
+  var tabs = document.querySelectorAll('#s2 .tabs .tab');
+  tabs.forEach(function(t){ t.classList.remove('on'); });
+  if (ev && ev.target) ev.target.classList.add('on');
+  ['users','externals','deactivated'].forEach(function(t){
+    var el = document.getElementById('conf-tab-' + t);
+    if (el) el.style.display = (t === tab) ? 'block' : 'none';
+  });
+}
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));

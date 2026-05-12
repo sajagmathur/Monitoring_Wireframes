@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -139,6 +139,12 @@
   .pill-override { background: #e0e7ff; color: #3730a3; }
   .pill-pending { background: #fef3c7; color: #78350f; }
   .pill-delta-only { background: #f0fdf4; color: #166534; border: 1px solid #86efac; }
+  .pill-abs-delta { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; }
+
+  /* Metric hover tooltip */
+  .metric-tip { position: relative; cursor: help; }
+  .metric-tip::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 4px); left: 0; background: #1e293b; color: #f8fafc; padding: 6px 9px; border-radius: 5px; font-size: 10px; line-height: 1.45; white-space: normal; width: 230px; z-index: 9999; display: none; pointer-events: none; box-shadow: 0 3px 8px rgba(0,0,0,.25); }
+  .metric-tip:hover::after { display: block; }
 
   /* Model selector */
   .model-table-wrap { background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
@@ -694,7 +700,7 @@
                 <tr class="subtype-row"><td colspan="10">Classification Performance</td></tr>
                 <tr>
                   <td><input type="checkbox" class="metric-checkbox" checked></td>
-                  <td><strong>Accuracy</strong></td><td>Class. Performance</td>
+                  <td class="metric-tip" data-tip="Proportion of all instances correctly classified. Equal weighting; can mislead on imbalanced classes."><strong>Accuracy</strong></td><td>Class. Performance</td>
                   <td><select class="dir-select"><option>Higher ▾</option></select></td>
                   <td><input class="threshold-input readonly" value="0.70" readonly></td>
                   <td><input class="threshold-input readonly" value="0.65" readonly></td>
@@ -705,7 +711,7 @@
                 </tr>
                 <tr>
                   <td><input type="checkbox" class="metric-checkbox" checked></td>
-                  <td><strong>Precision</strong></td><td>Class. Performance</td>
+                  <td class="metric-tip" data-tip="Of all predicted positives, the fraction truly positive. High precision = fewer false alarms."><strong>Precision</strong></td><td>Class. Performance</td>
                   <td><select class="dir-select"><option>Higher ▾</option></select></td>
                   <td><input class="threshold-input readonly" value="0.35" readonly></td>
                   <td><input class="threshold-input readonly" value="0.25" readonly></td>
@@ -716,7 +722,7 @@
                 </tr>
                 <tr>
                   <td><input type="checkbox" class="metric-checkbox" checked></td>
-                  <td><strong>Recall</strong></td><td>Class. Performance</td>
+                  <td class="metric-tip" data-tip="Of all actual positives, the fraction correctly identified. High recall = fewer missed cases."><strong>Recall</strong></td><td>Class. Performance</td>
                   <td><select class="dir-select"><option>Higher ▾</option></select></td>
                   <td><input class="threshold-input readonly" value="0.45" readonly></td>
                   <td><input class="threshold-input readonly" value="0.35" readonly></td>
@@ -727,7 +733,7 @@
                 </tr>
                 <tr>
                   <td><input type="checkbox" class="metric-checkbox" checked></td>
-                  <td><strong>F1 Score</strong></td><td>Class. Performance</td>
+                  <td class="metric-tip" data-tip="Harmonic mean of Precision and Recall. Best used when class distribution is uneven."><strong>F1 Score</strong></td><td>Class. Performance</td>
                   <td><select class="dir-select"><option>Higher ▾</option></select></td>
                   <td><input class="threshold-input readonly" value="0.35" readonly></td>
                   <td><input class="threshold-input readonly" value="0.25" readonly></td>
@@ -738,7 +744,7 @@
                 </tr>
                 <tr>
                   <td><input type="checkbox" class="metric-checkbox" checked></td>
-                  <td><strong>Type 1 Error</strong></td><td>Class. Performance</td>
+                  <td class="metric-tip" data-tip="False Positive Rate — proportion of negatives incorrectly classified as positive. Rejects qualifying applicants."><strong>Type 1 Error</strong></td><td>Class. Performance</td>
                   <td><select class="dir-select"><option>Lower ▾</option></select></td>
                   <td><input class="threshold-input readonly" value="0.40" readonly></td>
                   <td><input class="threshold-input readonly" value="0.50" readonly></td>
@@ -749,7 +755,7 @@
                 </tr>
                 <tr>
                   <td><input type="checkbox" class="metric-checkbox" checked></td>
-                  <td><strong>Type 2 Error</strong></td><td>Class. Performance</td>
+                  <td class="metric-tip" data-tip="False Negative Rate — proportion of positives incorrectly classified as negative. Approves high-risk cases."><strong>Type 2 Error</strong></td><td>Class. Performance</td>
                   <td><select class="dir-select"><option>Lower ▾</option></select></td>
                   <td><input class="threshold-input readonly" value="0.40" readonly></td>
                   <td><input class="threshold-input readonly" value="0.50" readonly></td>
@@ -763,13 +769,13 @@
           </div></div>
         </div>
 
-        <!-- CONCEPT DRIFT — delta only, no absolute threshold fields -->
+        <!-- CONCEPT DRIFT -- absolute and delta threshold fields supported -->
         <div class="kpi-section">
           <div class="kpi-section-header kpi-concept-drift">
-            🧠 Concept Drift <span class="kpi-count">3 metrics — delta thresholds only</span>
+            🧠 Concept Drift <span class="kpi-count">3 metrics</span>
           </div>
           <div class="info-banner" style="border-radius:0;margin-bottom:0;border-left:none;border-right:none;border-top:1px dashed #86efac;">
-            ℹ️ Concept Drift metrics have no absolute thresholds. Only delta (relative change) thresholds apply. Metrics without delta values configured are still computed and displayed as raw values without RAG status.
+            ℹ️ Concept Drift metrics support both Absolute and Delta threshold modes. Absolute threshold fields default to “Not set” until configured. Metrics without delta values are still computed and displayed as raw values without RAG status.
           </div>
           <div class="table-scroll"><div class="metric-table-wrap">
             <table class="metric-table">
@@ -789,36 +795,36 @@
                 <tr class="subtype-row"><td colspan="10">Explainability</td></tr>
                 <tr>
                   <td><input type="checkbox" class="metric-checkbox" checked></td>
-                  <td><strong>IV — Feature Level</strong></td>
+                  <td class="metric-tip" data-tip="Information Value per feature — measures predictive power. IV &lt;0.02: unpredictive; 0.02–0.1: weak; 0.1–0.3: medium; &gt;0.3: strong predictor."><strong>IV — Feature Level</strong></td>
                   <td>Explainability</td>
                   <td><select class="dir-select"><option>Higher ▾</option></select></td>
-                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
-                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
-                  <td><span class="pill pill-delta-only">Delta only</span></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly style="width:90px;"></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly style="width:90px;"></td>
+                  <td><span class="pill pill-abs-delta">Abs + Delta</span></td>
                   <td><input class="threshold-input readonly" value="0.10" readonly></td>
                   <td><input class="threshold-input readonly" value="0.20" readonly></td>
                   <td class="rag-rule"><span class="rag-r"></span>Δ≥0.20 &nbsp;<span class="rag-a"></span>Δ≥0.10</td>
                 </tr>
                 <tr>
                   <td><input type="checkbox" class="metric-checkbox" checked></td>
-                  <td><strong>Feature Importance — Feature Level</strong></td>
+                  <td class="metric-tip" data-tip="Relative contribution per feature to model output. A drift in importance rankings may signal data distribution or concept shifts."><strong>Feature Importance — Feature Level</strong></td>
                   <td>Explainability</td>
                   <td><select class="dir-select"><option>Higher ▾</option></select></td>
-                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
-                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
-                  <td><span class="pill pill-delta-only">Delta only</span></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly style="width:90px;"></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly style="width:90px;"></td>
+                  <td><span class="pill pill-abs-delta">Abs + Delta</span></td>
                   <td><input class="threshold-input not-set" value="Not set" readonly></td>
                   <td><input class="threshold-input not-set" value="Not set" readonly></td>
                   <td class="rag-rule"><span class="no-thresh-label">No threshold — raw value only</span></td>
                 </tr>
                 <tr>
                   <td><input type="checkbox" class="metric-checkbox" checked></td>
-                  <td><strong>SHAP — Feature Level</strong></td>
+                  <td class="metric-tip" data-tip="SHapley Additive exPlanations — game-theoretic marginal contribution per feature per prediction. Direction and magnitude of SHAP shift are both informative."><strong>SHAP — Feature Level</strong></td>
                   <td>Explainability</td>
                   <td><select class="dir-select"><option>Higher ▾</option></select></td>
-                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
-                  <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
-                  <td><span class="pill pill-delta-only">Delta only</span></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly style="width:90px;"></td>
+                  <td><input class="threshold-input not-set" value="Not set" readonly style="width:90px;"></td>
+                  <td><span class="pill pill-abs-delta">Abs + Delta</span></td>
                   <td><input class="threshold-input not-set" value="Not set" readonly></td>
                   <td><input class="threshold-input not-set" value="Not set" readonly></td>
                   <td class="rag-rule"><span class="no-thresh-label">No threshold — raw value only</span></td>
@@ -834,7 +840,7 @@
   <div class="annotation">
     <strong>📝 Note (WF3-DTL-001 to 012, WF3-THR-001 to 008, WF3-NTH-001 to 005):</strong>
     Only ✓ metrics for this family are shown — no inapplicable rows displayed (WF3-DTL-002).
-    Concept Drift metrics show "Not applicable" for absolute fields and delta fields only (WF3-DTL-005, WF3-THR-002).
+    Concept Drift metrics support both Absolute and Delta threshold modes; absolute fields default to "Not set" until configured (WF3-DTL-005, WF3-THR-002).
     Feature Importance and SHAP show "Not set" in amber — computed without RAG status (WF3-NTH-005).
     PDO thresholds: Warning=0.20, Breach=0.25 (confirmed values).
     Note: KS is not shown for CR_Continuous_Account level_Cross sectional — this screen shows the Classification family only.
@@ -1082,7 +1088,7 @@
           </div>
 
           <div class="kpi-section" style="margin-top:10px;">
-            <div class="kpi-section-header kpi-concept-drift">🧠 Concept Drift — delta thresholds only (edit mode)</div>
+            <div class="kpi-section-header kpi-concept-drift">🧠 Concept Drift — supports Absolute and Delta threshold modes (edit mode)</div>
             <div class="table-scroll"><div class="metric-table-wrap">
               <table class="metric-table">
                 <thead><tr>
@@ -1099,10 +1105,10 @@
                 <tbody>
                   <tr>
                     <td><input type="checkbox" class="metric-checkbox" checked></td>
-                    <td><strong>IV — Feature Level</strong></td>
+                    <td class="metric-tip" data-tip="Information Value per feature — measures predictive power. IV &lt;0.02: unpredictive; 0.02–0.1: weak; 0.1–0.3: medium; &gt;0.3: strong predictor."><strong>IV — Feature Level</strong></td>
                     <td><select class="dir-select"><option>Higher ▾</option></select></td>
-                    <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
-                    <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                    <td><input class="threshold-input not-set" value="Not set" style="width:90px;"></td>
+                    <td><input class="threshold-input not-set" value="Not set" style="width:90px;"></td>
                     <td><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
                     <td><input class="threshold-input" value="0.10"></td>
                     <td><input class="threshold-input" value="0.20"></td>
@@ -1110,10 +1116,10 @@
                   </tr>
                   <tr>
                     <td><input type="checkbox" class="metric-checkbox" checked></td>
-                    <td><strong>SHAP — Feature Level</strong></td>
+                    <td class="metric-tip" data-tip="SHapley Additive exPlanations — game-theoretic marginal contribution per feature per prediction. Direction and magnitude of SHAP shift are both informative."><strong>SHAP — Feature Level</strong></td>
                     <td><select class="dir-select"><option>Higher ▾</option></select></td>
-                    <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
-                    <td><input class="threshold-input na-field" value="Not applicable" disabled style="width:90px;"></td>
+                    <td><input class="threshold-input not-set" value="Not set" style="width:90px;"></td>
+                    <td><input class="threshold-input not-set" value="Not set" style="width:90px;"></td>
                     <td><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
                     <td><input class="threshold-input not-set" value="Not set" readonly></td>
                     <td><input class="threshold-input not-set" value="Not set" readonly></td>
@@ -1134,7 +1140,7 @@
     </div>
   </div>
   <div class="annotation">
-    <strong>📝 Note (WF3-OVR-001 to 007, WF3-THR-002, WF3-NTH-003):</strong> Only metrics applicable to this family shown — no inapplicable rows. Concept Drift metrics show "Not applicable" for absolute fields in edit mode (WF3-THR-002). "Override Active" badge on MDL-002. Modified rows highlighted amber with Reset button. Family default unchanged for other 18 models (WF3-OVR-005).
+    <strong>📝 Note (WF3-OVR-001 to 007, WF3-THR-002, WF3-NTH-003):</strong> Only metrics applicable to this family shown — no inapplicable rows. Concept Drift metrics support Absolute and Delta threshold modes; absolute fields default to "Not set" until configured (WF3-THR-002). "Override Active" badge on MDL-002. Modified rows highlighted amber with Reset button. Family default unchanged for other 18 models (WF3-OVR-005).
   </div>
 </div>
 
