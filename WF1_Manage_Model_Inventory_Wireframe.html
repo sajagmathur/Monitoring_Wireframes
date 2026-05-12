@@ -918,7 +918,6 @@
   <button class="nav-btn" onclick="showScreen('bulk-upload', this)">3. Bulk Upload</button>
   <button class="nav-btn" onclick="showScreen('bulk-preview', this)">4. Validation Preview</button>
   <button class="nav-btn" onclick="showScreen('bulk-result', this)">5. Upload Result</button>
-  <button class="nav-btn" onclick="showScreen('config-cat', this)">6. Category Labels</button>
   <button class="nav-btn" onclick="showScreen('add-data', this)">7. Add Data</button>
   <button class="nav-btn" onclick="showScreen('delete-confirm', this)">8. Delete Confirm</button>
   <button class="nav-btn" onclick="showScreen('archived-list', this)">9. Archived List</button>
@@ -1028,7 +1027,6 @@
             <div class="filter-chip">⏱️ Due Date / Time ▾</div>
           </div>
           <div class="toolbar-right">
-            <button class="btn" onclick="showScreen('config-cat', null)">⚙️ Category Labels</button>
             <button class="btn">📥 Download Template</button>
             <button class="btn">📤 Export Inventory</button>
             <div class="upload-dropdown">
@@ -1327,7 +1325,6 @@
         <!-- Classification -->
         <div class="form-section">
           <div class="form-section-title">1. Classification</div>
-          <div class="form-section-desc">Default labels are Geography, Domain, Product. Edit labels via "Configure Category Labels".</div>
           <div class="form-grid cols-3">
             <div class="form-group">
               <label>Geography <span class="req">*</span></label>
@@ -1780,103 +1777,6 @@
 
   <div class="annotation">
     <strong>📝 Note (WF2-BLK-009, WF2-AUD-001):</strong> Confirmation screen showing ingestion summary with audit reference. Both an Error Report and an Ingestion Log can be downloaded. The audit-log entry captures file, counts, Admin, timestamp, and the active label set at upload.
-  </div>
-</div>
-
-<!-- ============================================================= -->
-<!-- ===== SCREEN 6: CATEGORY LABEL CONFIGURATION             ===== -->
-<!-- ============================================================= -->
-<div id="config-cat" class="screen">
-  <span class="screen-label">Screen 6 — Configure Category Labels</span>
-  <div class="app-shell">
-    <div class="app-header">
-      <div class="app-brand"><div class="app-brand-logo">📊</div><div>Model Monitoring Platform</div></div>
-      <div class="app-header-right">
-        <div class="role-pill">👤 ADMIN</div>
-        <div class="user-pill"><div class="user-avatar">JD</div><span>John Doe</span></div>
-      </div>
-    </div>
-
-    <div class="app-body">
-      <div class="left-nav">
-        <div class="nav-section-title">Admin Console</div>
-        <div class="tile-nav-item active"><div class="tile-icon">📋</div><div class="tile-text"><div class="tile-title">Manage Model Inventory</div></div></div>
-      </div>
-
-      <div class="main-content">
-        <div class="breadcrumb"><a href="#" onclick="showScreen('inv-list', null); return false;">Manage Model Inventory</a> &nbsp;›&nbsp; Configure Category Labels</div>
-        <h2 class="page-title">Configure Category Labels</h2>
-        <p class="page-subtitle">Rename the three classification fields to match your taxonomy.</p>
-
-        <div class="warn-banner" style="margin-bottom: 18px;">
-          ⚠️ <strong>Going-forward only:</strong> Label changes apply to <strong>newly registered models only</strong>. The 142 existing models retain their current labels (Geography / Domain / Product). The downloadable template will use the new labels immediately.
-        </div>
-
-        <div class="form-section">
-          <div class="form-section-title">Current Label Configuration</div>
-          <div class="form-section-desc">Maximum 30 characters per label. Alphanumeric, spaces, and hyphens allowed.</div>
-
-          <div class="form-grid cols-3">
-            <div class="form-group">
-              <label>Category (current: <strong>Geography</strong>)</label>
-              <input type="text" value="Geography">
-              <div class="help">Default: Geography</div>
-            </div>
-            <div class="form-group">
-              <label>Sub Category 1 (current: <strong>Domain</strong>)</label>
-              <input type="text" value="Domain">
-              <div class="help">Default: Domain</div>
-            </div>
-            <div class="form-group">
-              <label>Sub Category 2 (current: <strong>Product</strong>)</label>
-              <input type="text" value="Product">
-              <div class="help">Default: Product</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="form-section-title">Impact Preview</div>
-          <table class="data-table">
-            <thead>
-              <tr><th>Item</th><th>Current</th><th>After Save</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>New models registered after save</td>
-                <td>Geography / Domain / Product</td>
-                <td><strong style="color:#16a34a;">[New labels you set above]</strong></td>
-              </tr>
-              <tr>
-                <td>Existing 142 active models</td>
-                <td>Geography / Domain / Product</td>
-                <td><strong style="color:#64748b;">Unchanged (historical labels preserved)</strong></td>
-              </tr>
-              <tr>
-                <td>Downloadable template</td>
-                <td>Header row uses Geography / Domain / Product</td>
-                <td><strong style="color:#16a34a;">Header row uses new labels</strong></td>
-              </tr>
-              <tr>
-                <td>Bulk upload schema</td>
-                <td>Validates Geography / Domain / Product columns</td>
-                <td><strong style="color:#16a34a;">Validates new labels</strong></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="form-actions">
-          <button class="btn">↺ Reset to Defaults</button>
-          <button class="btn" onclick="showScreen('inv-list', null)">Cancel</button>
-          <button class="btn-warn btn">💾 Save Changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="annotation">
-    <strong>📝 Note (WF2-CAT-001 to 009):</strong> Label rename is going-forward only (per stakeholder decision #5). Existing models keep their historical labels — their label-set version is persisted on every record. The View Details panel renders each model with its correct labels. Save is audit-logged with previous/new labels and the count of unaffected models.
   </div>
 </div>
 
